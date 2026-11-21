@@ -8,6 +8,16 @@ people. You add a card; there's nothing to configure per entity.
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![License](https://img.shields.io/badge/License-MIT-lightgrey.svg?style=for-the-badge)](LICENSE)
 
+![The Home dashboard on a desktop](docs/images/home-dark.png)
+
+<p align="center">
+  <img src="docs/images/phone.png" alt="The Home dashboard on a phone" width="270">
+  &nbsp;
+  <img src="docs/images/wall-panel.png" alt="A wall panel" width="540">
+</p>
+
+<sub>Screenshots of the demo house (`bun run demo`).</sub>
+
 ## The cards
 
 | Card | For |

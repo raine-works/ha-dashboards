@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/raine-works/ha-dashboards/tree/master/docs
+    about: Installation, the cards, wall panels, and references to every module, option and action

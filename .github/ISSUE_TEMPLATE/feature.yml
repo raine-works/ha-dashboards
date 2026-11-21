@@ -1,0 +1,19 @@
+name: Idea
+description: A feature, a device the dashboards should support, or a better way to do something
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: What would it let you do?
+  - type: textarea
+    id: devices
+    attributes:
+      label: Devices or integrations involved
+      description: The Home Assistant integrations (and entity types) it would need

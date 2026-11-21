@@ -6,6 +6,8 @@ Both cards are whole dashboards: put one in a `panel: true` view, alone.
 
 For desktops, laptops and phones (the Companion app included).
 
+![The Home dashboard in light mode](images/home-light.png)
+
 - **Wide screens** (1024px and up): the header (clock, weather, calendar, what's open, music,
   people and pets, and a More menu) over Lighting, Security and Climate side by side, each column
   scrolling on its own.
@@ -24,6 +26,8 @@ For desktops, laptops and phones (the Companion app included).
 ## `custom:wall-panel-dashboard`
 
 For a tablet on the wall. See [Wall panels](wall-panels.md).
+
+![A wall panel](images/wall-panel.png)
 
 | Option | | |
 | :--- | :--- | :--- |
