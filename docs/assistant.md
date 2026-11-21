@@ -42,5 +42,29 @@ tokens).
 `packages/mcp/src/index.ts`. Instead of `env`, the server reads `HA_URL` and `HA_TOKEN` from the
 repository's `.env`.
 
+**From your own configuration repository**: if you keep your Home Assistant configuration in Git
+(with [GitOps](https://github.com/raine-works/ha-gitops), say), add this repository as a submodule
+and point the server at it, so the assistant has it wherever you work on your house:
+
+```bash
+git submodule add https://github.com/raine-works/ha-dashboards.git ha-dashboards
+(cd ha-dashboards && bun install)
+```
+
+```json
+{
+  "mcpServers": {
+    "raineworks-dashboards": {
+      "command": "bun",
+      "args": ["--cwd", "ha-dashboards", "packages/mcp/src/index.ts"],
+      "env": { "HA_URL": "https://homeassistant.example.com", "HA_TOKEN": "${HOMEASSISTANT_TOKEN}" }
+    }
+  }
+}
+```
+
+Keep the token in an environment variable, as here, so `.mcp.json` can be committed with nothing
+secret in it.
+
 Then ask something like "Set up Raineworks Dashboards on my Home Assistant": it starts from
 `integration_status` and works through what's missing.
