@@ -7,7 +7,7 @@ laid out, how it's built, and the rules it keeps.
 
 ```text
 ha-dashboards/
-├── custom_components/raineworks_dashboards/   # the Home Assistant integration (Python, HACS)
+├── custom_components/raineworks_dashboards/   # the Home Assistant integration (Python, the Home Assistant Marketplace)
 ├── tests/                                     # the integration's tests (pytest)
 ├── packages/                                  # Bun workspaces
 │   ├── ui/            # @app/ui: every section, dialog and primitive the cards share

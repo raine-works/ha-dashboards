@@ -44,5 +44,5 @@ integration's options or actions (a test fails until you do).
 ## Releasing
 
 Bump `version` in `custom_components/raineworks_dashboards/manifest.json` on `master`. Once the tests
-pass, the release workflow builds the bundle into the integration and publishes the release HACS
-installs.
+pass, the release workflow builds the bundle into the integration and publishes the release the Home
+Assistant Marketplace installs.

@@ -17,7 +17,7 @@ body:
     id: version
     attributes:
       label: Raineworks Dashboards version
-      description: Settings → Devices & services → Raineworks Dashboards, or HACS
+      description: Settings → Devices & services → Raineworks Dashboards, or the Marketplace
     validations:
       required: true
   - type: input

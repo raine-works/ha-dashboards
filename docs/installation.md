@@ -1,11 +1,15 @@
 # Installation
 
-You need Home Assistant 2026.10 or later and [HACS](https://hacs.xyz) (the Marketplace on 2026.11+).
+You need Home Assistant 2026.11 or later, whose Home Assistant Marketplace installs it (on 2026.10,
+HACS, the Marketplace before it was built in, does the same).
 
 ## 1. The integration
 
-1. In HACS, add `https://github.com/raine-works/ha-dashboards` as a custom repository of type
-   **Integration**, then install **Raineworks Dashboards**.
+[![Open your Home Assistant instance and open this repository in the Home Assistant Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=raine-works&repository=ha-dashboards&category=integration)
+
+1. Open this repository in the Home Assistant Marketplace with the button above, or open the
+   Marketplace (Settings → Marketplace) and add `https://github.com/raine-works/ha-dashboards` as a
+   custom repository of type **Integration**. Download **Raineworks Dashboards**.
 2. Restart Home Assistant.
 3. Settings → Devices & services → **Add integration** → **Raineworks Dashboards**.
 

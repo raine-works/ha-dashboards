@@ -1,3 +1,5 @@
+<img src="custom_components/raineworks_dashboards/brand/icon@2x.png" alt="" width="96" align="right">
+
 # Raineworks Dashboards
 
 Dashboards for Home Assistant that work like an app: one for desktops and phones, and one for wall
@@ -5,7 +7,7 @@ tablets. Built with Preact, shadcn/ui and Tailwind CSS, they discover your house
 lights by room and floor, locks, garage doors, cameras, thermostats, curtains, fans, music, TVs and
 people. You add a card; there's nothing to configure per entity.
 
-[![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
+[![Home Assistant Marketplace](https://img.shields.io/badge/Home_Assistant-Marketplace-41BDF5.svg?style=for-the-badge)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=raine-works&repository=ha-dashboards&category=integration)
 [![License](https://img.shields.io/badge/License-MIT-lightgrey.svg?style=for-the-badge)](LICENSE)
 
 ![The Home dashboard on a desktop](docs/images/home-dark.png)
@@ -49,9 +51,12 @@ the way when it doesn't:
 
 ## Installation
 
-1. **The integration.** In HACS, add `https://github.com/raine-works/ha-dashboards` as a custom
-   repository (Integration) and install **Raineworks Dashboards**. Restart Home Assistant, then add
-   it under Settings → Devices & services. It serves the cards on every page, so there's no Lovelace
+[![Open your Home Assistant instance and open this repository in the Home Assistant Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=raine-works&repository=ha-dashboards&category=integration)
+
+1. **The integration.** Open this repository in the Home Assistant Marketplace with the button (or
+   add `https://github.com/raine-works/ha-dashboards` there as a custom repository of type
+   Integration) and download **Raineworks Dashboards**. Restart Home Assistant, then add it under
+   Settings → Devices & services. It serves the cards on every page, so there's no Lovelace
    resource to add.
 2. **A dashboard.** Settings → Dashboards → Add dashboard → New dashboard from scratch, then edit it
    in YAML mode:

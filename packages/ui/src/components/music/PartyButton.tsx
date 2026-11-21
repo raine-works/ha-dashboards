@@ -222,7 +222,7 @@ export const PartyButton: React.FC<{ size?: ButtonProps['size'] }> = ({ size = '
 								<AlertDescription>
 									{link.status === 200
 										? 'Turn on "Enable Guest Access via QR Code" in Music Assistant: Settings, Plugins, Party.'
-										: 'Install raine-works/ha-music-assistant from HACS: it replaces the Music Assistant integration with one that has it.'}
+										: 'Install raine-works/ha-music-assistant from the Home Assistant Marketplace: it replaces the Music Assistant integration with one that has it.'}
 								</AlertDescription>
 							</Alert>
 						)}

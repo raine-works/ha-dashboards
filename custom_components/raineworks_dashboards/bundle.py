@@ -1,8 +1,9 @@
 """The dashboards bundle this integration serves.
 
 One folder is served, /config/raineworks_dashboards/www (outside the integration's own
-folder, which HACS replaces on an update): the bundle (`dashboards-<hash>.js`), the
-chunks it loads on demand (`chunk-<hash>.js`), each with .br / .gz copies, and
+folder, which the Marketplace replaces on an update): the bundle
+(`dashboards-<hash>.js`), the chunks it loads on demand (`chunk-<hash>.js`), each
+with .br / .gz copies, and
 `version.json` naming the bundle, which the dashboards read to notice a newer one. A
 release's packaged www/ is copied in when it's newer than what's served (by its build
 time), and `bun run build` uploads a build straight into it (an admin's upload,

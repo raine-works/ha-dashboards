@@ -1,5 +1,5 @@
 // Renders the integration's brand icons (custom_components/raineworks_dashboards/brand/icon.png,
-// 256px, and icon@2x.png, 512px: what Home Assistant and HACS show) from assets/logo.svg, with
+// 256px, and icon@2x.png, 512px: what Home Assistant and its Marketplace show) from assets/logo.svg, with
 // headless Chrome on a transparent background (`bun scripts/render-brand.ts`; CHROME overrides the
 // browser's path). Run again after changing the SVG, and commit the PNGs.
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';

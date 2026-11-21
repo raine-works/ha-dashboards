@@ -114,7 +114,7 @@ export function setupTools(connect: Connect): Tool[] {
 						dashboards: dashboards.map((d) => ({ url_path: d.url_path, title: d.title, mode: d.mode })),
 						next: entries.length
 							? undefined
-							: 'Install "Raineworks Dashboards" from HACS (custom repository https://github.com/raine-works/ha-dashboards), restart, then add the integration.',
+							: 'Install "Raineworks Dashboards" from the Home Assistant Marketplace (Settings → Marketplace; custom repository https://github.com/raine-works/ha-dashboards), restart, then add the integration.',
 					});
 				}),
 		},
