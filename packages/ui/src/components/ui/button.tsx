@@ -72,6 +72,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 					ref={ref}
 					type="button"
 					data-slot="button"
+					data-variant={variant ?? 'default'}
+					data-size={size ?? 'default'}
 					className={cn(buttonVariants({ variant, size, className }))}
 					onClick={onClick}
 					{...props}
@@ -85,6 +87,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 				ref={ref}
 				type="button"
 				data-slot="button"
+				data-variant={variant ?? 'default'}
+				data-size={size ?? 'default'}
 				data-loading={loading || undefined}
 				aria-busy={loading || undefined}
 				className={cn(buttonVariants({ variant, size, className }), 'relative')}

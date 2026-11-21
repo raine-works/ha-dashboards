@@ -20,7 +20,8 @@ For desktops, laptops and phones (the Companion app included).
 
 | Option | | |
 | :--- | :--- | :--- |
-| `color_scheme` | `auto` (default), `light`, `dark` | `auto` follows Home Assistant's theme mode; the card's Appearance picker sets that for this browser |
+| `color_scheme` | `auto` (default), `light`, `dark` | `auto` follows Home Assistant's theme mode; the card's Appearance dialog sets that |
+| `theme` | a theme id | This dashboard in that theme whatever's picked ([Themes](themes.md)) |
 | `house` | see below | House settings, over the integration's |
 
 ## `custom:wall-panel-dashboard`
@@ -35,6 +36,7 @@ For a tablet on the wall. See [Wall panels](wall-panels.md).
 | `floor` | a floor id | Its floor's lights first |
 | `timer` | `true` | A countdown timer in the header, announced on the house's speaker when it ends |
 | `color_scheme` | `dark` (default), `light`, `auto` | |
+| `theme` | a theme id | This panel in that theme ([Themes](themes.md)) |
 | `house` | see below | |
 
 ## The `house` settings

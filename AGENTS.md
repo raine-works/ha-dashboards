@@ -9,7 +9,6 @@ laid out, how it's built, and the rules it keeps.
 ha-dashboards/
 ├── custom_components/raineworks_dashboards/   # the Home Assistant integration (Python, HACS)
 ├── tests/                                     # the integration's tests (pytest)
-├── theme/blackout.yaml                        # a Home Assistant theme matching the dashboards' tokens
 ├── packages/                                  # Bun workspaces
 │   ├── ui/            # @app/ui: every section, dialog and primitive the cards share
 │   │   └── src/
@@ -53,6 +52,29 @@ bun run report          # which modules a real Home Assistant would show
 - **Dependencies** come from the root `catalog`, pinned to exact versions (`dependencies.test.ts`).
 - **Releases:** bumping `custom_components/raineworks_dashboards/manifest.json`'s version on master
   publishes a release (after the tests pass) whose zip carries the built bundle.
+
+## Themes
+
+A theme is data (`packages/ui/src/themes`): shadcn's tokens for light and dark, the status,
+chart and sidebar colors, and optional effects (a two-color gradient, edges, glow). Presets in
+`themes/presets/` (Raineworks, the default; Neutral; Blue, Green, Orange, Rose, Violet).
+
+- **The dashboards**: the card writes the active theme's tokens into its ShadowRoot
+  (`themes/css.ts`) and its effects as `data-effects` on the mount point, which the effect styles
+  at the end of `styles/theme.css` key off (gradient edges on primary buttons, selected toggles and
+  active tabs; cards' edges on hover or focus; the glow; the header's hairline). The active theme
+  (`themes/catalog.ts`): a card's `theme` option, else the theme Home Assistant applies when it's
+  one of ours, else the house theme.
+- **Home Assistant**: each theme becomes a full Home Assistant theme (`themes/ha-theme.ts`: hex
+  where the Companion apps or `--rgb-*` need it, the primary palette, cards, inputs), written to
+  the integration's `themes.json` by `bun scripts/themes.ts` (a test fails when it's stale). The
+  integration (`themes.py`) registers them at runtime, again after `frontend.reload_themes`, makes
+  the house theme (its Theme option) the default, and keeps custom themes (each person's own, or an
+  administrator's for the house).
+- **Picking**: the Appearance dialog (`components/appearance/`) saves a person's theme to their
+  Home Assistant profile (a `settheme` event, as Home Assistant's Profile page does).
+- Statuses keep their own colors in every theme; the gradient is decoration, never a status.
+  Effects can't use `@property` (it doesn't work in a ShadowRoot): edges fade with opacity.
 
 ## No house in the source
 

@@ -64,7 +64,10 @@ const PanelHeaderContent: React.FC<PanelHeaderProps> = ({
 	const divider = <Separator orientation="vertical" className="data-[orientation=vertical]:h-10" />;
 
 	return (
-		<Card className="flex-row items-center justify-between gap-3 px-6 py-4 max-xl:gap-2 max-xl:p-3">
+		<Card
+			data-panel-header=""
+			className="flex-row items-center justify-between gap-3 px-6 py-4 max-xl:gap-2 max-xl:p-3"
+		>
 			{/* Left: Clock, Greeting & Date (calendar), Weather */}
 			{/* Keeps its width: the music button is what gives way */}
 			<div className="flex shrink-0 items-center gap-6 max-xl:gap-2.5">

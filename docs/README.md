@@ -4,6 +4,7 @@
 | :--- | :--- |
 | [Installation](installation.md) | The integration, your first dashboard, labeling lights |
 | [The cards](cards.md) | `custom:home-dashboard` and `custom:wall-panel-dashboard`, their options, and the `house` settings |
+| [Themes](themes.md) | Picking a theme, the house theme, a theme for one dashboard |
 | [Wall panels](wall-panels.md) | Tablets on the wall: their hardware, the status light, a shared user |
 | [Setting up with an assistant](assistant.md) | The setup MCP server: let Claude or another assistant check and set up your Home Assistant |
 | [Development](development.md) | Running the demo, building, testing and releasing |
