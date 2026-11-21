@@ -5,6 +5,7 @@ import {
 	Lock,
 	type LucideIcon,
 	Shield,
+	ShieldOff,
 	Square,
 	TriangleAlert,
 	Unlock,
@@ -14,7 +15,7 @@ import {
 import type React from 'preact/compat';
 import { useEffect, useState } from 'preact/compat';
 import { CONFIRM_TIMEOUT_MS, useHassApi, useHassSelector } from '../../context/HassContext';
-import { ModuleGate } from '../../context/Modules';
+import { ModuleGate, useModule } from '../../context/Modules';
 import { COMPACT_PANEL_QUERY, useMediaQuery } from '../../hooks/useMediaQuery';
 import { pickStates } from '../../lib/hass-store';
 import {
@@ -44,6 +45,7 @@ import {
 	CardFooter,
 	CardHeader,
 	CardTitle,
+	EmptyState,
 	StableLabel,
 	toast,
 } from '../ui';
@@ -127,6 +129,8 @@ const SecuritySectionContent: React.FC<SecuritySectionProps> = ({ compact: compa
 
 	const locks = usePending<'locking' | 'unlocking'>();
 	const garagesPending = usePending<GaragePending>();
+	const hasAlarm = useModule('alarm');
+	const hasCameras = useModule('cameras');
 
 	// Done once Home Assistant reports the target
 	const lockKey = found.locks.map((l) => states[l.id]?.state).join('|');
@@ -365,6 +369,13 @@ const SecuritySectionContent: React.FC<SecuritySectionProps> = ({ compact: compa
 				<ModuleGate id="alarm">
 					<AlarmCard compact={compact} />
 				</ModuleGate>
+
+				{/* A new house: say what shows up here rather than leave the column blank */}
+				{!hasAlarm && !hasCameras && found.locks.length === 0 && found.bays.length === 0 && (
+					<EmptyState icon={<ShieldOff className="size-10" />}>
+						Nothing here yet. Locks, garage doors, an Alarmo alarm and cameras show up as Home Assistant finds them.
+					</EmptyState>
+				)}
 
 				{compact ? (
 					// 10.5" panels: one card with a row per door and per garage bay

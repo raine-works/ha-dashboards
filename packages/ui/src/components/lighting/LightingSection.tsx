@@ -278,7 +278,10 @@ const LightingSectionContent: React.FC<LightingSectionProps> = ({
 				{houseWide && (
 					<TabsContent value="floor" className={cn('flex min-h-0 flex-col gap-4', scroller)}>
 						{houseRooms.length === 0 && (
-							<EmptyState icon={<Lightbulb className="size-10" />}>No Household Lights yet.</EmptyState>
+							<EmptyState icon={<Lightbulb className="size-10" />}>
+								No Household Lights yet. Give your room lights the Household Light label in Home Assistant, in areas on
+								floors.
+							</EmptyState>
 						)}
 						{/* This floor first, then the nearest; each floor's name stays in view while its rooms scroll */}
 						{houseRooms.map((houseFloor) => (

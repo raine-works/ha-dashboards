@@ -52,12 +52,18 @@ export function hideToolbar(card: Element): () => void {
 	};
 }
 
+/** The sidebar setting each card last asked to change, so it asks once per change, not per update. */
+const askedFrom = new WeakMap<Element, string>();
+
 /**
  * Set the user's "Always hide the sidebar" (Profile → sidebar; stored per browser), as the profile
- * page does. Only when it isn't already, so it fires once, not on every hass update.
+ * page does, whenever it's anything else. A browser that has never set it reports none (a new
+ * user's), which counts as docked; it asks once per setting it sees, not on every hass update.
  */
 export function keepSidebarHidden(card: Element, hass: Pick<HomeAssistant, 'dockedSidebar'>) {
-	if (!hass.dockedSidebar || hass.dockedSidebar === 'always_hidden') return;
+	const current = hass.dockedSidebar ?? 'unset';
+	if (current === 'always_hidden' || askedFrom.get(card) === current) return;
+	askedFrom.set(card, current);
 	card.dispatchEvent(
 		new CustomEvent('hass-dock-sidebar', { detail: { dock: 'always_hidden' }, bubbles: true, composed: true }),
 	);

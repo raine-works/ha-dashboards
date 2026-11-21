@@ -153,6 +153,10 @@ export function definePanelElement({
 			this._render();
 			// Before measuring the space above the element, which the toolbar took
 			if (hideChrome && !this._showToolbar) this._showToolbar = hideToolbar(this);
+			// Lovelace hands the card its first hass before attaching it; on a quiet house the next one can
+			// be minutes away, so the sidebar is asked for here too
+			const hass = this._store.get();
+			if (hideChrome && hass) keepSidebarHidden(this, hass);
 			if (!this._stopFitting) this._stopFitting = this._fitViewport();
 		}
 

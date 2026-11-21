@@ -1,4 +1,4 @@
-import { Minus, Plus, Thermometer, ThermometerSun } from 'lucide-react';
+import { Minus, Plus, Thermometer, ThermometerSnowflake, ThermometerSun } from 'lucide-react';
 import type React from 'preact/compat';
 import { Fragment, useState } from 'preact/compat';
 import { useEntity, useHassApi, useHassSelector } from '../../context/HassContext';
@@ -23,6 +23,7 @@ import {
 	CardDescription,
 	CardHeader,
 	CardTitle,
+	EmptyState,
 	Separator,
 	ToggleGroup,
 	ToggleGroupItem,
@@ -157,6 +158,9 @@ const ClimateSectionContent: React.FC = () => {
 	// The house-wide preset needs its helper and automation (the thermostat_presets module)
 	const presets = useModule('thermostat_presets');
 	const thermostats = useModule('climate');
+	const hasDiffusers = useModule('diffusers');
+	const hasCovers = useModule('covers');
+	const hasFans = useModule('fans');
 	const overridden = presets && preset.value === OVERRIDE_PRESET;
 	const { thermostats: configured } = useHouseConfig();
 	const zones = useHassSelector((hass) => (hass ? discoverThermostats(hass, hass.states, configured) : []), {
@@ -231,6 +235,14 @@ const ClimateSectionContent: React.FC = () => {
 							))}
 						</CardContent>
 					</Card>
+				)}
+
+				{/* A new house: say what shows up here rather than leave the column blank */}
+				{!(thermostats && zones.length) && !hasDiffusers && !hasCovers && !hasFans && (
+					<EmptyState icon={<ThermometerSnowflake className="size-10" />}>
+						Nothing here yet. Thermostats, curtains and blinds, fans and scent diffusers show up as Home Assistant finds
+						them.
+					</EmptyState>
 				)}
 
 				{/* Every EverScent diffuser (discovered; nothing without any): the oil left, the fragrance and Quick scent */}
