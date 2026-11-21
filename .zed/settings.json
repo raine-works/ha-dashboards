@@ -1,0 +1,48 @@
+{
+	"format_on_save": "on",
+	"formatter": [
+		{
+			"language_server": {
+				"name": "biome"
+			}
+		},
+		{
+			"code_action": "source.organizeImports"
+		},
+		{
+			"code_action": "source.fixAll.biome"
+		}
+	],
+	"languages": {
+		"CSS": {
+			"language_servers": ["biome", "!css-language-server"]
+		}
+	},
+	"lsp": {
+		"yaml-language-server": {
+			"settings": {
+				"yaml": {
+					"customTags": [
+						"!include scalar",
+						"!include mapping",
+						"!include sequence",
+						"!include_dir_list scalar",
+						"!include_dir_list mapping",
+						"!include_dir_list sequence",
+						"!include_dir_merge_list scalar",
+						"!include_dir_merge_list mapping",
+						"!include_dir_merge_list sequence",
+						"!include_dir_merge_named scalar",
+						"!include_dir_merge_named mapping",
+						"!include_dir_merge_named sequence",
+						"!include_dir_named scalar",
+						"!include_dir_named mapping",
+						"!include_dir_named sequence",
+						"!input scalar",
+						"!secret scalar"
+					]
+				}
+			}
+		}
+	}
+}

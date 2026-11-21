@@ -1,0 +1,15 @@
+@import "tailwindcss";
+@import "@app/ui/theme.css";
+
+/* Tailwind skips node_modules (where @app/ui is linked), so scan its source explicitly; this
+   package's own cards are found on their own */
+@source "../../ui/src";
+
+/* The Home dashboard on phones: it grows with its content and the page scrolls (wide screens get a
+   fixed height from definePanelElement's fillViewport, like the wall panels) */
+@layer base {
+	:host(home-dashboard) {
+		height: auto;
+		overflow: visible;
+	}
+}

@@ -1,0 +1,26 @@
+node_modules/
+.DS_Store
+*.log
+
+# Builds (bun run build uploads them to Home Assistant; a release's zip carries one)
+packages/*/dist/
+
+# Never commit credentials (secrets.yaml lives in Home Assistant's /config, not here)
+secrets.yaml
+.env*
+*.pem
+# Local MCP servers' settings (they hold Home Assistant tokens)
+.mcp.json
+
+# The house audit's personal terms (scripts/house-audit.ts): never public
+.house-terms
+
+# The integration's bundle (`bun run build:integration`; a release's zip carries it)
+custom_components/raineworks_dashboards/www/
+custom_components/raineworks_dashboards/sounds/
+
+# Python
+__pycache__/
+.venv/
+.pytest_cache/
+.ruff_cache/

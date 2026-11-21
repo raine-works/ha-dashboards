@@ -1,0 +1,57 @@
+# Publishes a GitHub release when the integration's manifest version changes on master, with
+# raineworks_dashboards.zip (hacs.json's zip_release): the integration with the dashboards bundle
+# built into its www/. Runs only after the Test workflow passes, only if the tag is new, and only
+# once the repository is public.
+name: "Release"
+
+on:
+  workflow_run:
+    workflows: ["Test"]
+    types: [completed]
+    branches: [master]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      !github.event.repository.private
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - name: Is this version new?
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v$(jq -r .version custom_components/raineworks_dashboards/manifest.json)"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag already exists; nothing to do."
+            echo "new=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "new=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.version.outputs.new == 'true'
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.5
+      - name: Build the bundle into the integration
+        if: steps.version.outputs.new == 'true'
+        run: |
+          bun install --frozen-lockfile
+          bun run build:integration
+      - name: Create the release with the integration's zip
+        if: steps.version.outputs.new == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          (cd custom_components/raineworks_dashboards && zip -qr "$GITHUB_WORKSPACE/raineworks_dashboards.zip" . -x '__pycache__/*')
+          gh release create "$TAG" raineworks_dashboards.zip --target "$SHA" --title "$TAG" --generate-notes

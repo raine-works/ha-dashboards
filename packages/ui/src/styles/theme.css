@@ -1,0 +1,907 @@
+/*
+ * Shared shadcn/ui theme for panels. Import from a panel stylesheet after Tailwind:
+ *   @import "tailwindcss";
+ *   @import "@app/ui/theme.css";
+ *   @source "../../ui/src";   (Tailwind skips node_modules, so scan this package explicitly)
+ */
+
+/* Sonner injects its CSS into document.head, which doesn't reach a ShadowRoot */
+@import "sonner/dist/styles.css";
+
+/* Leaflet (PeopleMap) normally ships its CSS as a separate file; it must live in the ShadowRoot too */
+@import "leaflet/dist/leaflet.css";
+
+@custom-variant dark (&:is(.dark *));
+/* Short viewport: an on-screen keyboard is open (the WebView resizes to the space above it) */
+@custom-variant short (@media (max-height: 480px));
+/* A wall panel (a touch tablet, `data-touch` on the mount point): controls a size up for fingers */
+@custom-variant touch (&:is([data-touch] *));
+
+/* Hide a scroller's scrollbar (Firefox, Chromium and WebKit). Tailwind 4.3 has it built in, which the
+   editor knows; the build's compiler (bun-plugin-tailwind's 4.1.14) doesn't, so it's defined here */
+@utility scrollbar-none {
+	scrollbar-width: none;
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+/* Light mode: definePanelElement puts .light on the mount point (the dark tokens on :host below
+   are inherited otherwise). :root would never match inside the ShadowRoot. Source of truth for the
+   Blackout theme's light mode (theme/blackout.yaml), kept in sync by blackout-theme.test.ts. */
+.light {
+	--background: oklch(1 0 0);
+	--foreground: oklch(0.145 0 0);
+	--card: oklch(1 0 0);
+	--card-foreground: oklch(0.145 0 0);
+	--popover: oklch(1 0 0);
+	--popover-foreground: oklch(0.145 0 0);
+	--primary: oklch(0.205 0 0);
+	--primary-foreground: oklch(0.985 0 0);
+	--secondary: oklch(0.97 0 0);
+	--secondary-foreground: oklch(0.205 0 0);
+	--muted: oklch(0.97 0 0);
+	--muted-foreground: oklch(0.556 0 0);
+	--accent: oklch(0.97 0 0);
+	--accent-foreground: oklch(0.205 0 0);
+	--destructive: oklch(0.577 0.245 27.325);
+
+	/* Status colors (panel extension to shadcn): solid surfaces for alerts and toasts. Darker than
+	   the dark mode's so status text (warning above all) stays readable on white */
+	/* Light status colors dark enough for text on white and for white text on them (WCAG 4.5:1) */
+	--success: oklch(0.5 0.14 155);
+	--success-foreground: oklch(0.985 0 0);
+	--warning: oklch(0.52 0.14 60);
+	--warning-foreground: oklch(0.985 0 0);
+	--info: oklch(0.55 0.19 255);
+	--info-foreground: oklch(0.985 0 0);
+	--alarm: oklch(0.577 0.245 27.325);
+	--alarm-foreground: oklch(0.985 0 0);
+	--border: oklch(0.922 0 0);
+	--input: oklch(0.922 0 0);
+	--ring: oklch(0.708 0 0);
+	/* Chart series (the energy circuits): a categorical palette validated for color vision deficiency
+	   in this order (adjacent pairs ΔE ≥ 9 under protanopia); light steps for white cards */
+	--chart-1: #2a78d6;
+	--chart-2: #eb6834;
+	--chart-3: #1baf7a;
+	--chart-4: #eda100;
+	--chart-5: #e87ba4;
+	--chart-6: #008300;
+	--chart-7: #6250d6;
+	--radius: 0.625rem;
+	--sidebar: oklch(0.985 0 0);
+	--sidebar-foreground: oklch(0.145 0 0);
+	--sidebar-primary: oklch(0.205 0 0);
+	--sidebar-primary-foreground: oklch(0.985 0 0);
+	--sidebar-accent: oklch(0.97 0 0);
+	--sidebar-accent-foreground: oklch(0.205 0 0);
+	--sidebar-border: oklch(0.922 0 0);
+	--sidebar-ring: oklch(0.708 0 0);
+}
+
+/* Dark mode, also the default on :host. Source of truth for the Blackout theme's shadcn tokens (theme/blackout.yaml),
+   kept in sync by packages/ui/src/__tests__/blackout-theme.test.ts. */
+.dark,
+:host {
+	--radius: 0.625rem;
+	--background: oklch(0.145 0 0);
+	--foreground: oklch(0.985 0 0);
+	--card: oklch(0.205 0 0);
+	--card-foreground: oklch(0.985 0 0);
+	--popover: oklch(0.205 0 0);
+	--popover-foreground: oklch(0.985 0 0);
+	--primary: oklch(0.922 0 0);
+	--primary-foreground: oklch(0.205 0 0);
+	--secondary: oklch(0.269 0 0);
+	--secondary-foreground: oklch(0.985 0 0);
+	--muted: oklch(0.269 0 0);
+	--muted-foreground: oklch(0.708 0 0);
+	--accent: oklch(0.269 0 0);
+	--accent-foreground: oklch(0.985 0 0);
+	--destructive: oklch(0.704 0.191 22.216);
+
+	/* Status colors (panel extension to shadcn): solid surfaces for alerts and toasts */
+	--success: oklch(0.6 0.15 155);
+	--success-foreground: oklch(0.985 0 0);
+	--warning: oklch(0.78 0.16 70);
+	--warning-foreground: oklch(0.22 0.05 60);
+	/* Light enough for info text on cards (5.7:1); a solid info fill carries no text (dots, bars) */
+	--info: oklch(0.66 0.16 255);
+	--info-foreground: oklch(0.985 0 0);
+	--alarm: oklch(0.577 0.245 27.325);
+	--alarm-foreground: oklch(0.985 0 0);
+	--border: oklch(1 0 0 / 10%);
+	--input: oklch(1 0 0 / 15%);
+	--ring: oklch(0.556 0 0);
+	/* Chart series: the same hues stepped for dark cards (all ≥ 3:1) */
+	--chart-1: #3987e5;
+	--chart-2: #d95926;
+	--chart-3: #199e70;
+	--chart-4: #c98500;
+	--chart-5: #d55181;
+	--chart-6: #008300;
+	--chart-7: #9085e9;
+	--sidebar: oklch(0.205 0 0);
+	--sidebar-foreground: oklch(0.985 0 0);
+	--sidebar-primary: oklch(0.488 0.243 264.376);
+	--sidebar-primary-foreground: oklch(0.985 0 0);
+	--sidebar-accent: oklch(0.269 0 0);
+	--sidebar-accent-foreground: oklch(0.985 0 0);
+	--sidebar-border: oklch(1 0 0 / 10%);
+	--sidebar-ring: oklch(0.556 0 0);
+}
+
+/* Now-playing equalizer bars (PlayingBars): animate-eq-bar. A playing live input's record icon:
+   animate-record-spin, one turn per 1.8s (33 1/3 rpm) */
+@theme {
+	--animate-eq-bar: eq-bar 0.9s ease-in-out infinite;
+	--animate-record-spin: record-spin 1.8s linear infinite;
+	/* A light's color ring while an effect runs (ColorRing): one slow turn every 6s */
+	--animate-ring-spin: record-spin 6s linear infinite;
+	/* A running fan's blades (FanRow): one accelerating turn as it comes on, then steady turns, faster
+	   with its speed (--fan-spin on the icon) */
+	--animate-fan-spin:
+		fan-spin-up 0.9s cubic-bezier(0.5, 0, 1, 1),
+		record-spin var(--fan-spin, 1.5s) linear 0.9s infinite;
+	/* A bottom sheet rising into place (the due date picker on phones), on iOS's sheet curve */
+	--animate-sheet-in: sheet-in 320ms cubic-bezier(0.32, 0.72, 0, 1);
+	/* A swiped row let go short of acting (SwipeRow): back past its place a little, then settling */
+	--ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+	@keyframes sheet-in {
+		from {
+			transform: translateY(100%);
+		}
+	}
+
+	@keyframes fan-spin-up {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	@keyframes record-spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	@keyframes eq-bar {
+		0%,
+		100% {
+			transform: scaleY(0.35);
+		}
+		50% {
+			transform: scaleY(1);
+		}
+	}
+}
+
+/* Holiday characters (components/holiday): a gentle idle motion (a bob, a wiggle with rests, a
+   heartbeat, twinkling sparkles), a hop and a burst of confetti on a tap; all still for reduced motion */
+@layer components {
+	.holiday-bob {
+		animation: holiday-bob 2.8s ease-in-out infinite;
+	}
+	.holiday-wiggle {
+		transform-origin: 50% 90%;
+		animation: holiday-wiggle 3.6s ease-in-out infinite;
+	}
+	.holiday-beat {
+		animation: holiday-beat 1.6s ease-in-out infinite;
+	}
+	.holiday-twinkle {
+		transform-box: fill-box;
+		transform-origin: center;
+		animation: holiday-twinkle 1.8s ease-in-out infinite;
+	}
+	.holiday-hop {
+		transform-origin: 50% 100%;
+		animation: holiday-hop 560ms cubic-bezier(0.3, 1.5, 0.5, 1);
+	}
+	.holiday-burst {
+		top: 0;
+		left: 0;
+		opacity: 0;
+		animation: holiday-burst 750ms cubic-bezier(0.2, 0.7, 0.3, 1);
+	}
+	@keyframes holiday-bob {
+		50% {
+			transform: translateY(-7%);
+		}
+	}
+	@keyframes holiday-wiggle {
+		0%,
+		70%,
+		100% {
+			transform: rotate(0);
+		}
+		76% {
+			transform: rotate(-9deg);
+		}
+		84% {
+			transform: rotate(8deg);
+		}
+		92% {
+			transform: rotate(-4deg);
+		}
+	}
+	@keyframes holiday-beat {
+		0%,
+		40%,
+		100% {
+			transform: scale(1);
+		}
+		12% {
+			transform: scale(1.1);
+		}
+		24% {
+			transform: scale(1.03);
+		}
+		32% {
+			transform: scale(1.09);
+		}
+	}
+	@keyframes holiday-twinkle {
+		50% {
+			transform: scale(0.45);
+			opacity: 0.55;
+		}
+	}
+	@keyframes holiday-hop {
+		0% {
+			transform: none;
+		}
+		25% {
+			transform: translateY(-35%) scale(1.15) rotate(-8deg);
+		}
+		55% {
+			transform: translateY(0) scale(1.12, 0.88);
+		}
+		75% {
+			transform: translateY(-8%) scale(0.96, 1.04) rotate(4deg);
+		}
+		100% {
+			transform: none;
+		}
+	}
+	@keyframes holiday-burst {
+		from {
+			opacity: 1;
+			transform: translate(-50%, -50%) scale(1);
+		}
+		to {
+			opacity: 0;
+			transform: translate(calc(var(--dx) - 50%), calc(var(--dy) - 50%))
+				scale(0.4) rotate(120deg);
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.holiday-bob,
+		.holiday-wiggle,
+		.holiday-beat,
+		.holiday-twinkle,
+		.holiday-hop {
+			animation: none;
+		}
+		.holiday-burst {
+			display: none;
+		}
+	}
+}
+
+/* Button `loading`: after 150ms the content hides in place (the button keeps its size) and the
+   spinner fades in; quicker actions never show it */
+@layer components {
+	[data-slot="button"][data-loading] > :not([data-slot="button-spinner"]) {
+		animation: busy-hide 0s 150ms forwards;
+	}
+	[data-slot="button-spinner"] {
+		animation: busy-show 120ms ease-out 150ms both;
+	}
+	@keyframes busy-hide {
+		to {
+			visibility: hidden;
+		}
+	}
+	@keyframes busy-show {
+		from {
+			opacity: 0;
+		}
+	}
+}
+
+@theme inline {
+	--font-sans:
+		"Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-success: var(--success);
+	--color-success-foreground: var(--success-foreground);
+	--color-warning: var(--warning);
+	--color-warning-foreground: var(--warning-foreground);
+	--color-info: var(--info);
+	--color-info-foreground: var(--info-foreground);
+	--color-alarm: var(--alarm);
+	--color-alarm-foreground: var(--alarm-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+	--color-chart-4: var(--chart-4);
+	--color-chart-5: var(--chart-5);
+	--color-chart-6: var(--chart-6);
+	--color-chart-7: var(--chart-7);
+	--color-sidebar: var(--sidebar);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-ring: var(--sidebar-ring);
+
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 4px);
+	--radius-2xl: calc(var(--radius) + 8px);
+}
+
+@layer base {
+	/* A keyboard focus ring on every button and link that doesn't draw its own (the custom row and
+	   tile buttons); components with their own (outline-none + a ring) keep theirs, utilities win */
+	:where(
+		button,
+		a,
+		[role="button"],
+		[role="switch"],
+		[tabindex]
+	):focus-visible {
+		outline: 2px solid var(--ring);
+		outline-offset: 2px;
+	}
+
+	:host {
+		display: block;
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+		/* Everything (dialogs, toasts, the phone tab bar, sticky headings) stays under Home
+		   Assistant's own toolbar: the dashboard is one layer of the page, whatever its z-indexes */
+		isolation: isolate;
+		/* The toolbar's height (measured by definePanelElement) and the screen below it, where dialogs go */
+		--panel-top: 0px;
+		--panel-height: calc(100dvh - var(--panel-top));
+	}
+
+	/* Native controls (scrollbars, date pickers) follow the dashboard's mode. The text color and
+	   background are set again on the mount point: inherited from :host they would keep the host's
+	   (dark) colors, around the content in light mode, and dialogs portal into the mount point
+	   outside any element that sets them */
+	.light {
+		color-scheme: light;
+		color: var(--foreground);
+		background-color: var(--background);
+	}
+
+	.dark {
+		color-scheme: dark;
+		color: var(--foreground);
+		background-color: var(--background);
+	}
+
+	* {
+		@apply border-border outline-ring/50;
+		-webkit-tap-highlight-color: transparent;
+		user-select: none;
+	}
+
+	:host,
+	body {
+		@apply bg-background font-sans text-foreground antialiased;
+	}
+
+	/* Touch panel disables text selection globally; fields still need it to be editable */
+	input,
+	textarea {
+		user-select: text;
+	}
+
+	/* Tailwind v4 preflight resets buttons to cursor: default */
+	button:not(:disabled),
+	[role="button"]:not(:disabled) {
+		cursor: pointer;
+	}
+}
+
+/* Embedded Home Assistant Native Camera Stream (inner players are styled in WebRtcCamera.tsx) */
+ha-camera-stream {
+	width: 100%;
+	height: 100%;
+	display: block;
+}
+
+/* Leaflet controls and zones in panel colors (Leaflet's defaults are white boxes) */
+.leaflet-container {
+	background: var(--muted);
+	font-family: inherit;
+}
+
+.dark .leaflet-container {
+	background: var(--background);
+}
+
+/* Esri's street map in gray, like a canvas basemap but with every street labeled */
+.leaflet-tiles-light {
+	filter: grayscale(1) contrast(1.05);
+}
+
+/* Dark mode: the same gray map inverted and dimmed (near black, light labels) */
+.leaflet-tiles-dark {
+	filter: invert(1) grayscale(1) contrast(1.2) brightness(0.7);
+}
+
+.leaflet-container .leaflet-control-attribution {
+	background: color-mix(in oklab, var(--background) 70%, transparent);
+	color: var(--muted-foreground);
+	font-size: 10px;
+}
+
+.leaflet-container .leaflet-control-attribution a {
+	color: inherit;
+}
+
+.leaflet-zone {
+	stroke: var(--info);
+	fill: var(--info);
+}
+
+.leaflet-zone-home {
+	stroke: var(--success);
+	fill: var(--success);
+}
+
+/* Continuous pulses and pings (detections, recording, a running washer) stand still for anyone whose
+   device asks for less motion. Outside any layer: the utilities layer comes after base, so a rule
+   there never won over the utilities' own animation. */
+@media (prefers-reduced-motion: reduce) {
+	.animate-pulse,
+	.animate-ping {
+		animation: none;
+	}
+}
+
+/* Assist (AssistOverlay, AssistButton). Its colors, shared by the glow, the card's ring, the orb
+   and the button: */
+@layer components {
+	.assist-card,
+	.assist-button {
+		--assist-blue: oklch(0.6 0.2 258);
+		--assist-violet: oklch(0.56 0.23 292);
+		--assist-pink: oklch(0.64 0.22 352);
+	}
+}
+
+/* The glow: while it listens, thinks or speaks, soft light rises from the bottom of the screen, like
+   Gemini on a Pixel. Blobs of color (radial gradients, soft by nature: no blur filter, so the wall
+   panels repaint it cheaply) are centered just below the edge, so nothing is solid where the screen
+   ends, and drift side to side on a layer twice the screen's width (a transform). It rises in from
+   under the edge, swells with the voice while listening (--assist-level, 0–1, which AssistOverlay
+   sets from the microphone), fades under a spoken answer and sinks away with the card. Above
+   dialogs, never taking taps itself (AssistOverlay's own full-screen layer does, while the card
+   is up: a tap anywhere closes it). */
+@layer components {
+	.assist-glow {
+		position: fixed;
+		inset: auto 0 0 0;
+		height: 9rem;
+		z-index: 60;
+		overflow: hidden;
+		pointer-events: none;
+		opacity: 0.8;
+		transform-origin: 50% 100%;
+		transition:
+			opacity 500ms ease-out,
+			transform 200ms linear;
+		animation: assist-glow-in 500ms cubic-bezier(0.32, 0.72, 0, 1) both;
+	}
+	.assist-glow::before {
+		content: "";
+		position: absolute;
+		inset: 0 auto 0 0;
+		width: 200%;
+		background:
+			radial-gradient(
+				ellipse 16% 95% at 6% 120%,
+				oklch(0.66 0.19 255 / 70%),
+				oklch(0.66 0.19 255 / 25%) 55%,
+				transparent
+			),
+			radial-gradient(
+				ellipse 16% 85% at 22% 120%,
+				oklch(0.62 0.22 290 / 65%),
+				oklch(0.62 0.22 290 / 22%) 55%,
+				transparent
+			),
+			radial-gradient(
+				ellipse 15% 80% at 38% 120%,
+				oklch(0.7 0.2 350 / 60%),
+				oklch(0.7 0.2 350 / 22%) 55%,
+				transparent
+			),
+			radial-gradient(
+				ellipse 15% 75% at 54% 120%,
+				oklch(0.82 0.15 75 / 55%),
+				oklch(0.82 0.15 75 / 20%) 55%,
+				transparent
+			),
+			radial-gradient(
+				ellipse 16% 85% at 70% 120%,
+				oklch(0.66 0.19 255 / 70%),
+				oklch(0.66 0.19 255 / 25%) 55%,
+				transparent
+			),
+			radial-gradient(
+				ellipse 14% 90% at 86% 120%,
+				oklch(0.62 0.22 290 / 65%),
+				oklch(0.62 0.22 290 / 22%) 55%,
+				transparent
+			),
+			radial-gradient(
+				ellipse 14% 80% at 98% 120%,
+				oklch(0.75 0.13 190 / 55%),
+				oklch(0.75 0.13 190 / 20%) 55%,
+				transparent
+			);
+		animation: assist-drift 9s ease-in-out infinite alternate;
+	}
+	/* Listening: breathing, taller with the voice; thinking: drifting quicker; speaking: slow and steady */
+	.assist-glow[data-phase="starting"],
+	.assist-glow[data-phase="listening"] {
+		transform: scaleY(calc(1 + var(--assist-level, 0) * 0.45));
+		animation:
+			assist-glow-in 500ms cubic-bezier(0.32, 0.72, 0, 1) both,
+			assist-breathe 2.4s ease-in-out 500ms infinite;
+	}
+	.assist-glow[data-phase="processing"]::before {
+		animation-duration: 3s;
+	}
+	.assist-glow[data-phase="error"]::before {
+		background: radial-gradient(
+			ellipse 40% 90% at 25% 120%,
+			color-mix(in oklch, var(--destructive) 45%, transparent),
+			transparent
+		);
+	}
+	/* The answer has been spoken: the light fades out under it */
+	.assist-glow:is([data-phase="answered"], [data-phase="typing"]) {
+		opacity: 0;
+	}
+	.assist-glow:is([data-phase="answered"], [data-phase="typing"])::before {
+		animation-play-state: paused;
+	}
+	.assist-glow[data-leaving] {
+		animation: assist-glow-out 220ms ease-in both;
+	}
+	@keyframes assist-glow-in {
+		from {
+			opacity: 0;
+			transform: translateY(60%);
+		}
+	}
+	@keyframes assist-glow-out {
+		to {
+			opacity: 0;
+			transform: translateY(40%);
+		}
+	}
+	@keyframes assist-drift {
+		to {
+			transform: translateX(-50%);
+		}
+	}
+	@keyframes assist-breathe {
+		50% {
+			opacity: 0.5;
+		}
+	}
+}
+
+/* The card: a pill ringed in the Assist colors, which turn around it while a run is in progress
+   (a conic gradient on a square behind the card's body, rotated: a transform, so nothing repaints;
+   @property can't animate a gradient's angle in a shadow root). It springs up from the bottom edge
+   and slides back out (AssistOverlay keeps it mounted for the 220ms), and widens for an answer; its
+   parts grow open in AssistOverlay (Reveal). After the answer the ring rests as a plain border; an
+   error's is red. */
+@layer components {
+	.assist-card {
+		position: relative;
+		isolation: isolate;
+		overflow: hidden;
+		padding: 2px;
+		border-radius: 2rem;
+		background: var(--border);
+		box-shadow:
+			0 18px 48px -12px oklch(0 0 0 / 45%),
+			0 0 44px -10px color-mix(in oklch, var(--assist-violet) 55%, transparent);
+		transform-origin: 50% 100%;
+		transition:
+			max-width 350ms cubic-bezier(0.32, 0.72, 0, 1),
+			box-shadow 400ms ease-out;
+		animation: assist-card-in 380ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+	}
+	.assist-card::before {
+		content: "";
+		position: absolute;
+		z-index: -1;
+		top: 50%;
+		left: 50%;
+		/* Covers the card's corners at any turn: wider than its diagonal */
+		width: min(200%, 60rem);
+		aspect-ratio: 1;
+		background: conic-gradient(
+			var(--assist-blue),
+			var(--assist-violet),
+			var(--assist-pink),
+			oklch(0.8 0.15 75),
+			var(--assist-blue)
+		);
+		transform: translate(-50%, -50%);
+		transition: opacity 400ms ease-out;
+		animation: assist-ring 4s linear infinite;
+	}
+	.assist-card[data-phase="processing"]::before {
+		animation-duration: 1.6s;
+	}
+	.assist-card[data-phase="answered"],
+	.assist-card[data-phase="typing"],
+	.assist-card[data-phase="error"] {
+		box-shadow: 0 18px 48px -12px oklch(0 0 0 / 45%);
+	}
+	.assist-card[data-phase="answered"]::before,
+	.assist-card[data-phase="typing"]::before,
+	.assist-card[data-phase="error"]::before {
+		opacity: 0;
+		animation-play-state: paused;
+	}
+	.assist-card[data-phase="error"] {
+		background: color-mix(in oklab, var(--destructive) 60%, var(--border));
+	}
+	.assist-card[data-leaving] {
+		animation: assist-card-out 220ms ease-in both;
+	}
+	@keyframes assist-card-in {
+		from {
+			opacity: 0;
+			transform: translateY(2rem) scale(0.88);
+		}
+	}
+	@keyframes assist-card-out {
+		to {
+			opacity: 0;
+			transform: translateY(1.25rem) scale(0.94);
+		}
+	}
+	@keyframes assist-ring {
+		to {
+			transform: translate(-50%, -50%) rotate(1turn);
+		}
+	}
+
+	/* The orb: the Assist colors turning in a circle, its icon in white. Listening, it grows with the
+	   voice and sends out a ripple; thinking, it turns fast; at rest (answered) it stands still. */
+	.assist-orb {
+		position: relative;
+		isolation: isolate;
+		display: flex;
+		flex-shrink: 0;
+		align-items: center;
+		justify-content: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 9999px;
+		color: white;
+		transition: transform 160ms linear;
+	}
+	.assist-orb::before,
+	.assist-orb::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+	}
+	.assist-orb::before {
+		z-index: -1;
+		background: conic-gradient(
+			var(--assist-blue),
+			var(--assist-violet),
+			var(--assist-pink),
+			var(--assist-blue)
+		);
+		animation: assist-spin 6s linear infinite;
+	}
+	.assist-orb::after {
+		z-index: -2;
+		border: 2px solid var(--assist-violet);
+		opacity: 0;
+	}
+	.assist-card:is([data-phase="starting"], [data-phase="listening"])
+		.assist-orb {
+		transform: scale(calc(1 + var(--assist-level, 0) * 0.22));
+	}
+	.assist-card:is([data-phase="starting"], [data-phase="listening"])
+		.assist-orb::after {
+		animation: assist-ripple 1.8s ease-out infinite;
+	}
+	.assist-card[data-phase="processing"] .assist-orb::before {
+		animation-duration: 1.2s;
+	}
+	.assist-card:is([data-phase="answered"], [data-phase="typing"])
+		.assist-orb::before {
+		animation-play-state: paused;
+	}
+	.assist-card[data-phase="error"] .assist-orb {
+		color: var(--destructive);
+	}
+	.assist-card[data-phase="error"] .assist-orb::before {
+		background: color-mix(in oklab, var(--destructive) 14%, transparent);
+		animation: none;
+	}
+	@keyframes assist-spin {
+		to {
+			transform: rotate(1turn);
+		}
+	}
+	@keyframes assist-ripple {
+		from {
+			opacity: 0.7;
+			transform: scale(1);
+		}
+		to {
+			opacity: 0;
+			transform: scale(1.45);
+		}
+	}
+
+	/* The voice's meter: bars rising from dots with --assist-level, each a moment after the one
+	   before it (--i), by its own share (--gain), so the voice runs across them */
+	.assist-meter {
+		display: inline-flex;
+		flex-shrink: 0;
+		align-items: center;
+		gap: 3px;
+		height: 1.5rem;
+		margin-inline: 0.25rem;
+		animation: assist-rise 260ms ease-out both;
+	}
+	.assist-meter > span {
+		width: 3px;
+		height: 100%;
+		border-radius: 9999px;
+		background: currentColor;
+		transform: scaleY(calc(0.17 + var(--assist-level, 0) * var(--gain, 0.5)));
+		transition: transform 160ms linear calc(var(--i, 0) * 30ms);
+	}
+
+	/* A status, what it heard or the answer rolling up into place; the orb's icon popping in */
+	.assist-rise {
+		animation: assist-rise 260ms ease-out both;
+	}
+	.assist-pop {
+		animation: assist-pop 340ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+	}
+	@keyframes assist-rise {
+		from {
+			opacity: 0;
+			transform: translateY(0.5rem);
+		}
+	}
+	@keyframes assist-pop {
+		from {
+			opacity: 0;
+			transform: scale(0.4) rotate(-40deg);
+		}
+	}
+}
+
+/* The Assist button (Button's `assist` variant): a ring of the Assist colors around a fill tinted
+   with them, its icon in violet, so it's the one control in a header that stands out; filled with
+   the colors while a run is in progress. It dips under a finger, and its sparkles twinkle every few
+   seconds (.assist-twinkle). */
+@layer components {
+	.assist-button {
+		--assist-fill: color-mix(in oklab, var(--card) 86%, var(--assist-violet));
+		border: 1.5px solid transparent;
+		background:
+			linear-gradient(var(--assist-fill), var(--assist-fill)) padding-box,
+			linear-gradient(
+				135deg,
+				var(--assist-blue),
+				var(--assist-violet),
+				var(--assist-pink)
+			)
+			border-box;
+		color: oklch(0.47 0.2 292);
+	}
+	.dark .assist-button {
+		color: oklch(0.86 0.09 292);
+	}
+	.assist-button:hover {
+		--assist-fill: color-mix(in oklab, var(--card) 74%, var(--assist-violet));
+	}
+	.assist-button:active {
+		transform: scale(0.92);
+	}
+	.assist-button[aria-pressed="true"] {
+		background: linear-gradient(
+				135deg,
+				var(--assist-blue),
+				var(--assist-violet),
+				var(--assist-pink)
+			)
+			border-box;
+		color: white;
+	}
+	.assist-twinkle {
+		animation: assist-twinkle 7s ease-in-out infinite;
+	}
+	@keyframes assist-twinkle {
+		0%,
+		82%,
+		100% {
+			transform: none;
+		}
+		88% {
+			transform: scale(1.3) rotate(20deg);
+		}
+		94% {
+			transform: scale(0.92) rotate(-8deg);
+		}
+	}
+}
+
+/* A circle (the phone's tab bar). Outside any layer: the sizes' own radius is a utility, which a
+   layered rule never wins over. */
+.assist-button[data-shape="round"] {
+	border-radius: 9999px;
+}
+
+/* Less motion: nothing turns, pops, ripples or slides (the meter still shows the voice). Outside any
+   layer and after the rules above, matching their specificity. */
+@media (prefers-reduced-motion: reduce) {
+	.assist-glow[data-phase],
+	.assist-glow[data-phase]::before,
+	.assist-card[data-phase],
+	.assist-card[data-phase]::before,
+	.assist-card[data-phase] .assist-orb::before,
+	.assist-card[data-phase] .assist-orb::after,
+	.assist-meter,
+	.assist-rise,
+	.assist-pop,
+	.assist-twinkle {
+		animation: none;
+	}
+	.assist-glow[data-phase],
+	.assist-card[data-phase] .assist-orb,
+	.assist-button:active {
+		transform: none;
+	}
+}

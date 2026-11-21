@@ -1,0 +1,386 @@
+Blackout:
+  card-mod-theme: Blackout
+  card-mod-root-yaml: |
+    app-header, .header, ha-top-app-bar {
+      z-index: 100 !important;
+      background: oklch(0.145 0 0) !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+  card-mod-card-yaml: |
+    ha-card {
+      border-radius: 24px !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      background: oklch(0.205 0 0) !important;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.6) !important;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+  card-mod-grid-section-yaml: |
+    .container {
+      width: 100% !important;
+    }
+    .card.full-width {
+      width: 100% !important;
+    }
+    .card.full-width > * {
+      width: 100% !important;
+      display: block !important;
+    }
+    .card.full-width hui-card {
+      width: 100% !important;
+      display: block !important;
+    }
+
+  ########################################################
+  ############### shadcn Design Tokens ###################
+  ########################################################
+  # Fonts (Clean modern typography)
+  primary-font-family: "Poppins, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+  secondary-font-family: "Poppins, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
+  paper-font-common-base_-_font-family: "var(--secondary-font-family)"
+  paper-font-common-code_-_font-family: "var(--secondary-font-family)"
+  paper-font-body1_-_font-family: "var(--secondary-font-family)"
+  paper-font-subhead_-_font-family: "var(--secondary-font-family)"
+  paper-font-headline_-_font-family: "var(--primary-font-family)"
+  paper-font-caption_-_font-family: "var(--secondary-font-family)"
+  paper-font-title_-_font-family: "var(--primary-font-family)"
+  ha-card-header-font-family: "var(--primary-font-family)"
+
+  # Core shadcn Surface Tokens (Official OKLCH)
+  # Mirrors the dark tokens in packages/ui/src/styles/theme.css (source of truth); a test fails if they drift.
+  background: "oklch(0.145 0 0)"
+  foreground: "oklch(0.985 0 0)"
+  card: "oklch(0.205 0 0)"
+  card-foreground: "oklch(0.985 0 0)"
+  popover: "oklch(0.205 0 0)"
+  popover-foreground: "oklch(0.985 0 0)"
+  primary: "oklch(0.922 0 0)"
+  primary-foreground: "oklch(0.205 0 0)"
+  secondary: "oklch(0.269 0 0)"
+  secondary-foreground: "oklch(0.985 0 0)"
+  muted: "oklch(0.269 0 0)"
+  muted-foreground: "oklch(0.708 0 0)"
+  accent: "oklch(0.269 0 0)"
+  accent-foreground: "oklch(0.985 0 0)"
+  destructive: "oklch(0.704 0.191 22.216)"
+  success: "oklch(0.6 0.15 155)"
+  success-foreground: "oklch(0.985 0 0)"
+  warning: "oklch(0.78 0.16 70)"
+  warning-foreground: "oklch(0.22 0.05 60)"
+  info: "oklch(0.66 0.16 255)"
+  info-foreground: "oklch(0.985 0 0)"
+  alarm: "oklch(0.577 0.245 27.325)"
+  alarm-foreground: "oklch(0.985 0 0)"
+  border: "oklch(1 0 0 / 10%)"
+  input: "oklch(1 0 0 / 15%)"
+  ring: "oklch(0.556 0 0)"
+  radius: "0.625rem"
+  shadcn-background: "oklch(0.145 0 0)"
+  shadcn-card: "oklch(0.205 0 0)"
+  shadcn-card-hover: "oklch(0.269 0 0)"
+  shadcn-border: "oklch(1 0 0 / 10%)"
+  shadcn-border-subtle: "oklch(1 0 0 / 6%)"
+  shadcn-foreground: "oklch(0.985 0 0)"
+  shadcn-muted: "oklch(0.269 0 0)"
+  shadcn-muted-foreground: "oklch(0.708 0 0)"
+  shadcn-primary: "oklch(0.922 0 0)"
+  shadcn-secondary: "oklch(0.269 0 0)"
+  shadcn-radius: "0.625rem"
+  # Opaque surface for HA dialogs, bottom sheets, dropdowns and popovers. Without it they fall back
+  # to the translucent card-background-color (glass cards) and content shows through.
+  ha-dialog-surface-background: "oklch(0.205 0 0)"
+
+  # Glassmorphism Tokens
+  glass-background: "oklch(0.205 0 0)"
+  glass-backdrop-filter: "none"
+  glass-border: "1px solid rgba(255, 255, 255, 0.1)"
+  glass-subtle-border: "1px solid rgba(255, 255, 255, 0.06)"
+  glass-status-glow: "0 0 12px rgba(34, 197, 94, 0.4)"
+
+  # Spacing & Elevation (24px soft rounded edges)
+  horizontal-stack-card-margin: 0px 8px
+  vertical-stack-card-margin: 8px 0px
+  grid-card-gap: 16px
+  ha-card-border-width: "1px"
+  ha-card-border-color: "rgba(255, 255, 255, 0.1)"
+  ha-card-border-radius: 24px
+  ha-card-background: "oklch(0.205 0 0)"
+  ha-card-box-shadow: "0 25px 50px -12px rgba(0, 0, 0, 0.7)"
+  masonry-view-card-margin: 10px 0px
+
+  # Main Interface Structure (OLED True Black Canvas)
+  # primary-color, accent-color and the other accent variables below are the fallback: the
+  # dashboards' bundle sets the signed-in person's phone accent color (Material You) over them
+  # on the page (accentChromeVars in packages/ui/src/lib/accent.ts)
+  primary-color: "#f4f4f5"
+  accent-color: "#f59e0b"
+  # Hex, not oklch: the Companion apps read this (iOS page background, Android navigation bar)
+  primary-background-color: "#0a0a0a"
+  secondary-background-color: "oklch(0.205 0 0)"
+  divider-color: "rgba(255, 255, 255, 0.1)"
+
+  # Text Mapping (High legibility zinc typography)
+  primary-text-color: "#f4f4f5"
+  secondary-text-color: "#a1a1aa"
+  text-primary-color: "#f4f4f5"
+  disabled-text-color: "#71717a"
+  text-accent-color: "#f59e0b"
+
+  # Header
+  # Hex, not oklch: the Companion apps color the phone status bar with it (= oklch(0.145 0 0))
+  app-header-background-color: "#0a0a0a"
+  app-header-text-color: "#f4f4f5"
+  app-header-selection-bar-color: transparent
+  app-header-edit-background-color: "#18181b"
+  app-header-edit-text-color: "#f4f4f5"
+
+  # Cards & Surfaces
+  card-background-color: "oklch(0.205 0 0)"
+  paper-listbox-background-color: "oklch(0.205 0 0)"
+
+  # State Colors & Badges (Accents that pop on dark surfaces)
+  state-unavailable-color: "#52525b"
+  state-light-off-color: "#71717a"
+  state-light-on-color: "#f59e0b"
+  state-icon-color: "#a1a1aa"
+  state-icon-active-color: "#f59e0b"
+
+  # Sidebar Menu
+  sidebar-icon-color: "#a1a1aa"
+  sidebar-text-color: "#f4f4f5"
+  sidebar-background-color: "oklch(0.145 0 0)"
+  sidebar-selected-icon-color: "#f59e0b"
+  sidebar-selected-text-color: "#f59e0b"
+
+  # Interactive Components (Buttons & Toggles)
+  paper-item-icon-color: "#a1a1aa"
+  mdc-button-outline-color: "rgba(255, 255, 255, 0.1)"
+  mdc-theme-primary: "#f4f4f5"
+  mdc-theme-surface: "oklch(0.205 0 0)"
+
+  # Sliders (shadcn-aligned slider track & thumb)
+  paper-slider-knob-color: "#ffffff"
+  paper-slider-knob-start-color: "#ffffff"
+  paper-slider-pin-color: "#f59e0b"
+  paper-slider-pin-start-color: "#71717a"
+  paper-slider-active-color: "#f59e0b"
+  paper-slider-secondary-color: "rgba(255, 255, 255, 0.15)"
+  paper-slider-container-color: "rgba(255, 255, 255, 0.1)"
+
+  # Switches & Toggles (shadcn Switch styling)
+  switch-checked-button-color: "#ffffff"
+  switch-checked-track-color: "#22c55e"
+  switch-unchecked-button-color: "#71717a"
+  switch-unchecked-track-color: "rgba(255, 255, 255, 0.1)"
+  paper-toggle-button-checked-button-color: "#ffffff"
+  paper-toggle-button-checked-bar-color: "#22c55e"
+  paper-toggle-button-unchecked-button-color: "#71717a"
+  paper-toggle-button-unchecked-bar-color: "rgba(255, 255, 255, 0.1)"
+
+  # Tables & Inputs
+  table-row-background-color: "oklch(0.205 0 0)"
+  table-row-alternative-background-color: "oklch(0.235 0 0)"
+  data-table-background-color: "oklch(0.145 0 0)"
+  mdc-text-field-fill-color: "rgba(255, 255, 255, 0.06)"
+  input-fill-color: "rgba(255, 255, 255, 0.06)"
+  input-dropdown-icon-color: "#a1a1aa"
+  material-background-color: "oklch(0.205 0 0)"
+  input-ink-color: "#f4f4f5"
+  input-label-ink-color: "#a1a1aa"
+  input-idle-line-color: "rgba(255, 255, 255, 0.1)"
+  input-hover-line-color: "#f4f4f5"
+  mdc-select-fill-color: "rgba(255, 255, 255, 0.06)"
+  mdc-select-ink-color: "#f4f4f5"
+  mdc-select-label-ink-color: "#a1a1aa"
+  mdc-select-idle-line-color: "rgba(255, 255, 255, 0.1)"
+  mdc-select-dropdown-icon-color: "#a1a1aa"
+  mdc-select-hover-line-color: "#f4f4f5"
+  mdc-text-field-disabled-fill-color: "rgba(255, 255, 255, 0.02)"
+  mdc-checkbox-unchecked-color: "#71717a"
+
+  # Dynamic CSS Color Assignments (Vivid status palette)
+  purple: "#c084fc"
+  yellow: "#facc15"
+  orange: "#fb923c"
+  red: "#f87171"
+  green: "#4ade80"
+  blue: "#38bdf8"
+  teal: "#2dd4bf"
+  pink: "#f472b6"
+
+  # Tints & Alpha Overlays
+  purple-tint: "rgba(192, 132, 252, 0.15)"
+  yellow-tint: "rgba(250, 204, 21, 0.15)"
+  orange-tint: "rgba(251, 146, 60, 0.15)"
+  red-tint: "rgba(248, 113, 113, 0.15)"
+  green-tint: "rgba(74, 222, 128, 0.15)"
+  blue-tint: "rgba(56, 189, 248, 0.15)"
+  teal-tint: "rgba(45, 212, 191, 0.15)"
+  pink-tint: "rgba(244, 114, 182, 0.15)"
+
+  # Gradients
+  brightness: "linear-gradient(90deg, rgba(245, 158, 11, 0.4) 0%, rgba(251, 191, 36, 1) 100%)"
+  brightness-tint: "linear-gradient(90deg, rgba(245, 158, 11, 0.08) 0%, rgba(251, 191, 36, 0.16) 100%)"
+  temperature: "linear-gradient(90deg, #38bdf8 0%, #fb923c 100%)"
+  temperature-tint: "linear-gradient(90deg, rgba(56, 189, 248, 0.15) 0%, rgba(251, 146, 60, 0.15) 100%)"
+
+  ########################################################
+  ############### Variables Based on Modes ###############
+  ########################################################
+  modes:
+    dark:
+      # Elevation & Shadows
+      ha-card-box-shadow: "0 25px 50px -12px rgba(0, 0, 0, 0.7)"
+      color-tint: "0.16"
+
+      # Theme-Adaptive Glass & Text Tokens
+      rgb-primary-text-color: 244, 244, 245
+      rgb-secondary-text-color: 161, 161, 170
+      glass-background: "oklch(0.205 0 0)"
+      glass-border: "1px solid rgba(255, 255, 255, 0.1)"
+      glass-subtle-border: "1px solid rgba(255, 255, 255, 0.06)"
+
+    light:
+      ha-card-box-shadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)"
+      color-tint: "0.12"
+      rgb-primary-text-color: 9, 9, 11
+      rgb-secondary-text-color: 113, 113, 122
+      glass-background: "oklch(1 0 0)"
+      glass-border: "1px solid rgba(0, 0, 0, 0.1)"
+      glass-subtle-border: "1px solid rgba(0, 0, 0, 0.06)"
+
+      # shadcn tokens: mirror the `.light` block in packages/ui/src/styles/theme.css
+      # (blackout-theme.test.ts keeps them in sync)
+      background: "oklch(1 0 0)"
+      foreground: "oklch(0.145 0 0)"
+      card: "oklch(1 0 0)"
+      card-foreground: "oklch(0.145 0 0)"
+      popover: "oklch(1 0 0)"
+      popover-foreground: "oklch(0.145 0 0)"
+      primary: "oklch(0.205 0 0)"
+      primary-foreground: "oklch(0.985 0 0)"
+      secondary: "oklch(0.97 0 0)"
+      secondary-foreground: "oklch(0.205 0 0)"
+      muted: "oklch(0.97 0 0)"
+      muted-foreground: "oklch(0.556 0 0)"
+      accent: "oklch(0.97 0 0)"
+      accent-foreground: "oklch(0.205 0 0)"
+      destructive: "oklch(0.577 0.245 27.325)"
+      success: "oklch(0.5 0.14 155)"
+      success-foreground: "oklch(0.985 0 0)"
+      warning: "oklch(0.52 0.14 60)"
+      warning-foreground: "oklch(0.985 0 0)"
+      info: "oklch(0.55 0.19 255)"
+      info-foreground: "oklch(0.985 0 0)"
+      alarm: "oklch(0.577 0.245 27.325)"
+      alarm-foreground: "oklch(0.985 0 0)"
+      border: "oklch(0.922 0 0)"
+      input: "oklch(0.922 0 0)"
+      ring: "oklch(0.708 0 0)"
+      radius: "0.625rem"
+      shadcn-background: "oklch(1 0 0)"
+      shadcn-card: "oklch(1 0 0)"
+      shadcn-card-hover: "oklch(0.97 0 0)"
+      shadcn-border: "oklch(0.922 0 0)"
+      shadcn-border-subtle: "oklch(0.97 0 0)"
+      shadcn-foreground: "oklch(0.145 0 0)"
+      shadcn-muted: "oklch(0.97 0 0)"
+      shadcn-muted-foreground: "oklch(0.556 0 0)"
+      shadcn-primary: "oklch(0.205 0 0)"
+      shadcn-secondary: "oklch(0.97 0 0)"
+      shadcn-radius: "0.625rem"
+      ha-dialog-surface-background: "oklch(1 0 0)"
+
+      # Home Assistant chrome: toolbar, sidebar, page and card surfaces
+      card-mod-root-yaml: |
+        app-header, .header, ha-top-app-bar {
+          z-index: 100 !important;
+          background: oklch(1 0 0) !important;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+        }
+      card-mod-card-yaml: |
+        ha-card {
+          border-radius: 24px !important;
+          border: 1px solid rgba(0, 0, 0, 0.08) !important;
+          background: oklch(1 0 0) !important;
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+      ha-card-border-color: "rgba(0, 0, 0, 0.08)"
+      ha-card-background: "#ffffff"
+      card-background-color: "#ffffff"
+      primary-color: "#18181b"
+      accent-color: "#d97706"
+      primary-background-color: "#ffffff"
+      secondary-background-color: "#f4f4f5"
+      divider-color: "rgba(0, 0, 0, 0.1)"
+      primary-text-color: "#18181b"
+      secondary-text-color: "#71717a"
+      text-primary-color: "#ffffff"
+      disabled-text-color: "#a1a1aa"
+      text-accent-color: "#d97706"
+      # Hex for the Companion apps' status bar (see above)
+      app-header-background-color: "#ffffff"
+      app-header-text-color: "#18181b"
+      app-header-edit-background-color: "#f4f4f5"
+      app-header-edit-text-color: "#18181b"
+      paper-listbox-background-color: "#ffffff"
+      state-unavailable-color: "#a1a1aa"
+      state-light-off-color: "#a1a1aa"
+      state-light-on-color: "#d97706"
+      state-icon-color: "#71717a"
+      state-icon-active-color: "#d97706"
+      sidebar-icon-color: "#71717a"
+      sidebar-text-color: "#18181b"
+      sidebar-background-color: "#fafafa"
+      sidebar-selected-icon-color: "#d97706"
+      sidebar-selected-text-color: "#d97706"
+      paper-item-icon-color: "#71717a"
+      mdc-button-outline-color: "rgba(0, 0, 0, 0.12)"
+      mdc-theme-primary: "#18181b"
+      mdc-theme-surface: "#ffffff"
+      paper-slider-knob-color: "#ffffff"
+      paper-slider-knob-start-color: "#ffffff"
+      paper-slider-pin-color: "#d97706"
+      paper-slider-pin-start-color: "#a1a1aa"
+      paper-slider-active-color: "#d97706"
+      paper-slider-secondary-color: "rgba(0, 0, 0, 0.15)"
+      paper-slider-container-color: "rgba(0, 0, 0, 0.1)"
+      switch-unchecked-button-color: "#ffffff"
+      switch-unchecked-track-color: "rgba(0, 0, 0, 0.15)"
+      paper-toggle-button-unchecked-button-color: "#ffffff"
+      paper-toggle-button-unchecked-bar-color: "rgba(0, 0, 0, 0.15)"
+      table-row-background-color: "#ffffff"
+      table-row-alternative-background-color: "#f4f4f5"
+      data-table-background-color: "#ffffff"
+      mdc-text-field-fill-color: "rgba(0, 0, 0, 0.04)"
+      input-fill-color: "rgba(0, 0, 0, 0.04)"
+      input-dropdown-icon-color: "#71717a"
+      material-background-color: "#ffffff"
+      input-ink-color: "#18181b"
+      input-label-ink-color: "#71717a"
+      input-idle-line-color: "rgba(0, 0, 0, 0.12)"
+      input-hover-line-color: "#18181b"
+      mdc-select-fill-color: "rgba(0, 0, 0, 0.04)"
+      mdc-select-ink-color: "#18181b"
+      mdc-select-label-ink-color: "#71717a"
+      mdc-select-idle-line-color: "rgba(0, 0, 0, 0.12)"
+      mdc-select-dropdown-icon-color: "#71717a"
+      mdc-select-hover-line-color: "#18181b"
+      mdc-text-field-disabled-fill-color: "rgba(0, 0, 0, 0.02)"
+      mdc-checkbox-unchecked-color: "#a1a1aa"
+      purple: "#9333ea"
+      yellow: "#ca8a04"
+      orange: "#ea580c"
+      red: "#dc2626"
+      green: "#16a34a"
+      blue: "#0284c7"
+      teal: "#0d9488"
+      pink: "#db2777"
+      purple-tint: "rgba(147, 51, 234, 0.12)"
+      yellow-tint: "rgba(202, 138, 4, 0.12)"
+      orange-tint: "rgba(234, 88, 12, 0.12)"
+      red-tint: "rgba(220, 38, 38, 0.12)"
+      green-tint: "rgba(22, 163, 74, 0.12)"
+      blue-tint: "rgba(2, 132, 199, 0.12)"
+      teal-tint: "rgba(13, 148, 136, 0.12)"
+      pink-tint: "rgba(219, 39, 119, 0.12)"

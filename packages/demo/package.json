@@ -1,0 +1,23 @@
+{
+	"name": "@app/demo",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"description": "A made-up house for running the dashboards without Home Assistant: contributors, screenshots, the setup MCP's preview",
+	"exports": {
+		".": "./src/house.ts",
+		"./hass": "./src/hass.ts"
+	},
+	"scripts": {
+		"demo": "bun src/serve.ts",
+		"test": "bun test",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@app/ui": "workspace:*"
+	},
+	"devDependencies": {
+		"@types/bun": "catalog:",
+		"typescript": "catalog:"
+	}
+}

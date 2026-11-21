@@ -1,0 +1,25 @@
+{
+	"name": "@app/dashboard-build",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"description": "Shared Bun build for the dashboards: Tailwind-in-ShadowRoot bundle + publish hook (+ Lovelace resource sync for the loader)",
+	"exports": {
+		".": "./src/build-panel.ts"
+	},
+	"scripts": {
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@babel/core": "catalog:",
+		"babel-plugin-react-compiler": "catalog:",
+		"bun-plugin-tailwind": "catalog:",
+		"preact": "catalog:",
+		"tailwindcss": "catalog:"
+	},
+	"devDependencies": {
+		"@types/babel__core": "catalog:",
+		"@types/bun": "catalog:",
+		"typescript": "catalog:"
+	}
+}

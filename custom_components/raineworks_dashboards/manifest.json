@@ -1,0 +1,23 @@
+{
+	"domain": "raineworks_dashboards",
+	"name": "Raineworks Dashboards",
+	"after_dependencies": [
+		"chime_tts",
+		"escpos_printer",
+		"media_source",
+		"music_assistant",
+		"person",
+		"tts",
+		"warden"
+	],
+	"codeowners": ["@raine-works"],
+	"config_flow": true,
+	"dependencies": ["frontend", "http", "websocket_api"],
+	"documentation": "https://github.com/raine-works/ha-dashboards",
+	"integration_type": "service",
+	"iot_class": "calculated",
+	"issue_tracker": "https://github.com/raine-works/ha-dashboards/issues",
+	"requirements": [],
+	"single_config_entry": true,
+	"version": "0.1.0"
+}

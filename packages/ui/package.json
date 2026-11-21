@@ -1,0 +1,57 @@
+{
+	"name": "@app/ui",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"description": "Shared shadcn/ui components, Home Assistant context and helpers for wall panels",
+	"exports": {
+		"./components": "./src/components/ui/index.ts",
+		"./camera": "./src/components/camera/index.ts",
+		"./audio": "./src/components/audio/MessageComposer.tsx",
+		"./intercom": "./src/components/intercom/IntercomDialog.tsx",
+		"./hass": "./src/context/HassContext.tsx",
+		"./panel": "./src/panel/definePanelElement.tsx",
+		"./lib/*": "./src/lib/*.ts",
+		"./types": "./src/types/homeassistant.ts",
+		"./theme.css": "./src/styles/theme.css",
+		"./alerts": "./src/components/alerts/PanelAlerts.tsx",
+		"./alerts/open-sensors": "./src/components/alerts/OpenSensorsDialog.tsx",
+		"./laundry": "./src/components/laundry/LaundryCard.tsx",
+		"./climate": "./src/components/climate/ClimateSection.tsx",
+		"./people": "./src/components/people/PeopleDialog.tsx",
+		"./pets": "./src/components/pets/PetsDialog.tsx",
+		"./header": "./src/components/header/PanelHeader.tsx",
+		"./security": "./src/components/security/SecuritySection.tsx",
+		"./lighting": "./src/components/lighting/LightingSection.tsx",
+		"./covers": "./src/components/covers/CoverCard.tsx",
+		"./hooks/*": "./src/hooks/*.ts",
+		"./layout": "./src/components/layout/PanelLayout.tsx",
+		"./color-scheme": "./src/context/ColorScheme.tsx",
+		"./modules": "./src/context/Modules.tsx",
+		"./music": "./src/components/music/MusicDialog.tsx",
+		"./calendar": "./src/components/calendar/CalendarDialog.tsx",
+		"./todo": "./src/components/todo/TodoDialog.tsx",
+		"./tv": "./src/components/tv/TvDialog.tsx"
+	},
+	"scripts": {
+		"test": "bun test",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@fontsource/poppins": "catalog:",
+		"class-variance-authority": "catalog:",
+		"clsx": "catalog:",
+		"leaflet": "catalog:",
+		"lucide-react": "catalog:",
+		"preact": "catalog:",
+		"recharts": "catalog:",
+		"sonner": "catalog:",
+		"tailwind-merge": "catalog:",
+		"uqr": "catalog:"
+	},
+	"devDependencies": {
+		"@types/bun": "catalog:",
+		"@types/leaflet": "catalog:",
+		"typescript": "catalog:"
+	}
+}

@@ -1,0 +1,96 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.5.10/schema.json",
+	"assist": {
+		"actions": {
+			"source": {
+				"organizeImports": "on"
+			}
+		}
+	},
+	"files": {
+		"includes": [
+			"**",
+			"!**/node_modules",
+			"!**/.claude",
+			"!**/.turbo",
+			"!**/dist",
+			"!**/.venv",
+			"!custom_components/*/www",
+			"!**/*.yml",
+			"!**/*.yaml",
+			"!**/*.html",
+			"!**/*.md"
+		]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"bracketSpacing": true
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "single",
+			"arrowParentheses": "always",
+			"bracketSameLine": false,
+			"bracketSpacing": true,
+			"jsxQuoteStyle": "double",
+			"quoteProperties": "asNeeded",
+			"semicolons": "always",
+			"trailingCommas": "all",
+			"lineWidth": 120
+		}
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
+	},
+	"overrides": [
+		{
+			"includes": [".zed/**/*.json", ".vscode/**/*.json"],
+			"json": {
+				"parser": {
+					"allowTrailingCommas": true,
+					"allowComments": true
+				}
+			}
+		}
+	],
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"preset": "recommended",
+			"a11y": {
+				"useSemanticElements": "off",
+				"useFocusableInteractive": "off",
+				"noRedundantRoles": "off",
+				"noSvgWithoutTitle": "off"
+			},
+			"correctness": {
+				"useExhaustiveDependencies": "off",
+				"noChildrenProp": "off",
+				"noUnusedImports": "error",
+				"noUnusedVariables": "error",
+				"noUnusedFunctionParameters": "error"
+			},
+			"complexity": {
+				"noBannedTypes": "off"
+			},
+			"suspicious": {
+				"noArrayIndexKey": "off"
+			},
+			"security": {
+				"noDangerouslySetInnerHtml": "off"
+			},
+			"nursery": {
+				"useTailwindShorthandClasses": "warn",
+				"useSortedClasses": {
+					"level": "warn",
+					"options": {
+						"functions": ["cn", "cva", "clsx", "tw"]
+					}
+				}
+			}
+		}
+	}
+}

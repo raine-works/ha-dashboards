@@ -1,0 +1,4 @@
+{
+	"extends": "../../tsconfig.json",
+	"include": ["src/**/*", "scripts/**/*", "../ui/src/types/env.d.ts"]
+}

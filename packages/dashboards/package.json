@@ -1,0 +1,25 @@
+{
+	"name": "@app/dashboards",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"description": "The dashboards: every card (home, kitchen, basement, hallway, each in src/<name>), built as one bundle to dist/dashboards.js and uploaded to Home Assistant's integration",
+	"scripts": {
+		"build": "bun scripts/build.ts",
+		"build:local": "bun scripts/build.ts --no-sync",
+		"dev": "bun scripts/build.ts --watch",
+		"test": "bun test",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@app/ui": "workspace:*",
+		"lucide-react": "catalog:",
+		"preact": "catalog:"
+	},
+	"devDependencies": {
+		"@app/ha-client": "workspace:*",
+		"@app/dashboard-build": "workspace:*",
+		"@types/bun": "catalog:",
+		"typescript": "catalog:"
+	}
+}

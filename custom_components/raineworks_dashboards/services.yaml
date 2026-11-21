@@ -1,0 +1,116 @@
+reload_panels:
+wake_panels:
+set_affirmation:
+  fields:
+    person:
+      required: true
+      selector:
+        entity:
+          domain: person
+    text:
+      required: true
+      selector:
+        text:
+          multiline: true
+notify_people:
+  fields:
+    people:
+      selector:
+        entity:
+          domain: person
+          multiple: true
+    exclude:
+      selector:
+        entity:
+          domain: person
+          multiple: true
+    title:
+      required: true
+      selector:
+        text:
+    message:
+      required: true
+      selector:
+        text:
+          multiline: true
+    data:
+      selector:
+        object:
+add_todo_item:
+  fields:
+    list:
+      required: true
+      selector:
+        entity:
+          domain: todo
+    item:
+      required: true
+      selector:
+        text:
+    person:
+      selector:
+        entity:
+          domain: person
+    note:
+      selector:
+        text:
+          multiline: true
+    due_date:
+      selector:
+        date:
+notify_todo_assignee:
+  fields:
+    person:
+      selector:
+        entity:
+          domain: person
+    list:
+      required: true
+      selector:
+        entity:
+          domain: todo
+    item:
+      required: true
+      selector:
+        text:
+    uid:
+      selector:
+        text:
+    uids:
+      selector:
+        text:
+          multiple: true
+print_note:
+  fields:
+    message:
+      required: true
+      selector:
+        text:
+          multiline: true
+    sender:
+      selector:
+        text:
+    printer:
+      selector:
+        entity:
+          domain: notify
+          integration: escpos_printer
+print_todo_list:
+  fields:
+    list:
+      required: true
+      selector:
+        entity:
+          domain: todo
+    uids:
+      selector:
+        text:
+          multiple: true
+    person:
+      selector:
+        text:
+    printer:
+      selector:
+        entity:
+          domain: notify
+          integration: escpos_printer

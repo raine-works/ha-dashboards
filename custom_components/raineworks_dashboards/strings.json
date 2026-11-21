@@ -1,0 +1,307 @@
+{
+	"config": {
+		"step": {
+			"user": {
+				"title": "Raineworks Dashboards",
+				"description": "Dashboards for wall panels, desktops and phones, built from what your home has. After setup, add a dashboard whose view hosts `custom:home-dashboard` or `custom:wall-panel-dashboard`."
+			}
+		},
+		"abort": {
+			"single_instance_allowed": "Raineworks Dashboards is already set up."
+		}
+	},
+	"options": {
+		"step": {
+			"init": {
+				"title": "Raineworks Dashboards",
+				"menu_options": {
+					"general": "General",
+					"house": "House",
+					"bedtime": "Bedtime",
+					"laundry": "Laundry"
+				}
+			},
+			"general": {
+				"title": "General",
+				"data": {
+					"serve_bundle": "Serve the dashboards",
+					"household_group": "Household",
+					"alarm_panel": "Alarm panel",
+					"bedtime_entity": "Bedtime"
+				},
+				"data_description": {
+					"serve_bundle": "Load the dashboards on every page from this integration. Turn off only when you build and serve them yourself.",
+					"household_group": "Who the dashboards list, message and assign chores to: a Warden group's members, or everyone whose person has a device tracker.",
+					"alarm_panel": "The wall panels' status lights pulse red when it's triggered, amber during its delays, and show green while armed. Leave empty to use Alarmo's panel, else the first one.",
+					"bedtime_entity": "While it's on, the status lights show at 10% (a triggered alarm stays bright); else this integration's Home Bedtime, when it has bedtime rooms. Doors labeled Exterior Door show amber while open."
+				}
+			},
+			"house": {
+				"title": "House",
+				"description": "What the dashboards can't find on their own. A dashboard card's own `house` option wins where both set something.",
+				"data": {
+					"announce_speaker": "Announcing speaker",
+					"weather": "Weather",
+					"thermostats": "Thermostats",
+					"tts_engine": "Voice (text-to-speech)",
+					"tts_voice": "Voice name",
+					"tts_streaming": "The voice streams",
+					"tts_fallback": "Fallback voice",
+					"guest_wifi_qr": "Guest Wi-Fi QR code",
+					"birthday_calendar": "Birthdays calendar",
+					"announce_speakers": "Announcement speakers",
+					"quiet_start": "Quiet from",
+					"quiet_end": "Quiet until",
+					"home_path": "Home dashboard"
+				},
+				"data_description": {
+					"announce_speaker": "Where the wall panel timer announces, and the Daily dialog's first speaker.",
+					"weather": "Else the first weather entity.",
+					"thermostats": "The climate card's thermostats, in this order; else every thermostat.",
+					"tts_engine": "The house's voice for the intercom's typed messages and camera talkback; else the first text-to-speech entity.",
+					"tts_voice": "Named on every call, so a change of the engine's default never changes it.",
+					"tts_streaming": "The engine speaks an answer as it's written (Assist speaks through it itself).",
+					"tts_fallback": "Spoken with when the voice fails.",
+					"guest_wifi_qr": "An image with the guest network's QR code (UniFi's), shown on the wall panels.",
+					"birthday_calendar": "Else the calendar named Birthdays.",
+					"announce_speakers": "Where an announcement plays when none are named; else the announcing speaker.",
+					"quiet_start": "Automated announcements stay silent from this time (10 PM if empty), and while bedtime is on.",
+					"quiet_end": "…until this time (7 AM if empty). A person's own announcements (the intercom, the timer) always play.",
+					"home_path": "The Home dashboard's path (/dashboard-home/home): to-do pushes open their item there."
+				}
+			},
+			"laundry": {
+				"title": "Laundry",
+				"description": "The washer's and dryer's sensors (SmartThings names them so). A machine with all three shows in the header while it runs.",
+				"data": {
+					"washer_machine_state": "Washer machine state",
+					"washer_job_state": "Washer job state",
+					"washer_time_remaining": "Washer time remaining",
+					"dryer_machine_state": "Dryer machine state",
+					"dryer_job_state": "Dryer job state",
+					"dryer_time_remaining": "Dryer time remaining"
+				}
+			},
+			"bedtime": {
+				"title": "Bedtime",
+				"description": "A Bedtime switch for each room picked, and Home Bedtime: every room on turns Home Bedtime on, any room off turns it off, and Home Bedtime turned on puts every room to bed. What a room's bedtime does is up to your automations (trigger on its switch). A room that had a bedtime toggle (an input_boolean labeled Bedtime, in that area) keeps its name and state.",
+				"data": {
+					"bedtime_rooms": "Bedtime rooms",
+					"bedtime_ends": "Bedtime ends"
+				},
+				"data_description": {
+					"bedtime_rooms": "Each gets a Bedtime switch, in its area, labeled Bedtime.",
+					"bedtime_ends": "Every room's bedtime turns off then (and so Home Bedtime)."
+				}
+			}
+		}
+	},
+	"config_subentries": {
+		"wall_panel": {
+			"initiate_flow": {
+				"user": "Add wall panel"
+			},
+			"entry_type": "Wall panel",
+			"step": {
+				"user": {
+					"title": "Wall panel",
+					"description": "A tablet on a wall showing a `custom:wall-panel-dashboard`. Pick its device and its status light, wake and reload are found on it; pick any of them yourself to override, or leave them out if the tablet has none.",
+					"data": {
+						"name": "Name",
+						"device_id": "Device",
+						"status_light": "Status light",
+						"wake": "Wake the screen",
+						"reload": "Reload"
+					},
+					"data_description": {
+						"name": "How it's named where the shared user can't say which panel it was (who armed the alarm). Use the same name as its card's `name`.",
+						"device_id": "The tablet's device (ROAMiQ, Fully Kiosk Browser, the Companion app…).",
+						"status_light": "A light showing the house's status: the alarm, an exterior door open.",
+						"wake": "A button or switch that turns its screen on: pressed when the doorbell rings.",
+						"reload": "A button that reloads its dashboard: pressed by the reload_panels action."
+					}
+				},
+				"reconfigure": {
+					"title": "Wall panel",
+					"data": {
+						"name": "Name",
+						"device_id": "Device",
+						"status_light": "Status light",
+						"wake": "Wake the screen",
+						"reload": "Reload"
+					}
+				}
+			},
+			"abort": {
+				"reconfigure_successful": "The wall panel was updated."
+			}
+		}
+	},
+	"services": {
+		"reload_panels": {
+			"name": "Reload wall panels",
+			"description": "Presses every wall panel's reload, so each loads its dashboard again (a new version, after a deploy)."
+		},
+		"wake_panels": {
+			"name": "Wake wall panels",
+			"description": "Turns on every wall panel's screen."
+		},
+		"set_affirmation": {
+			"name": "Set daily affirmation",
+			"description": "Stores a household member's daily affirmation (the Daily dialog shows it).",
+			"fields": {
+				"person": {
+					"name": "Person",
+					"description": "A household member."
+				},
+				"text": {
+					"name": "Text",
+					"description": "The affirmation."
+				}
+			}
+		},
+		"notify_people": {
+			"name": "Notify people",
+			"description": "Sends a push to household members' phones (their Companion apps). No people: the whole household.",
+			"fields": {
+				"people": {
+					"name": "People",
+					"description": "Who to notify. Leave empty for the whole household."
+				},
+				"exclude": {
+					"name": "Exclude",
+					"description": "People to leave out (whoever made the change)."
+				},
+				"title": {
+					"name": "Title",
+					"description": "A few words, such as who it's from."
+				},
+				"message": {
+					"name": "Message",
+					"description": "What to say."
+				},
+				"data": {
+					"name": "Notification data",
+					"description": "The Companion app's data (tag, group, channel, clickAction, url, actions, image…)."
+				}
+			}
+		},
+		"add_todo_item": {
+			"name": "Add to-do item",
+			"description": "Adds an item to a to-do list, for a household member (an 'Assigned to' line in its description) or anyone, and tells whom it's for.",
+			"fields": {
+				"list": {
+					"name": "List",
+					"description": "The to-do list."
+				},
+				"item": {
+					"name": "Item",
+					"description": "What to do."
+				},
+				"person": {
+					"name": "Person",
+					"description": "Who it's for; empty for anyone."
+				},
+				"note": {
+					"name": "Note",
+					"description": "A line under the assignee."
+				},
+				"due_date": {
+					"name": "Due date",
+					"description": "When it's due."
+				}
+			}
+		},
+		"notify_todo_assignee": {
+			"name": "Notify to-do assignee",
+			"description": "Pushes a to-do item to whom it's for (anyone: the household but whoever added it), with Mark done.",
+			"fields": {
+				"person": {
+					"name": "Person",
+					"description": "Who it's for; empty for anyone."
+				},
+				"list": {
+					"name": "List",
+					"description": "The to-do list."
+				},
+				"item": {
+					"name": "Item",
+					"description": "The item's summary (finds it without a uid)."
+				},
+				"uid": {
+					"name": "Item uid",
+					"description": "The item's uid, when known."
+				},
+				"uids": {
+					"name": "Item uids",
+					"description": "Several items at once; the item then lists their summaries."
+				}
+			}
+		},
+		"print_note": {
+			"name": "Print note",
+			"description": "Prints a note on the receipt printer: titled Note, who it's from and when, the message big and centered.",
+			"fields": {
+				"message": {
+					"name": "Message",
+					"description": "The note (plain text: the printer has no emoji)."
+				},
+				"sender": {
+					"name": "From",
+					"description": "Who it's from; empty for no name."
+				},
+				"printer": {
+					"name": "Printer",
+					"description": "Empty for the first receipt printer."
+				}
+			}
+		},
+		"print_todo_list": {
+			"name": "Print to-do list",
+			"description": "Prints a to-do list's open items (or those picked) as a checklist, each with its due date and who it's for.",
+			"fields": {
+				"list": {
+					"name": "List",
+					"description": "The to-do list."
+				},
+				"uids": {
+					"name": "Items",
+					"description": "The items to print (their uids); empty for every open item."
+				},
+				"person": {
+					"name": "Person",
+					"description": "Whose slip this is (their name): titled with it, their own items not repeating it."
+				},
+				"printer": {
+					"name": "Printer",
+					"description": "Empty for the first receipt printer."
+				}
+			}
+		}
+	},
+	"entity": {
+		"switch": {
+			"room_bedtime": {
+				"name": "Bedtime"
+			},
+			"home_bedtime": {
+				"name": "Home Bedtime"
+			}
+		},
+		"datetime": {
+			"holiday_mute": {
+				"name": "Holiday sounds muted until"
+			}
+		},
+		"binary_sensor": {
+			"lock_fault": {
+				"name": "Lock fault"
+			}
+		},
+		"sensor": {
+			"affirmation": {
+				"name": "Daily affirmation"
+			}
+		}
+	}
+}
