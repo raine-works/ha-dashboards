@@ -64,6 +64,21 @@
         "typescript": "catalog:",
       },
     },
+    "packages/mcp": {
+      "name": "@app/mcp",
+      "version": "1.0.0",
+      "bin": {
+        "raineworks-dashboards-mcp": "./src/index.ts",
+      },
+      "dependencies": {
+        "@app/ha-client": "workspace:*",
+        "@app/ui": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
     "packages/ui": {
       "name": "@app/ui",
       "version": "1.0.0",
@@ -115,6 +130,8 @@
     "@app/demo": ["@app/demo@workspace:packages/demo"],
 
     "@app/ha-client": ["@app/ha-client@workspace:packages/ha-client"],
+
+    "@app/mcp": ["@app/mcp@workspace:packages/mcp"],
 
     "@app/ui": ["@app/ui@workspace:packages/ui"],
 

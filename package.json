@@ -38,11 +38,10 @@
 		"typescript": "catalog:"
 	},
 	"scripts": {
-		"build": "bun run --filter @app/dashboards build",
 		"audit:house": "bun scripts/house-audit.ts",
-		"report": "bun scripts/capability-report.ts",
-		"build:local": "bun run --filter @app/dashboards build:local",
+		"build": "bun run --filter @app/dashboards build",
 		"build:integration": "bun packages/dashboards/scripts/build.ts --integration",
+		"build:local": "bun run --filter @app/dashboards build:local",
 		"check": "bun check",
 		"demo": "bun run --filter @app/demo demo",
 		"dev": "bun run --filter @app/dashboards dev",
@@ -50,6 +49,8 @@
 		"lint": "biome check . && bun scripts/tailwind-lint.ts",
 		"lint:fix": "biome check --write .",
 		"lint:tailwind": "bun scripts/tailwind-lint.ts",
+		"mcp": "bun packages/mcp/src/index.ts",
+		"report": "bun scripts/capability-report.ts",
 		"test": "bun test",
 		"typecheck": "bun run --filter '*' typecheck"
 	}

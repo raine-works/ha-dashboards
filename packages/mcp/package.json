@@ -1,0 +1,27 @@
+{
+	"name": "@app/mcp",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"description": "The setup MCP server: lets an AI assistant check and set up the dashboards on a Home Assistant (stdio, HA_URL / HA_TOKEN)",
+	"bin": {
+		"raineworks-dashboards-mcp": "./src/index.ts"
+	},
+	"exports": {
+		".": "./src/index.ts",
+		"./server": "./src/server.ts",
+		"./tools": "./src/tools.ts"
+	},
+	"scripts": {
+		"start": "bun src/index.ts",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@app/ha-client": "workspace:*",
+		"@app/ui": "workspace:*"
+	},
+	"devDependencies": {
+		"@types/bun": "catalog:",
+		"typescript": "catalog:"
+	}
+}

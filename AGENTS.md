@@ -22,6 +22,7 @@ ha-dashboards/
 │   ├── dashboards/    # @app/dashboards: the cards (src/home, src/wall-panel), one bundle
 │   ├── dashboard-build/ # the Bun build: React Compiler, CSS into the ShadowRoot, chunks
 │   ├── ha-client/     # the tools' websocket client (HA_URL / HA_TOKEN) and house snapshot
+│   ├── mcp/           # the setup MCP server (stdio, no SDK): `bun run mcp`
 │   └── demo/          # a made-up house and mock hass: `bun run demo`
 └── scripts/           # house-audit, capability report, brand icons, holiday fixture, Tailwind lint
 ```
