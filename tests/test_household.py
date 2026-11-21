@@ -1,5 +1,8 @@
 """Who the household is, and the info command the dashboards read it from."""
 
+import json
+from pathlib import Path
+
 from homeassistant.core import HomeAssistant
 
 from custom_components.raineworks_dashboards.const import CONF_HOUSEHOLD_GROUP
@@ -35,7 +38,11 @@ async def test_info_command(
     result = (await client.receive_json())["result"]
     assert result["household"] == ["person.admin", "person.alex"]
     assert result["household_source"] == "warden"
-    assert result["version"] == "0.1.0"
+    manifest = (
+        Path(__file__).parent.parent
+        / "custom_components/raineworks_dashboards/manifest.json"
+    )
+    assert result["version"] == json.loads(manifest.read_text())["version"]
 
 
 async def test_household_through_wardens_public_api(

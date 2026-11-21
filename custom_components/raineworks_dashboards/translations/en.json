@@ -138,6 +138,52 @@
 		}
 	},
 	"services": {
+		"announce": {
+			"name": "Announce",
+			"description": "Speaks a message in the house's voice on Music Assistant speakers (each group once, through its leader) and on every TV that's on, after a chime (in a holiday's days, the holiday's sound). Skipped during quiet hours and bedtime unless told otherwise.",
+			"fields": {
+				"message": {
+					"name": "Message",
+					"description": "What to say."
+				},
+				"speakers": {
+					"name": "Speakers",
+					"description": "Speakers by entity id or name; the House options' announcement speakers when empty."
+				},
+				"volume": {
+					"name": "Volume",
+					"description": "The announcement's volume."
+				},
+				"chime": {
+					"name": "Chime",
+					"description": "Play a chime before it."
+				},
+				"holiday_chime": {
+					"name": "Holiday chime",
+					"description": "In a holiday's days, its sound as the chime."
+				},
+				"chime_sound": {
+					"name": "Chime sound",
+					"description": "One of the integration's sounds by name (birthday), instead of the usual chime."
+				},
+				"quiet_hours": {
+					"name": "Respect quiet hours",
+					"description": "Skip it during the House options' quiet hours and while bedtime is on (off for announcements a person starts)."
+				},
+				"tvs": {
+					"name": "TVs",
+					"description": "Also speak it on every TV that's on."
+				},
+				"wait": {
+					"name": "Wait",
+					"description": "Wait for it to be spoken; off answers at once and speaks in the background."
+				},
+				"cache": {
+					"name": "Cache",
+					"description": "Keep the spoken audio to reuse for the same message."
+				}
+			}
+		},
 		"reload_panels": {
 			"name": "Reload wall panels",
 			"description": "Presses every wall panel's reload, so each loads its dashboard again (a new version, after a deploy)."

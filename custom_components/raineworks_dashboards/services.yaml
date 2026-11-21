@@ -114,3 +114,49 @@ print_todo_list:
         entity:
           domain: notify
           integration: escpos_printer
+announce:
+  fields:
+    message:
+      required: true
+      selector:
+        text:
+          multiline: true
+    speakers:
+      selector:
+        entity:
+          domain: media_player
+          multiple: true
+    volume:
+      default: 75
+      selector:
+        number:
+          min: 0
+          max: 100
+          unit_of_measurement: "%"
+    chime:
+      default: true
+      selector:
+        boolean:
+    holiday_chime:
+      default: true
+      selector:
+        boolean:
+    chime_sound:
+      selector:
+        text:
+    quiet_hours:
+      default: true
+      selector:
+        boolean:
+    tvs:
+      default: true
+      selector:
+        boolean:
+    wait:
+      default: true
+      selector:
+        boolean:
+    cache:
+      default: false
+      selector:
+        boolean:

@@ -77,6 +77,12 @@ views:
 Any tablet works: a panel's hardware is found on its device (a light for status, a button or switch
 to wake the screen, a restart button to reload), and each can be left out.
 
+## Documentation
+
+The [docs](docs/README.md): [installation](docs/installation.md), [the cards and their settings](docs/cards.md),
+[wall panels](docs/wall-panels.md), and references to every [module](docs/reference/modules.md),
+[integration option](docs/reference/options.md) and [action](docs/reference/actions.md).
+
 ## Configuration
 
 Discovery covers most houses. What it can't tell (which speaker announces, the voice, the laundry's
