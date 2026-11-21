@@ -73,6 +73,12 @@ chart and sidebar colors, and optional effects (a two-color gradient, edges, glo
   administrator's for the house).
 - **Picking**: the Appearance dialog (`components/appearance/`) saves a person's theme to their
   Home Assistant profile (a `settheme` event, as Home Assistant's Profile page does).
+- **Making**: the theme editor (`ThemeEditor.tsx`, loaded on demand) builds a theme from choices
+  (`themes/build.ts`: a starting theme, an accent color or gradient, a gray base, a radius,
+  effects; shadcn CSS in and out), previews it on the real components, and saves it with its Home
+  Assistant theme generated in the browser (`raineworks_dashboards/themes/save`). Each effect reads
+  its own colors (`--edge-from/to`, `--glow-from/to`, falling back to the gradient), since the page's
+  `data-effects` reaches into a preview: the preview makes the ones its theme lacks transparent.
 - Statuses keep their own colors in every theme; the gradient is decoration, never a status.
   Effects can't use `@property` (it doesn't work in a ShadowRoot): edges fade with opacity.
 

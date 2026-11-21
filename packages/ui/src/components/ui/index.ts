@@ -24,5 +24,6 @@ export * from './swipe-row';
 export * from './switch';
 export * from './switch-row';
 export * from './tabs';
+export * from './textarea';
 export * from './toggle-group';
 export * from './wheel-picker';

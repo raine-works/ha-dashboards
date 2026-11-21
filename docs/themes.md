@@ -19,6 +19,26 @@ On the Home dashboard, open **Appearance** (in the More menu on a wide screen, t
 button on a phone): choose Light, Dark or Auto, and a theme. Your choice is saved to your Home
 Assistant profile, so it follows you to every device. **House theme** goes back to the house's.
 
+## Making your own
+
+In Appearance, **New theme** under Your themes (or the pencil on one of yours) opens the theme
+editor, with a preview in light and dark on the dashboards' own buttons, toggles and cards:
+
+- **Start from** any theme: its statuses, charts and everything you don't change come from it.
+- **Accent**: the theme's own, **a color** (buttons, focus rings, and Home Assistant's switches,
+  sliders and selected items), or **a gradient**, two colors for Raineworks-style edges and glow,
+  each of which can be turned off.
+- **Grays**: Neutral, Zinc, Stone or Slate, shadcn's bases.
+- **Corners**: from square to round.
+- **Import** takes a theme from [ui.shadcn.com/themes](https://ui.shadcn.com/themes),
+  [tweakcn](https://tweakcn.com) or a project's `globals.css` (its `:root { … }` and
+  `.dark { … }`); **Copy CSS** gives yours back in the same format.
+
+**Save** makes it a Home Assistant theme and picks it for you. Your themes are yours: others
+don't see them in their Appearance dialog (Home Assistant's own theme list is shared, so they do
+show in everyone's Profile → Theme). An administrator can **Share with the house**, so everyone
+can pick it, and it can be the house theme.
+
 ## The house theme
 
 The integration's options (Settings → Devices & services → Raineworks Dashboards → Configure →

@@ -99,6 +99,14 @@ export function parseCssColor(value: string): ParsedColor | null {
 		const rgb = parseHex(`#${hex[1]}`);
 		return rgb ? { color: rgbToOklch(rgb), alpha: hex[2] ? Number.parseInt(hex[2], 16) / 255 : 1 } : null;
 	}
+	const hsl = /^hsla?\(\s*([\d.]+)(?:deg)?\s*[, ]\s*([\d.]+)%\s*[, ]\s*([\d.]+)%\s*(?:[,/]\s*([\d.]+%?))?\s*\)$/.exec(
+		v,
+	);
+	if (hsl)
+		return {
+			color: rgbToOklch(hslToRgb(Number(hsl[1]), Number(hsl[2]), Number(hsl[3]))),
+			alpha: hsl[4] ? percentOr(hsl[4]) : 1,
+		};
 	const rgb = /^rgba?\(\s*([\d.]+)\s*[, ]\s*([\d.]+)\s*[, ]\s*([\d.]+)\s*(?:[,/]\s*([\d.]+%?))?\s*\)$/.exec(v);
 	if (rgb)
 		return {
@@ -153,4 +161,14 @@ export function mixHex(a: string, b: string, amount: number): string {
 export function withAlpha(color: string, alpha: number): string {
 	const parsed = parseCssColor(color);
 	return parsed ? `rgba(${hexToRgbList(toHex(parsed.color))}, ${alpha})` : color;
+}
+
+/** HSL (degrees, percent, percent) → sRGB channels (0–255). */
+export function hslToRgb(h: number, s: number, l: number): [number, number, number] {
+	const sat = s / 100;
+	const light = l / 100;
+	const k = (n: number) => (n + h / 30) % 12;
+	const a = sat * Math.min(light, 1 - light);
+	const f = (n: number) => light - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+	return [f(0), f(8), f(4)].map((v) => Math.round(v * 255)) as [number, number, number];
 }
