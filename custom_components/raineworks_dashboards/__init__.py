@@ -26,6 +26,12 @@ from .panels import PanelsController
 from .printer import async_register_printer
 from .sensor import AFFIRMATIONS
 from .serve import BundleUploadView, server
+from .themes import (
+    CONF_THEME,
+    DEFAULT_THEME,
+    async_register_commands as async_register_theme_commands,
+    async_setup_themes,
+)
 from .todo import async_register_todo
 
 type DashboardsConfigEntry = ConfigEntry[PanelsController]
@@ -44,6 +50,7 @@ PLATFORMS = [
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Register the websocket commands and actions (once, whatever the entries)."""
     websocket_api.async_register(hass)
+    async_register_theme_commands(hass)
 
     def controllers() -> list[PanelsController]:
         return [
@@ -96,6 +103,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: DashboardsConfigEntry) -
         await bundles.async_start()
         entry.async_on_unload(bundles.async_stop)
     entry.async_on_unload(async_start_sweeping(hass))
+    # The dashboards' themes in Home Assistant's theme list; the house's is its default
+    themes = await async_setup_themes(
+        hass, entry.options.get(CONF_THEME, DEFAULT_THEME)
+    )
+    entry.async_on_unload(themes.async_listen())
     controller = PanelsController(hass, entry)
     entry.runtime_data = controller
     controller.async_start()

@@ -1,8 +1,10 @@
 import { Moon, Sun, SunMoon } from 'lucide-react';
 import type React from 'preact/compat';
+import { useState } from 'preact/compat';
 import { type ColorSchemeSetting, useHomeAssistantColorScheme } from '../../context/ColorScheme';
 import { cn } from '../../lib/utils';
-import { Button, type ButtonProps, Popover, PopoverContent, PopoverTrigger, ToggleGroup, ToggleGroupItem } from '../ui';
+import { AppearanceDialog } from '../appearance/AppearanceDialog';
+import { Button, type ButtonProps, ToggleGroup, ToggleGroupItem } from '../ui';
 
 const CHOICES: { value: ColorSchemeSetting; label: string; icon: typeof Sun }[] = [
 	{ value: 'light', label: 'Light', icon: Sun },
@@ -35,27 +37,27 @@ export const ColorSchemeToggle: React.FC<{ className?: string }> = ({ className 
 	);
 };
 
-/** A header button showing Home Assistant's appearance (sun, moon, or both for Auto); opens the toggle. */
+/** A header button showing Home Assistant's appearance (sun, moon, or both for Auto); opens Appearance. */
 export const ColorSchemeButton: React.FC<{ size?: ButtonProps['size']; className?: string }> = ({
 	size = 'icon-sm',
 	className,
 }) => {
 	const [setting] = useHomeAssistantColorScheme();
+	const [open, setOpen] = useState(false);
 	const Icon = CHOICES.find((c) => c.value === setting)?.icon ?? SunMoon;
 	return (
-		<Popover>
-			<PopoverTrigger asChild>
-				<Button variant="outline" size={size} aria-label="Appearance" title="Appearance" className={className}>
-					<Icon />
-				</Button>
-			</PopoverTrigger>
-			<PopoverContent align="end" className="flex w-72 flex-col gap-2 p-3">
-				<span className="font-medium text-sm">Appearance</span>
-				<ColorSchemeToggle />
-				<span className="text-muted-foreground text-xs">
-					Home Assistant on this device. Auto follows the device's setting.
-				</span>
-			</PopoverContent>
-		</Popover>
+		<>
+			<Button
+				variant="outline"
+				size={size}
+				aria-label="Appearance"
+				title="Appearance"
+				className={className}
+				onClick={() => setOpen(true)}
+			>
+				<Icon />
+			</Button>
+			<AppearanceDialog isOpen={open} onClose={() => setOpen(false)} />
+		</>
 	);
 };

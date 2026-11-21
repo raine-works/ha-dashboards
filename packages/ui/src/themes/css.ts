@@ -18,3 +18,16 @@ export function themeEffects(theme: DashboardTheme): string {
 	if (!effects?.gradient) return '';
 	return [effects.edges && 'edges', effects.glow && 'glow'].filter(Boolean).join(' ');
 }
+
+/** A theme's tokens for one mode as inline style (a preview drawn in that theme, wherever it sits). */
+export function themeStyle(theme: DashboardTheme, mode: 'light' | 'dark'): Record<string, string> {
+	const tokens = mode === 'dark' ? theme.dark : theme.light;
+	const style: Record<string, string> = { '--radius': theme.radius };
+	for (const name of TOKEN_NAMES) style[`--${name}`] = tokens[name];
+	const gradient = theme.effects?.gradient;
+	if (gradient) {
+		style['--gradient-from'] = gradient.from;
+		style['--gradient-to'] = gradient.to;
+	}
+	return style;
+}

@@ -803,3 +803,31 @@ ha-camera-stream {
 		transform: none;
 	}
 }
+
+/* Theme previews (AppearanceDialog): a theme with a gradient draws its edge and glow on the
+   preview's button, as its primary buttons do */
+@layer components {
+	.theme-preview-edge::before {
+		content: "";
+		position: absolute;
+		inset: -1px;
+		border: 1px solid transparent;
+		border-radius: inherit;
+		background: linear-gradient(
+				135deg in oklab,
+				var(--gradient-from),
+				var(--gradient-to)
+			)
+			border-box;
+		mask:
+			linear-gradient(#000 0 0) padding-box exclude,
+			linear-gradient(#000 0 0) border-box;
+		pointer-events: none;
+	}
+	.theme-preview-edge[data-glow] {
+		box-shadow:
+			-4px 3px 10px -3px
+			color-mix(in oklab, var(--gradient-from) 60%, transparent),
+			4px 4px 11px -3px color-mix(in oklab, var(--gradient-to) 60%, transparent);
+	}
+}

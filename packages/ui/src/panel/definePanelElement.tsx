@@ -18,8 +18,8 @@ import { createHassStore } from '../lib/hass-store';
 import { setHouseConfig } from '../lib/house-config';
 import { loadHousehold } from '../lib/household';
 import { installTapHaptics } from '../lib/tones';
+import { activeTheme, loadThemeCatalog, subscribeThemeCatalog } from '../themes/catalog';
 import { themeCss, themeEffects } from '../themes/css';
-import { neutral } from '../themes/presets/neutral';
 import type { DashboardTheme } from '../themes/tokens';
 import type { HomeAssistant } from '../types/homeassistant';
 import { hideToolbar, keepSidebarHidden } from './chrome';
@@ -94,6 +94,7 @@ export function definePanelElement({
 		/** The active theme's tokens (themes/css.ts), after the compiled styles */
 		private _themeEl: HTMLStyleElement | null = null;
 		private _themeId = '';
+		private _stopCatalog: (() => void) | null = null;
 		/** hass goes to the store, not a re-render: only components showing what changed update */
 		private _store = createHassStore();
 		/** Color scheme of the last render; the tree re-renders only when it (or the config) changes */
@@ -115,6 +116,7 @@ export function definePanelElement({
 		set hass(hass: HomeAssistant) {
 			this._store.set(hass);
 			this._loadHousehold(hass);
+			void loadThemeCatalog(hass);
 			if (hideChrome && this.isConnected) keepSidebarHidden(this, hass);
 			this._render();
 		}
@@ -145,6 +147,11 @@ export function definePanelElement({
 			this._render();
 			// Before measuring the space above the element, which the toolbar took
 			if (hideChrome && !this._showToolbar) this._showToolbar = hideToolbar(this);
+			// A custom theme saved, or the house theme changed: draw with it
+			this._stopCatalog ??= subscribeThemeCatalog(() => {
+				this._themeId = '';
+				this._render();
+			});
 			// Lovelace hands the card its first hass before attaching it; on a quiet house the next one can
 			// be minutes away, so the sidebar is asked for here too
 			const hass = this._store.get();
@@ -153,6 +160,8 @@ export function definePanelElement({
 		}
 
 		disconnectedCallback() {
+			this._stopCatalog?.();
+			this._stopCatalog = null;
 			this._root?.unmount();
 			this._root = null;
 			this._renderedScheme = null;
@@ -218,7 +227,7 @@ export function definePanelElement({
 			if (setting === 'auto') migrateDeviceColorScheme();
 			const scheme = resolveColorScheme(setting, this._store.get());
 			if (this._mountPoint.className !== scheme) this._mountPoint.className = scheme;
-			this._applyTheme(neutral);
+			this._applyTheme(activeTheme(this._store.get(), this.config.theme));
 			if (scheme === this._renderedScheme) return;
 			this._renderedScheme = scheme;
 

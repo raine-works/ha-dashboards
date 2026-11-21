@@ -7,6 +7,7 @@ import {
 	ListTodo,
 	MessagesSquare,
 	Newspaper,
+	Palette,
 	PanelLeft,
 	Tv as TvIcon,
 	Wifi,
@@ -34,6 +35,7 @@ import { cn } from '../../lib/utils';
 import { formatWeatherCondition } from '../../lib/weather';
 import { openSidebar } from '../../panel/chrome';
 import { showOpenSensors } from '../alerts/OpenSensorsDialog';
+import { AppearanceDialog } from '../appearance/AppearanceDialog';
 import { DailyBriefDialog, type DailyBriefTab } from '../brief/DailyBriefDialog';
 import { CalendarDialog } from '../calendar/CalendarDialog';
 import { useNextCalendarEvent } from '../calendar/useCalendar';
@@ -62,7 +64,6 @@ import {
 import { WeatherDialog } from '../weather/WeatherDialog';
 import { WeatherIcon } from '../weather/WeatherIcon';
 import { GuestWifiDialog, useGuestWifi } from '../wifi/GuestWifiDialog';
-import { ColorSchemeToggle } from './ColorSchemePicker';
 
 // Header building blocks shared by the wall panels and the home dashboard. Each button owns its dialog.
 
@@ -480,7 +481,7 @@ export const CamerasButton: React.FC<HeaderButtonProps> = ({ size = 'icon-xl', c
 	);
 };
 
-type MoreDialog = 'brief' | 'intercom' | 'tv' | 'energy' | 'wifi';
+type MoreDialog = 'brief' | 'intercom' | 'tv' | 'energy' | 'wifi' | 'appearance';
 
 /** A tile in the More menu: the icon over its label and a line of detail, two across. */
 const MORE_TILE =
@@ -566,13 +567,8 @@ export const MoreButton: React.FC<{ tvRemote?: boolean; colorSchemePicker?: bool
 						{messages && tile('intercom', MessagesSquare, 'Messages')}
 						{tvTile && tile('tv', TvIcon, 'TVs', tvsOn > 0 ? `${tvsOn} on` : undefined)}
 					</div>
-					{/* This device's Light / Dark / Auto (the Home dashboard; the wall panels stay dark) */}
-					{colorSchemePicker && (
-						<div className="flex flex-col gap-1.5 border-t px-1.5 pt-2.5 pb-1">
-							<span className="text-muted-foreground text-xs">Appearance</span>
-							<ColorSchemeToggle />
-						</div>
-					)}
+					{/* The theme and Light / Dark / Auto (the Home dashboard; the wall panels follow the house) */}
+					{colorSchemePicker && <div className="flex border-t pt-2">{tile('appearance', Palette, 'Appearance')}</div>}
 				</PopoverContent>
 			</Popover>
 			<DailyBriefDialog isOpen={dialog === 'brief'} onClose={close} tab={linkedBriefTab(link)} />
@@ -580,6 +576,7 @@ export const MoreButton: React.FC<{ tvRemote?: boolean; colorSchemePicker?: bool
 			<TvDialog isOpen={dialog === 'tv'} onClose={close} remote={tvRemote} />
 			<EnergyDialog isOpen={dialog === 'energy'} onClose={close} />
 			<GuestWifiDialog isOpen={dialog === 'wifi'} onClose={close} />
+			<AppearanceDialog isOpen={dialog === 'appearance'} onClose={close} />
 		</>
 	);
 };

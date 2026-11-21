@@ -49,6 +49,8 @@ async def ws_info(
             # The house settings, as a card's `house` option (house.yaml) writes them;
             # a card's own option wins where both set something
             "house": _without_empty(options.get(CONF_HOUSE) or {}),
+            # The house theme's id (Home Assistant's default; a person's own pick wins)
+            "theme": options.get("theme", "raineworks"),
         },
     )
 

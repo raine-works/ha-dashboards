@@ -47,6 +47,7 @@ from .const import (
     SUBENTRY_WALL_PANEL,
 )
 from .household import warden_groups
+from .themes import CONF_THEME, DEFAULT_THEME, KEEP_HA_THEME
 
 # The household option's "no group" choice: every person with a device tracker
 TRACKERS = "__trackers__"
@@ -108,6 +109,7 @@ class DashboardsOptionsFlow(OptionsFlow):
             return self._save(
                 {
                     CONF_SERVE_BUNDLE: user_input[CONF_SERVE_BUNDLE],
+                    CONF_THEME: user_input.get(CONF_THEME, DEFAULT_THEME),
                     CONF_HOUSEHOLD_GROUP: None if group == TRACKERS else group,
                     CONF_ALARM_PANEL: user_input.get(CONF_ALARM_PANEL),
                     CONF_BEDTIME_ENTITY: user_input.get(CONF_BEDTIME_ENTITY),
@@ -119,6 +121,26 @@ class DashboardsOptionsFlow(OptionsFlow):
                 CONF_SERVE_BUNDLE, default=options.get(CONF_SERVE_BUNDLE, True)
             ): BooleanSelector(),
         }
+        # The house theme: Home Assistant's default, for anyone without their own
+        themes = self.hass.data.get(f"{DOMAIN}_themes")
+        if themes is not None:
+            choices = [
+                SelectOptionDict(value=t["id"], label=t["name"])
+                for t in [
+                    *themes.presets,
+                    *(t for t in themes.custom if t.get("owner") is None),
+                ]
+            ]
+            choices.append(
+                SelectOptionDict(
+                    value=KEEP_HA_THEME, label="Leave Home Assistant's theme"
+                )
+            )
+            schema[
+                vol.Required(CONF_THEME, default=options.get(CONF_THEME, DEFAULT_THEME))
+            ] = SelectSelector(
+                SelectSelectorConfig(options=choices, mode=SelectSelectorMode.DROPDOWN)
+            )
         groups = warden_groups(self.hass)
         if groups is not None:
             choices = [SelectOptionDict(value=TRACKERS, label="Everyone with a phone")]

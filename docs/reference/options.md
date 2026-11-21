@@ -13,6 +13,7 @@ in YAML wins over these key by key.
 | Household | `household_group` | Who the dashboards list, message and assign chores to: a Warden group's members, or everyone whose person has a device tracker. |
 | Alarm panel | `alarm_panel` | The wall panels' status lights pulse red when it's triggered, amber during its delays, and show green while armed. Leave empty to use Alarmo's panel, else the first one. |
 | Bedtime | `bedtime_entity` | While it's on, the status lights show at 10% (a triggered alarm stays bright); else this integration's Home Bedtime, when it has bedtime rooms. Doors labeled Exterior Door show amber while open. |
+| Theme | `theme` | The house's theme: the dashboards' and Home Assistant's whole UI (and the Companion apps' bars) for anyone who hasn't picked their own. Each person picks theirs in the dashboards' Appearance menu. |
 
 ## House
 

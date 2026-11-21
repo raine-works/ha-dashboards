@@ -135,3 +135,22 @@ export function applyVars(el: HTMLElement, vars: Record<string, string>, previou
 		if (el.style.getPropertyValue(name) !== value) el.style.setProperty(name, value);
 	return vars;
 }
+
+/** `a` mixed into `b` by `amount` (0–1), in OKLab like CSS's color-mix(in oklab, …), as hex. */
+export function mixHex(a: string, b: string, amount: number): string {
+	const ca = parseCssColor(a)?.color;
+	const cb = parseCssColor(b)?.color;
+	if (!ca || !cb) return a;
+	const lab = (c: Oklch) => [c.l, c.c * Math.cos((c.h * Math.PI) / 180), c.c * Math.sin((c.h * Math.PI) / 180)];
+	const [l1, a1, b1] = lab(ca) as [number, number, number];
+	const [l2, a2, b2] = lab(cb) as [number, number, number];
+	const [l, A, B] = [l1 * amount + l2 * (1 - amount), a1 * amount + a2 * (1 - amount), b1 * amount + b2 * (1 - amount)];
+	const h = (Math.atan2(B, A) * 180) / Math.PI;
+	return toHex({ l, c: Math.hypot(A, B), h: h < 0 ? h + 360 : h });
+}
+
+/** A color at `alpha` as rgba() (Home Assistant's shadows and borders). */
+export function withAlpha(color: string, alpha: number): string {
+	const parsed = parseCssColor(color);
+	return parsed ? `rgba(${hexToRgbList(toHex(parsed.color))}, ${alpha})` : color;
+}
