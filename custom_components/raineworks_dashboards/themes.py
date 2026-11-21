@@ -26,8 +26,9 @@ from typing import Any
 import uuid
 
 from homeassistant.components import websocket_api
-from homeassistant.components.frontend import DATA_THEMES, EVENT_THEMES_UPDATED
+from homeassistant.components.frontend import DATA_THEMES
 from homeassistant.components.websocket_api import ActiveConnection
+from homeassistant.const import EVENT_THEMES_UPDATED
 from homeassistant.core import Event, HomeAssistant, callback
 from homeassistant.helpers.storage import Store
 import voluptuous as vol

@@ -1,6 +1,7 @@
 """The dashboards' themes in Home Assistant's list, the house theme, custom themes."""
 
-from homeassistant.components.frontend import DATA_THEMES, EVENT_THEMES_UPDATED
+from homeassistant.components.frontend import DATA_THEMES
+from homeassistant.const import EVENT_THEMES_UPDATED
 from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import async_capture_events
