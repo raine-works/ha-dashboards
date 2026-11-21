@@ -43,6 +43,7 @@ async def test_general_without_warden(hass: HomeAssistant, setup) -> None:
     await hass.config_entries.options.async_configure(
         result["flow_id"], {CONF_SERVE_BUNDLE: False}
     )
+    await hass.async_block_till_done()
     assert entry.options[CONF_SERVE_BUNDLE] is False
     assert entry.options[CONF_HOUSEHOLD_GROUP] is None
 
@@ -54,6 +55,7 @@ async def test_general_picks_a_warden_group(hass: HomeAssistant, warden, setup) 
     await hass.config_entries.options.async_configure(
         result["flow_id"], {CONF_SERVE_BUNDLE: True, CONF_HOUSEHOLD_GROUP: "g-family"}
     )
+    await hass.async_block_till_done()
     assert entry.options[CONF_HOUSEHOLD_GROUP] == "g-family"
 
 
@@ -72,6 +74,7 @@ async def test_house_and_laundry_keep_each_other_and_general(
             "tts_streaming": False,
         },
     )
+    await hass.async_block_till_done()
     result = await _open(hass, entry, "laundry")
     await hass.config_entries.options.async_configure(
         result["flow_id"],
