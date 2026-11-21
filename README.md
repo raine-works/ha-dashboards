@@ -1,4 +1,6 @@
-<img src="custom_components/raineworks_dashboards/brand/icon@2x.png" alt="" width="96" align="right">
+<p align="center">
+  <img src="custom_components/raineworks_dashboards/brand/icon@2x.png" alt="Raineworks Dashboards" width="128">
+</p>
 
 # Raineworks Dashboards
 
@@ -9,6 +11,8 @@ people. You add a card; there's nothing to configure per entity.
 
 [![Home Assistant Marketplace](https://img.shields.io/badge/Home_Assistant-Marketplace-41BDF5.svg?style=for-the-badge)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=raine-works&repository=ha-dashboards&category=integration)
 [![License](https://img.shields.io/badge/License-MIT-lightgrey.svg?style=for-the-badge)](LICENSE)
+
+<a href="https://buymeacoffee.com/raineworks"><img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black" alt="Buy Me a Coffee" /></a>
 
 ![The Home dashboard on a desktop](docs/images/home-dark.png)
 
@@ -133,6 +137,13 @@ the rules it follows.
   authentication
 - [ha-gitops](https://github.com/raine-works/ha-gitops): deploy your Home Assistant configuration
   from Git
+
+## ☕ Support
+
+If you find this project helpful, consider buying me a coffee to support continued
+maintenance and development:
+
+<a href="https://buymeacoffee.com/raineworks"><img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black" alt="Buy Me a Coffee" /></a>
 
 ## License
 
