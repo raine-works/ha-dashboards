@@ -1,15 +1,13 @@
 import { describe, expect, it } from 'bun:test';
 import { resolve } from 'node:path';
 
-// The panel theme (theme.css, dark tokens) is the source of truth; the Blackout Home Assistant
+import { neutral } from '../themes/presets/neutral';
+
+// The Neutral theme (themes/presets/neutral.ts) is the source of truth; the Blackout Home Assistant
 // theme mirrors it so YAML dashboards and panels share one design language.
-const themeCss = await Bun.file(resolve(import.meta.dir, '../styles/theme.css')).text();
 const blackoutYaml = await Bun.file(resolve(import.meta.dir, '../../../../theme/blackout.yaml')).text();
 
-const darkBlock = themeCss.slice(themeCss.indexOf('.dark,\n:host {'));
-const panelTokens = Object.fromEntries(
-	[...darkBlock.slice(0, darkBlock.indexOf('\n}')).matchAll(/--([a-z0-9-]+):\s*([^;]+);/g)].map((m) => [m[1], m[2]]),
-);
+const panelTokens: Record<string, string> = { ...neutral.dark, radius: neutral.radius };
 // Top-level theme keys (two-space indent) only, so `modes:` overrides don't shadow them
 const blackoutTokens = Object.fromEntries(
 	[...blackoutYaml.matchAll(/^ {2}([a-z0-9-]+): "([^"]*)"$/gm)].map((m) => [m[1], m[2]]),
@@ -47,11 +45,8 @@ describe('Blackout theme follows the panel shadcn theme', () => {
 	});
 });
 
-// Light mode: theme.css `.light` ↔ Blackout's `modes: light:` (six-space indent)
-const lightBlock = themeCss.slice(themeCss.indexOf('.light {'));
-const panelLightTokens = Object.fromEntries(
-	[...lightBlock.slice(0, lightBlock.indexOf('\n}')).matchAll(/--([a-z0-9-]+):\s*([^;]+);/g)].map((m) => [m[1], m[2]]),
-);
+// Light mode: Neutral's light tokens ↔ Blackout's `modes: light:` (six-space indent)
+const panelLightTokens: Record<string, string> = { ...neutral.light, radius: neutral.radius };
 const blackoutLight = blackoutYaml.slice(blackoutYaml.indexOf('\n    light:\n'));
 const blackoutLightTokens = Object.fromEntries(
 	[...blackoutLight.matchAll(/^ {6}([a-z0-9-]+): "([^"]*)"$/gm)].map((m) => [m[1], m[2]]),

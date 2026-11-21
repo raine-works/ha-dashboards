@@ -14,11 +14,13 @@ import {
 } from '../context/ColorScheme';
 import { HassProvider } from '../context/HassContext';
 import { WallPanelContext } from '../context/WallPanel';
-import { accentChromeVars, accentPanelTokens, accentSensorFor, applyVars, parseHex, rgbToOklch } from '../lib/accent';
 import { createHassStore } from '../lib/hass-store';
 import { setHouseConfig } from '../lib/house-config';
 import { loadHousehold } from '../lib/household';
 import { installTapHaptics } from '../lib/tones';
+import { themeCss, themeEffects } from '../themes/css';
+import { neutral } from '../themes/presets/neutral';
+import type { DashboardTheme } from '../themes/tokens';
 import type { HomeAssistant } from '../types/homeassistant';
 import { hideToolbar, keepSidebarHidden } from './chrome';
 import { ensurePanelFonts } from './fonts';
@@ -67,12 +69,6 @@ export interface PanelElementOptions {
 	wallPanel?: string | boolean;
 }
 
-// Without an accent sensor found, look again this often (the person's trackers may arrive later)
-const ACCENT_RETRY_MS = 30_000;
-
-/** The accent variables set on Home Assistant's page, shared by every card (kept after a card leaves) */
-let chromeVars: Record<string, string> = {};
-
 const panelStyles = (key: string) => globalThis.__panelStyles?.[key] ?? '';
 
 /**
@@ -95,22 +91,15 @@ export function definePanelElement({
 		private _root: PreactRoot | null = null;
 		private _mountPoint: HTMLDivElement | null = null;
 		private _styleEl: HTMLStyleElement | null = null;
+		/** The active theme's tokens (themes/css.ts), after the compiled styles */
+		private _themeEl: HTMLStyleElement | null = null;
+		private _themeId = '';
 		/** hass goes to the store, not a re-render: only components showing what changed update */
 		private _store = createHassStore();
 		/** Color scheme of the last render; the tree re-renders only when it (or the config) changes */
 		private _renderedScheme: string | null = null;
 		private _stopFitting: (() => void) | null = null;
 		private _showToolbar: (() => void) | null = null;
-		/** The signed-in person's phone accent sensor, looked up again when the registry or user changes */
-		private _accentLookup: {
-			entities: unknown;
-			user: string | undefined;
-			sensor: string | undefined;
-			at: number;
-		} | null = null;
-		private _accentKey = '';
-		private _accentVars: { panel: Record<string, string>; chrome: Record<string, string> } = { panel: {}, chrome: {} };
-		private _panelVars: Record<string, string> = {};
 		/** The connection the household was last asked over (asked again after a reconnect). */
 		private _householdFor: unknown = null;
 		public config: Record<string, unknown> = {};
@@ -138,6 +127,9 @@ export function definePanelElement({
 				this._styleEl = document.createElement('style');
 				this._styleEl.id = `${tag}-styles`;
 				shadow.appendChild(this._styleEl);
+				this._themeEl = document.createElement('style');
+				this._themeEl.id = `${tag}-theme`;
+				shadow.appendChild(this._themeEl);
 
 				this._mountPoint = document.createElement('div');
 				this._mountPoint.style.cssText = 'width:100%;height:100%;display:flex;flex-direction:column';
@@ -226,7 +218,7 @@ export function definePanelElement({
 			if (setting === 'auto') migrateDeviceColorScheme();
 			const scheme = resolveColorScheme(setting, this._store.get());
 			if (this._mountPoint.className !== scheme) this._mountPoint.className = scheme;
-			this._applyAccent(scheme);
+			this._applyTheme(neutral);
 			if (scheme === this._renderedScheme) return;
 			this._renderedScheme = scheme;
 
@@ -253,47 +245,14 @@ export function definePanelElement({
 			);
 		}
 
-		/**
-		 * The signed-in person's phone accent color (Material You, from the Companion app's Dynamic
-		 * Color sensor) over the theme's neutral accent: on this card (dialogs portal into it) and on
-		 * Home Assistant's own page (its buttons, switches, sliders and sidebar, which keep it after
-		 * leaving the dashboard). Without one, the theme's own colors. Runs on every hass update, so
-		 * it's cheap: the registry scan reruns only when the registry changes, the colors only when
-		 * the sensor or the mode does.
-		 */
-		private _applyAccent(scheme: string) {
-			const hass = this._store.get();
-			if (!hass || !this._mountPoint) return;
-			const user = hass.user?.id;
-			// Found again when the registry or user changes, and while none is found, every so often: the
-			// person's trackers can arrive after the first update
-			const lookup = this._accentLookup;
-			if (
-				!lookup ||
-				lookup.entities !== hass.entities ||
-				lookup.user !== user ||
-				(!lookup.sensor && Date.now() - lookup.at > ACCENT_RETRY_MS)
-			)
-				this._accentLookup = {
-					entities: hass.entities,
-					user,
-					at: Date.now(),
-					sensor: accentSensorFor(hass.states, hass.entities, user),
-				};
-			const sensor = this._accentLookup?.sensor;
-			const value = sensor ? hass.states[sensor]?.state : undefined;
-			const chromeDark = hass.themes?.darkMode ?? scheme === 'dark';
-			const key = `${value}|${scheme}|${chromeDark}`;
-			if (key !== this._accentKey) {
-				this._accentKey = key;
-				const rgb = parseHex(value);
-				const seed = rgb && rgbToOklch(rgb);
-				this._accentVars = seed
-					? { panel: accentPanelTokens(seed, scheme === 'dark'), chrome: accentChromeVars(seed, chromeDark) }
-					: { panel: {}, chrome: {} };
-			}
-			this._panelVars = applyVars(this._mountPoint, this._accentVars.panel, this._panelVars);
-			chromeVars = applyVars(document.documentElement, this._accentVars.chrome, chromeVars);
+		/** The theme's tokens and effects on this card, rewritten only when the theme changes. */
+		private _applyTheme(theme: DashboardTheme) {
+			if (!this._themeEl || !this._mountPoint || theme.id === this._themeId) return;
+			this._themeId = theme.id;
+			this._themeEl.textContent = themeCss(theme);
+			const effects = themeEffects(theme);
+			if (effects) this._mountPoint.dataset.effects = effects;
+			else delete this._mountPoint.dataset.effects;
 		}
 
 		/**
