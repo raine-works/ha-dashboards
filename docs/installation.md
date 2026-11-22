@@ -44,6 +44,15 @@ room, so it shows the lamps and ceiling lights people switch, not every LED in t
 
 Scenes show on their rooms when you use [Stateful Scenes](https://github.com/hugobloem/stateful_scenes).
 
+Speakers and TVs work the same way, but only if you want them to. The dashboards list every Music
+Assistant speaker and every Raineworks TV until you give one of them the label:
+
+- **Household Speaker** (`household_speaker`), on Music Assistant's `media_player`s: from then on
+  only labeled speakers show in the music player, the Messages dialog and the Daily dialog's Play on.
+- **Household TV** (`household_tv`), on Raineworks TV's `media_player`s: from then on only labeled
+  TVs show in the TVs dialog, the Messages dialog and Party mode's Show on TVs. Party mode lists
+  Music Assistant's display for each labeled TV that's available, matched to it by name.
+
 ## 4. What it found
 
 Open the dashboard: every section that has something to show is there. Anything missing needs

@@ -404,6 +404,20 @@ describe('which players are speakers', () => {
 		expect(isSpeaker('media_player.unknown', registries)).toBe(true);
 	});
 
+	it('lists only speakers with the Household Speaker label once any has it', () => {
+		const labeled = {
+			...registries,
+			entities: {
+				...registries.entities,
+				'media_player.kitchen': { ...registries.entities['media_player.kitchen'], labels: ['household_speaker'] },
+				'media_player.office': { entity_id: 'media_player.office', device_id: 'sonos' },
+			},
+		};
+		expect(isSpeaker('media_player.kitchen', labeled)).toBe(true);
+		expect(isSpeaker('media_player.office', labeled)).toBe(false);
+		expect(isSpeaker('media_player.unknown', labeled)).toBe(false);
+	});
+
 	it('discovers only speakers', () => {
 		const states = Object.fromEntries(
 			['media_player.kitchen', 'media_player.web_chrome_on_mac_2', 'media_player.garage'].map((id) => [

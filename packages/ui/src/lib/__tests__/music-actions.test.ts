@@ -89,6 +89,16 @@ describe('the Party Dashboard on TVs', () => {
 		]);
 	});
 
+	it("leaves out a display that's unavailable", () => {
+		const offline = {
+			...states,
+			'media_player.kai_s_tv': state('media_player.kai_s_tv', "Kai's TV", 'tv', 'unavailable'),
+		};
+		expect(partyDisplays({ states: offline, entities }, new Set(["Kai's TV", 'Home Theater TV']))).toEqual([
+			{ id: 'media_player.home_theater_tv', name: 'Home Theater TV', showing: false },
+		]);
+	});
+
 	it('shows it with play_media and takes it off with turn_off', async () => {
 		const { hass, calls } = fakeHass(undefined);
 		await castParty(hass, 'media_player.kai_s_tv', true);

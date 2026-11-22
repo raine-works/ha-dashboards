@@ -1,4 +1,5 @@
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
+import { labelInUse } from './labels';
 import { entityArea } from './lights';
 import { MEDIA_FEATURE } from './music';
 import { trimmedString as str } from './values';
@@ -297,18 +298,27 @@ export function toTv(entity: HassEntity, activityState?: string): Tv {
 }
 
 /**
+ * The label ("Household TV") that picks the house's TVs: once any entity carries it, only the
+ * labeled Raineworks TV `media_player`s are listed (the TVs dialog, the intercom's TVs, Party
+ * mode's displays, which are matched to them by name); a house without it lists every one.
+ */
+export const TV_LABEL = 'household_tv';
+
+/**
  * Every TV, by name: the integration's `media_player`s, not hidden. Music Assistant calls things
  * TVs too (its dashboard displays, Party mode's cast targets, the Library's WiiM Pro among them).
  * Without the entity registry (tests), by device class alone.
  */
 export function discoverTvs(states: Record<string, HassEntity>, registries?: Pick<HomeAssistant, 'entities'>): Tv[] {
 	const registry = registries?.entities;
+	const labeled = labelInUse(registry, TV_LABEL);
 	return Object.values(states)
 		.filter((s) => {
 			if (!s.entity_id.startsWith('media_player.') || s.attributes.device_class !== 'tv') return false;
 			if (s.attributes.mass_player_type != null) return false;
 			if (!registry) return true;
 			const entry = registry[s.entity_id];
+			if (labeled && !entry?.labels?.includes(TV_LABEL)) return false;
 			return entry?.platform === TV_PLATFORM && !entry.hidden;
 		})
 		.map((s) => {

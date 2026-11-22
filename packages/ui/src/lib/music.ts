@@ -1,8 +1,9 @@
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
 import { houseConfig } from './house-config';
+import { labelInUse } from './labels';
 import { callForResponse } from './service-calls';
 import { formatClock } from './time';
-import { finiteNumber as num } from './values';
+import { isUnavailable, finiteNumber as num } from './values';
 
 // media_player supported_features bits used by the player
 export const MEDIA_FEATURE = {
@@ -119,13 +120,21 @@ const BROWSER_PLAYER_MODEL = 'Web Player';
 type Registries = Pick<HomeAssistant, 'entities' | 'devices'> | null | undefined;
 
 /**
- * A real speaker to list (in the music player and the intercom): not one of Music Assistant's
- * browser players (device model "Web Player", e.g. "Web (Chrome on Mac)"), and not hidden in
- * Home Assistant (so any player can be left out by hiding its entity).
+ * The label ("Household Speaker") that picks the speakers the dashboards list: once any entity
+ * carries it, only the labeled ones are speakers (the music player, the intercom, the Daily
+ * dialog's Play on); a house without it lists every Music Assistant speaker.
+ */
+export const SPEAKER_LABEL = 'household_speaker';
+
+/**
+ * A real speaker to list (in the music player and the intercom): with the Household Speaker label in
+ * use, one that carries it; else not one of Music Assistant's browser players (device model "Web
+ * Player", e.g. "Web (Chrome on Mac)"). Never one hidden in Home Assistant.
  */
 export function isSpeaker(entityId: string, hass: Registries): boolean {
 	const entry = hass?.entities?.[entityId];
 	if (entry?.hidden) return false;
+	if (labelInUse(hass?.entities, SPEAKER_LABEL)) return !!entry?.labels?.includes(SPEAKER_LABEL);
 	const device = entry?.device_id ? hass?.devices?.[entry.device_id] : undefined;
 	return device?.model !== BROWSER_PLAYER_MODEL;
 }
@@ -681,8 +690,9 @@ export async function getPartyLink(hass: Hass): Promise<PartyLink> {
 /**
  * The TVs for the Party Dashboard from Music Assistant's display media players (the built-in
  * integration's: `music_assistant` entities with device class tv, each a display it can cast to),
- * by name; `tvNames` keeps those named as one of the house's TVs (Music Assistant counts some audio
- * receivers as displays). A display shows the Party Dashboard while it's playing `party`.
+ * by name: those named in `tvNames`, the house's TVs (`discoverTvs()`: the Household TV label's,
+ * else every Raineworks TV; Music Assistant counts some audio receivers as displays), while
+ * available. A display shows the Party Dashboard while it's playing `party`.
  */
 export function partyDisplays(
 	hass: Pick<HomeAssistant, 'states' | 'entities'>,
@@ -693,7 +703,7 @@ export function partyDisplays(
 		.flatMap((e) => {
 			const state = hass.states[e.entity_id];
 			const name = text(state?.attributes.friendly_name) ?? e.entity_id;
-			if (state?.attributes.device_class !== 'tv' || !tvNames.has(name)) return [];
+			if (state?.attributes.device_class !== 'tv' || !tvNames.has(name) || isUnavailable(state.state)) return [];
 			const showing = state.state === 'playing' && state.attributes.media_content_id === 'party';
 			return [{ id: e.entity_id, name, showing }];
 		})

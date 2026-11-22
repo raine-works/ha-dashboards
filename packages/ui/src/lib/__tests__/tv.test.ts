@@ -84,6 +84,26 @@ describe('TVs', () => {
 		]);
 	});
 
+	it('lists only TVs with the Household TV label once any has it', () => {
+		const tvs = discoverTvs(
+			{
+				'media_player.theater_tv': tvEntity('media_player.theater_tv', 'idle', { friendly_name: 'Theater TV' }),
+				'media_player.garage_tv': tvEntity('media_player.garage_tv', 'off', { friendly_name: 'Garage TV' }),
+			},
+			{
+				entities: {
+					'media_player.theater_tv': {
+						entity_id: 'media_player.theater_tv',
+						platform: TV_PLATFORM,
+						labels: ['household_tv'],
+					},
+					'media_player.garage_tv': { entity_id: 'media_player.garage_tv', platform: TV_PLATFORM },
+				},
+			},
+		);
+		expect(tvs.map((tv) => tv.entityId)).toEqual(['media_player.theater_tv']);
+	});
+
 	it('lists the launcher: featured apps first, the rest by name, without unnamed packages or the input app', () => {
 		expect(toApps(APPS).map((app) => app.name)).toEqual([
 			'YouTube TV',
