@@ -1,3 +1,8 @@
+/**
+ * The wall panel's kitchen timer: a header button with the live countdown, its dialog, and the
+ * announcement when it's done (on the house's announcing speaker, else the panel's own chime).
+ */
+
 import {
 	Button,
 	Dialog,
@@ -66,14 +71,21 @@ function playChime(contextRef: { current: AudioContext | null }) {
 	}
 }
 
+/** The panel timer as the header and its dialog see it (`usePanelTimer`). */
 export interface PanelTimerControls {
+	/** Whole seconds left. */
 	seconds: number;
+	/** Counting down (not paused). */
 	running: boolean;
 	/** A countdown exists (running or paused). */
 	active: boolean;
+	/** Percent of the total still left, for the progress bar. */
 	progress: number;
+	/** Add minutes and (re)start it. */
 	add: (minutes: number) => void;
+	/** Pause or resume. */
 	toggle: () => void;
+	/** Clear it. */
 	reset: () => void;
 }
 
@@ -138,12 +150,14 @@ export function usePanelTimer(): PanelTimerControls {
 	};
 }
 
+/** `PanelTimerDialog`'s props: the header's timer, and whether the dialog is open. */
 export interface PanelTimerDialogProps {
 	timer: PanelTimerControls;
 	isOpen: boolean;
 	onClose: () => void;
 }
 
+/** The timer's dialog: the countdown, presets to add minutes, pause and reset. */
 export const PanelTimerDialog: React.FC<PanelTimerDialogProps> = ({ timer, isOpen, onClose }) => (
 	<Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
 		<DialogContent>

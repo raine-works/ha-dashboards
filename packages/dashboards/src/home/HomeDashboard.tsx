@@ -1,3 +1,8 @@
+/**
+ * The Home dashboard, for everyone's own devices: the wall panel layout on wide screens, a tab
+ * per section on phones.
+ */
+
 import { PanelAlerts } from '@app/ui/alerts';
 import { CameraModal, useCameraActivity } from '@app/ui/camera';
 import { ClimateSection } from '@app/ui/climate';
@@ -49,6 +54,7 @@ const LIGHTING: LightingSectionProps = {
 	allFloors: true,
 };
 
+/** The Home dashboard's pages (a tab each on phones). */
 export type View = 'lights' | 'security' | 'climate' | 'music' | 'cameras';
 
 const VIEWS: { id: View; label: string; icon: LucideIcon }[] = [

@@ -1,3 +1,5 @@
+/** Optimistic state: a pick shown at once, before Home Assistant reports it. */
+
 import { useEffect, useState } from 'preact/compat';
 import { CONFIRM_TIMEOUT_MS } from '../context/HassContext';
 

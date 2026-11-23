@@ -1,3 +1,5 @@
+/** The wall panel dashboard: its card options and its three-column layout. */
+
 import { ClimateSection } from '@app/ui/climate';
 import { PanelLayout } from '@app/ui/layout';
 import { LightingSection } from '@app/ui/lighting';

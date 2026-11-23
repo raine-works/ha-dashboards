@@ -1,3 +1,5 @@
+/** A clock for components that show elapsed or relative time. */
+
 import { useEffect, useState } from 'preact/compat';
 
 /**

@@ -1,3 +1,5 @@
+/** Media queries in script, for layouts CSS alone can't switch, and the queries the panels share. */
+
 import { useEffect, useState } from 'preact/compat';
 
 /** Whether a CSS media query matches, kept up to date (works inside the panel's ShadowRoot: it reads window). */

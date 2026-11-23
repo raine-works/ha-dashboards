@@ -1,8 +1,14 @@
+/**
+ * Sliders that don't jump back: a control's value held while it's dragged, and after it's
+ * released until Home Assistant reports it.
+ */
+
 import { useEffect, useState } from 'preact/compat';
 
 // Give up waiting for Home Assistant to report a set value after this long
 const HOLD_TIMEOUT_MS = 10_000;
 
+/** A held value and its setters (`useHold`): what's shown instead of the reported value. */
 export interface Hold {
 	/** The value shown instead of the reported one (null: the reported one). */
 	held: { value: number; committed: boolean } | null;

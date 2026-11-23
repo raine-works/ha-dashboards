@@ -1,9 +1,12 @@
-// The repo's tools talk to Home Assistant through this: the loader sync, the capability report and
-// the setup MCP. Where Home Assistant is and how to sign in come from the environment, never the
-// source: HA_URL (https://homeassistant.local:8123) and HA_TOKEN (a long-lived token), else
-// HA_MCP_CONFIG, an MCP client's config whose `homeassistant` server holds HOMEASSISTANT_TOKEN.
-// A `.env` at the repo's root (gitignored) is read too, since workspace scripts run in their own
-// package's folder, where Bun's own .env loading doesn't look.
+/**
+ * The repo's tools talk to Home Assistant through this: the loader sync, the capability report and
+ * the setup MCP. Where Home Assistant is and how to sign in come from the environment, never the
+ * source: HA_URL (https://homeassistant.local:8123) and HA_TOKEN (a long-lived token), else
+ * HA_MCP_CONFIG, an MCP client's config whose `homeassistant` server holds HOMEASSISTANT_TOKEN.
+ * A `.env` at the repo's root (gitignored) is read too, since workspace scripts run in their own
+ * package's folder, where Bun's own .env loading doesn't look.
+ */
+
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -31,7 +34,10 @@ export function setting(name: string): string | undefined {
 /** Home Assistant's base URL (no trailing slash), or undefined when HA_URL isn't set. */
 export const homeAssistantUrl = () => setting('HA_URL')?.replace(/\/+$/, '');
 
-/** A long-lived Home Assistant token: HA_TOKEN, else the one in HA_MCP_CONFIG. */
+/**
+ * A long-lived Home Assistant token: HA_TOKEN, else the one in HA_MCP_CONFIG (undefined when
+ * neither has one). Throws when HA_MCP_CONFIG names a file that isn't JSON.
+ */
 export function homeAssistantToken(): string | undefined {
 	const token = setting('HA_TOKEN');
 	if (token) return token;
@@ -41,9 +47,11 @@ export function homeAssistantToken(): string | undefined {
 	return parsed?.mcpServers?.homeassistant?.env?.HOMEASSISTANT_TOKEN ?? undefined;
 }
 
+/** A signed-in websocket connection to Home Assistant (`connectHomeAssistant`). */
 export interface HomeAssistantConnection {
 	/** One websocket command (its `id` added); resolves with its result, rejects with its error. */
 	call<T = unknown>(message: Record<string, unknown>): Promise<T>;
+	/** Close the websocket; calls still waiting reject. */
 	close(): void;
 }
 

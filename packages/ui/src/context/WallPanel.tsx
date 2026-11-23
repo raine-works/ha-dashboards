@@ -1,3 +1,5 @@
+/** Whether, and as which wall panel, the dashboard runs on a shared wall tablet. */
+
 import { createContext, useContext } from 'preact/compat';
 
 /**

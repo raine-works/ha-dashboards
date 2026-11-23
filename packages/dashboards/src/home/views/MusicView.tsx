@@ -1,3 +1,5 @@
+/** The Home dashboard's Music page. */
+
 import { MusicPlayer } from '@app/ui/music';
 import { Music } from 'lucide-react';
 import type React from 'preact/compat';
