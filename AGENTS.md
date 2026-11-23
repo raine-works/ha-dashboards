@@ -3,6 +3,14 @@
 A guide for developers and AI coding assistants working on Raineworks Dashboards: how the code is
 laid out, how it's built, and the rules it keeps.
 
+## Raineworks base rules
+
+This repository follows Raineworks' base rules, in [`.raineworks/base.md`](.raineworks/base.md): read them before
+changing anything. They're a copy of `base.md` in `raine-works/agents`, kept current by its sync: change them there,
+not here. Where this file is more specific, it wins.
+
+@.raineworks/base.md
+
 ## Layout
 
 ```text

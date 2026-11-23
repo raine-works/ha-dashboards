@@ -1,0 +1,30 @@
+# Claude reviews every pull request against the rules, and answers replies to its comments. The workflow is Raineworks', in
+# raine-works/agents (.github/workflows/code-review.yml): this file only calls it, and comes from the raineworks-base skill's
+# templates/workflows/code-review.yml. Change the workflow there, for every repository at once; here, only its inputs
+# (with:). The Base rules check moves the pin when the shared workflows change.
+name: Code review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  pull_request_review_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write
+  actions: read
+
+jobs:
+  code-review:
+    name: Code review
+    uses: raine-works/agents/.github/workflows/code-review.yml@bcc3f92307e34338be03ec7f6a243c3435604800 # raine-works/agents master
+    secrets: inherit
+    with:
+      focus: |
+        - The Home Assistant websocket client and token handling: HA_URL / HA_TOKEN and any token never reach the bundle, logs, errors or fixtures; the admin-only bundle upload and the integration's serving of the bundle (serve.py, bundle.py) stay authenticated and validated.
+        - The AGENTS.md rules for the dashboards: no house entity ids or personal names in the source (audit:house), discovery in pure tested functions, theme tokens only, shadcn new-york v4 ports, dialogs portal into the mount point.
+        - Shadow DOM: each card renders in a ShadowRoot (no document.body portals, no vh, no @property).
+        - Real-time resilience: components subscribe through narrow selectors, every tap shows state at once, sections and dialogs sit in an ErrorBoundary, failed service calls are toasted.
+        - Python integration: no blocking I/O in the event loop, hassfest and HACS validity, manifest version bumped only for a release, tests for every change.
