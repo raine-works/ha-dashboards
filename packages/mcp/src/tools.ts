@@ -1,7 +1,10 @@
-// The setup tools: what an assistant needs to check a Home Assistant for the dashboards and set
-// them up. Each connects with HA_URL / HA_TOKEN (an administrator's long-lived token: the
-// registries and dashboards need one), does one job and says what it found or did. The connection
-// is injected so the tests can run them on a made-up house.
+/**
+ * The setup tools: what an assistant needs to check a Home Assistant for the dashboards and set
+ * them up. Each connects with HA_URL / HA_TOKEN (an administrator's long-lived token: the
+ * registries and dashboards need one), does one job and says what it found or did. The connection
+ * is injected so the tests can run them on a made-up house.
+ */
+
 import type { HomeAssistantConnection } from '@app/ha-client';
 import { type HouseSnapshot, readSnapshot } from '@app/ha-client/snapshot';
 import { mergeHouseSources, parseHouseConfig } from '@app/ui/lib/house-config';
@@ -9,6 +12,7 @@ import { HOUSEHOLD_LIGHT_LABEL } from '@app/ui/lib/lights';
 import { type ModuleHass, moduleReport } from '@app/ui/lib/modules';
 import type { Tool } from './server';
 
+/** Opens a connection to Home Assistant for one tool call (closed when the call ends). */
 export type Connect = () => Promise<HomeAssistantConnection>;
 
 const DOMAIN = 'raineworks_dashboards';
@@ -87,6 +91,10 @@ export function dashboardConfig(card: Record<string, unknown>) {
 	return { views: [{ title: 'Home', path: 'home', panel: true, cards: [card] }] };
 }
 
+/**
+ * The server's tools, each connecting with `connect` when it runs. Those that change Home
+ * Assistant are marked `writes`; a failure throws, for the assistant to see.
+ */
 export function setupTools(connect: Connect): Tool[] {
 	return [
 		{

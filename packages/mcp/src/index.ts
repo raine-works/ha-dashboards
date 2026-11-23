@@ -1,6 +1,9 @@
 #!/usr/bin/env bun
-// The setup MCP server, on stdio: `bun packages/mcp/src/index.ts` (or `bun run mcp`) with HA_URL
-// and HA_TOKEN (an administrator's long-lived token) in the environment or the repo's .env.
+/**
+ * The setup MCP server, on stdio: `bun packages/mcp/src/index.ts` (or `bun run mcp`) with HA_URL
+ * and HA_TOKEN (an administrator's long-lived token) in the environment or the repo's .env.
+ */
+
 import { connectHomeAssistant } from '@app/ha-client';
 import { createServer, serveStdio } from './server';
 import { setupTools } from './tools';

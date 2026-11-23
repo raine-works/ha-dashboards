@@ -1,3 +1,5 @@
+/** The React Compiler as a Bun plugin, and the report of what it memoized and what it skipped. */
+
 import { transformAsync } from '@babel/core';
 import ReactCompiler, { type LoggerEvent } from 'babel-plugin-react-compiler';
 import type { BunPlugin, PluginBuilder } from 'bun';
@@ -13,6 +15,7 @@ const SOURCE_FILTER = /\/packages\/[^/]+\/src\/(?!.*__tests__\/).*\.tsx?$/;
  */
 const asReact = (source: string) => source.replace(/from '(preact\/compat)'/g, "from 'react'");
 
+/** What the compiler did over a build, filled in by {@link reactCompilerPlugin} as it goes. */
 export interface CompilerReport {
 	/** Components and hooks the compiler memoized. */
 	compiled: number;

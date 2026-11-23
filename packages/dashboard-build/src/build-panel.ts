@@ -1,3 +1,8 @@
+/**
+ * The cards' Bun build: Preact in place of React, the React Compiler, Tailwind's CSS embedded for
+ * the ShadowRoot, inlined assets and content-named chunks, once or on every change (`--watch`).
+ */
+
 import { existsSync, mkdirSync, readdirSync, rmSync, watch } from 'node:fs';
 import { createRequire } from 'node:module';
 import { basename, dirname, join, resolve } from 'node:path';
@@ -67,10 +72,13 @@ const inlineAssetsPlugin: BunPlugin = {
  * so it resolves wherever the bundle is served from. Named by content, so cached for good.
  */
 export interface BuildChunk {
+	/** Its file name (`chunk-<hash>.js`). */
 	name: string;
+	/** Its code. */
 	contents: string;
 }
 
+/** One bundle to build: what it starts from, where it goes, and how it's published. */
 export interface PanelBuildConfig {
 	/** Short panel name, used in logs. */
 	name: string;
@@ -112,6 +120,15 @@ export function unwrapPropertyFallbacks(css: string): string {
 	return css;
 }
 
+/**
+ * Builds `panel` once: its bundle (JS with its CSS embedded under `globalThis.__panelStyles`) and
+ * its chunks, written beside `outfile` (replacing the last build's chunks), then published when
+ * `sync` is on and the panel has `publish`.
+ *
+ * @param options.production Minified, no sourcemap (default); off for `--watch`'s development builds.
+ * @param options.sync Publish the result (default); off for `--no-sync` and `--watch`.
+ * @returns `false` when Bun's build failed (its logs printed), else `true`. A failing `publish` throws.
+ */
 export async function buildPanel(panel: PanelBuildConfig, { production = true, sync = true } = {}) {
 	const isProduction = production;
 	const tempOutdir = join(dirname(panel.outfile), `.build-tmp-${panel.name}`);

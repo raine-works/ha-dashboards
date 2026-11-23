@@ -1,6 +1,9 @@
-// `bun run demo`: the dashboards on the demo house at http://localhost:4173 (`?card=panel` for a
-// wall panel). Serves the built bundle from packages/dashboards/dist (`bun run build:local`, or
-// `bun run dev` alongside to rebuild on every change).
+/**
+ * `bun run demo`: the dashboards on the demo house at http://localhost:4173 (`?card=panel` for a
+ * wall panel). Serves the built bundle from packages/dashboards/dist (`bun run build:local`, or
+ * `bun run dev` alongside to rebuild on every change).
+ */
+
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import page from './index.html';
