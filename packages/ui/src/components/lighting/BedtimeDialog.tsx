@@ -138,7 +138,7 @@ export const BedtimeDialog: React.FC<BedtimeDialogProps> = ({
 	];
 	return (
 		<Dialog open={open} onOpenChange={(next) => !next && onCancel()}>
-			<DialogContent className="gap-5 sm:max-w-md">
+			<DialogContent className="gap-5">
 				<DialogHeader className="flex-row items-center gap-3 text-left max-sm:pl-0">
 					{/* Night's own color, a small hint like a section icon */}
 					<span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-indigo-500/15 text-indigo-500 dark:bg-indigo-400/15 dark:text-indigo-400">

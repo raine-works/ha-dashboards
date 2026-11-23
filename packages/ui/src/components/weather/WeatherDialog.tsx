@@ -77,7 +77,7 @@ const Detail: React.FC<{ icon: LucideIcon; label: string; value: string; detail?
 
 /** Precipitation chance under an hour or beside a day, only when it's worth mentioning. */
 const Chance: React.FC<{ value?: number; className?: string }> = ({ value, className }) => (
-	<span className={cn('text-sky-600 text-xs tabular-nums dark:text-sky-400', className)}>
+	<span className={cn('text-info text-xs tabular-nums', className)}>
 		{value != null && value >= 10 ? `${value}%` : ''}
 	</span>
 );

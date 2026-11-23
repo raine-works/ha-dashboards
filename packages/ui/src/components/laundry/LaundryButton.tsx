@@ -45,7 +45,7 @@ export const LaundryButton: React.FC<{ size?: ButtonProps['size']; className?: s
 				</Button>
 			)}
 			<Dialog open={open} onOpenChange={setOpen}>
-				<DialogContent className="sm:max-w-xl">
+				<DialogContent>
 					<DialogHeader>
 						<DialogTitle>Laundry</DialogTitle>
 						<DialogDescription>Washer and dryer</DialogDescription>

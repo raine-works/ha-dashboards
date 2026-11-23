@@ -216,8 +216,8 @@ export const DueDatePicker: React.FC<DueDatePickerProps> = ({
 			<>
 				{trigger}
 				<Dialog open={open} onOpenChange={setOpen}>
-					{/* A sheet from the bottom edge: layout overrides of the phone's full-screen dialog */}
-					<DialogContent className="max-sm:top-auto max-sm:max-h-[calc(var(--panel-height)-2rem)] max-sm:animate-sheet-in max-sm:rounded-t-2xl max-sm:border-t">
+					{/* A sheet from the bottom edge, as tall as its content: the phone's full-screen dialog, let go at the top */}
+					<DialogContent className="max-sm:top-auto max-sm:animate-sheet-in max-sm:rounded-t-2xl max-sm:border-t">
 						<DialogHeader>
 							<DialogTitle>Due</DialogTitle>
 							<DialogDescription className="sr-only">Pick a day{withTime ? ' and a time' : ''}</DialogDescription>
