@@ -3,4 +3,4 @@
 # requires (the integration depends on it to serve the bundle).
 pytest-homeassistant-custom-component==0.13.375
 home-assistant-frontend==20260930.5
-ruff
+ruff==0.17.6
