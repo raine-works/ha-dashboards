@@ -1,7 +1,11 @@
-// Which themes a page can show, and which one a card shows. The presets are built in; the custom
-// themes (each person's own and the house's) come from the raineworks_dashboards integration,
-// asked once per connection, with the house theme's id. One store for the page, so every card and
-// the picker agree.
+/**
+ * Which themes a page can show, and which one a card shows. The presets are built in; the custom
+ * themes (each person's own and the house's) come from the raineworks_dashboards integration,
+ * asked once per connection, with the house theme's id. One store for the page, so every card and
+ * the picker agree.
+ *
+ * @module
+ */
 import type { HomeAssistant } from '../types/homeassistant';
 import { DEFAULT_THEME_ID, haThemeName, PRESET_THEMES } from './index';
 import type { DashboardTheme } from './tokens';
@@ -13,6 +17,7 @@ export interface CatalogTheme {
 	theme: DashboardTheme;
 	/** Its name in Home Assistant's theme list. */
 	haName: string;
+	/** Made in the theme editor (from the integration), not a preset. */
 	custom: boolean;
 	/** This person's own custom theme (they can edit and delete it). */
 	mine: boolean;
@@ -20,6 +25,7 @@ export interface CatalogTheme {
 	shared: boolean;
 }
 
+/** The page's theme store: the themes to pick from (presets first) and the house theme. */
 export interface ThemeCatalog {
 	themes: CatalogTheme[];
 	/** The house theme's id (Home Assistant's default; '' when the house leaves Home Assistant's own). */
@@ -38,8 +44,10 @@ let catalog: ThemeCatalog = { themes: presets, house: DEFAULT_THEME_ID };
 const listeners = new Set<() => void>();
 let loadedFor: unknown = null;
 
+/** The catalog as it stands (a stable object until it changes, for `useSyncExternalStore`). */
 export const themeCatalog = () => catalog;
 
+/** Call `listener` whenever the catalog changes; returns the unsubscribe. */
 export function subscribeThemeCatalog(listener: () => void) {
 	listeners.add(listener);
 	return () => listeners.delete(listener);

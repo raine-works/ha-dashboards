@@ -1,3 +1,8 @@
+/**
+ * The theme catalog as a hook, for the pickers.
+ *
+ * @module
+ */
 import { useSyncExternalStore } from 'preact/compat';
 import { subscribeThemeCatalog, type ThemeCatalog, themeCatalog } from './catalog';
 

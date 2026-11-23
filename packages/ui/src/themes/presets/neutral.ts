@@ -1,3 +1,8 @@
+/**
+ * The Neutral theme: shadcn's neutral palette, which the color themes build on.
+ *
+ * @module
+ */
 import type { DashboardTheme } from '../tokens';
 
 /** shadcn's neutral palette: black, white and grays, with an amber accent in Home Assistant's own UI. */

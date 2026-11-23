@@ -1,11 +1,16 @@
-// A theme as the dashboards' CSS: its tokens on the mount point's .light / .dark class (the card
-// puts one there; dark is also the :host default, before the first render), and its effects as
-// variables and a data attribute the effect styles in theme.css key off.
+/**
+ * A theme as the dashboards' CSS: its tokens on the mount point's .light / .dark class (the card
+ * puts one there; dark is also the :host default, before the first render), and its effects as
+ * variables and a data attribute the effect styles in theme.css key off.
+ *
+ * @module
+ */
 import { type DashboardTheme, TOKEN_NAMES, type Tokens } from './tokens';
 
 const declarations = (tokens: Tokens, theme: DashboardTheme) =>
 	[`--radius: ${theme.radius};`, ...TOKEN_NAMES.map((name) => `--${name}: ${tokens[name]};`)].join(' ');
 
+/** A theme's stylesheet for a card's ShadowRoot: both modes' tokens, the radius and the gradient's colors. */
 export function themeCss(theme: DashboardTheme): string {
 	const gradient = theme.effects?.gradient;
 	const effectVars = gradient ? ` --gradient-from: ${gradient.from}; --gradient-to: ${gradient.to};` : '';
