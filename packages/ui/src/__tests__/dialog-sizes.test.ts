@@ -3,16 +3,17 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Glob } from 'bun';
 
-// AGENTS.md: the dialog sizes (DialogContent's `size`: `default`, `workspace` or `sheet`), and a dialog never sets
-// its own width or height. This finds DialogContent tags whose classes size them anyway.
+// AGENTS.md: the dialog sizes (DialogContent's `size`: `default`, `workspace`, `sheet`, `compact` or `fullscreen`),
+// and a dialog never sets its own width or height. This finds DialogContent tags whose classes size them anyway;
+// a dialog that needs a new shape gets a new size in components/ui/dialog.tsx.
 
 const packages = resolve(import.meta.dir, '../../..');
 
-/**
- * Dialogs with a shape of their own, not yet a size variant: Party mode takes the whole screen, and the
- * keypad keeps a phone keypad's narrow column. Don't add to this list: add a size to components/ui/dialog.tsx.
- */
-const KNOWN = new Set(['ui/src/components/music/PartyMode.tsx', 'ui/src/components/security/KeypadModal.tsx']);
+const dialogSource = () => readFileSync(resolve(packages, 'ui/src/components/ui/dialog.tsx'), 'utf8');
+
+/** A size's classes, from its constant in dialog.tsx. */
+const sizeClasses = (source: string, name: string) =>
+	source.match(new RegExp(`const ${name} =\\s*'([^']*)'`))?.[1].split(/\s+/) ?? [];
 
 /** Classes that set a width or height, under any variants (`sm:max-w-md`, `max-sm:max-h-[…]`). */
 const SIZING = /^!?(?:min-|max-)?(?:w|h|size)-/;
@@ -42,7 +43,7 @@ describe('dialog sizes', () => {
 	it('no dialog sets its own width or height', () => {
 		const sized: string[] = [];
 		for (const file of new Glob('*/src/**/*.tsx').scanSync(packages)) {
-			if (file.includes('__tests__') || file.endsWith('components/ui/dialog.tsx') || KNOWN.has(file)) continue;
+			if (file.includes('__tests__') || file.endsWith('components/ui/dialog.tsx')) continue;
 			for (const { line, classes } of sizedDialogs(readFileSync(resolve(packages, file), 'utf8')))
 				sized.push(`${file}:${line} ${classes.join(' ')}`);
 		}
@@ -51,10 +52,27 @@ describe('dialog sizes', () => {
 
 	it('a sheet lets go of the top on phones but keeps a height cap', () => {
 		// Without the cap, a sheet anchored only at the bottom grows past the toolbar and nothing scrolls
-		const source = readFileSync(resolve(packages, 'ui/src/components/ui/dialog.tsx'), 'utf8');
-		const sheet = source.match(/const SHEET =\s*'([^']*)'/)?.[1].split(/\s+/) ?? [];
+		const source = dialogSource();
+		const sheet = sizeClasses(source, 'SHEET');
 		expect(sheet).toContain('max-sm:top-auto');
 		expect(sheet).toContain('max-sm:max-h-[calc(var(--panel-height)-2rem)]');
 		expect(source).toContain("size === 'sheet' && SHEET,\n\t\t\t\t\tclassName,");
+	});
+
+	it('fullscreen stays under the toolbar, never using vh', () => {
+		// AGENTS.md: nothing renders over Home Assistant's toolbar but an open dialog's overlay; heights use --panel-height
+		const source = dialogSource();
+		const fullscreen = sizeClasses(source, 'FULLSCREEN');
+		expect(fullscreen).toContain('top-(--panel-top)');
+		expect(fullscreen).toContain('h-(--panel-height)');
+		expect(fullscreen).toContain('max-h-none');
+		expect(fullscreen.some((c) => c.includes('vh'))).toBe(false);
+		expect(source).toContain("size === 'fullscreen' && FULLSCREEN,");
+	});
+
+	it('compact narrows only wider screens (phones keep the whole screen)', () => {
+		const source = dialogSource();
+		expect(sizeClasses(source, 'COMPACT')).toEqual(['sm:max-w-sm']);
+		expect(source).toContain("size === 'compact' && COMPACT,");
 	});
 });

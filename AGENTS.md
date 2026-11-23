@@ -114,8 +114,9 @@ module, with its detection tested.
 - Theme tokens only (`bg-background`, `text-muted-foreground`, status tokens `success`, `warning`,
   `info`, `alarm`), never raw palette colors for surfaces and text.
 - Dialog sizes: `workspace` for feature dialogs, `default` for confirmations and pickers, `sheet`
-  for a picker that rises from the bottom edge on phones (`default` elsewhere). A dialog never sets
-  its own width or height.
+  for a picker that rises from the bottom edge on phones (`default` elsewhere), `compact` for a
+  narrow column (the alarm keypad), `fullscreen` for the whole screen under the toolbar (Party
+  mode). A dialog never sets its own width or height.
 - Buttons never squish: share a row with `flex-1`, never equal grid columns.
 - Wall panels are a size up for fingers (`touch:` variant, nothing under 44px). Check layouts at
   1280×800 and 960×600, and phones at 540px wide.
