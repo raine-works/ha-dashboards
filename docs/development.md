@@ -12,6 +12,13 @@ bun run audit:house -- --strict   # no house's entity ids or personal names in t
 
 [AGENTS.md](../AGENTS.md) describes the layout and the rules the code follows.
 
+### Your editor
+
+Editor settings are each person's own: `.vscode/` and `.zed/` are gitignored. What helps:
+format on save with Biome (`biome.json` is the configuration), the Tailwind CSS and Bun extensions,
+and, for Home Assistant YAML, the custom tags `!include`, `!include_dir_list`,
+`!include_dir_merge_list`, `!include_dir_merge_named`, `!include_dir_named`, `!input` and `!secret`.
+
 ## Trying it on your Home Assistant
 
 Put an administrator's long-lived token in `.env` (gitignored):
