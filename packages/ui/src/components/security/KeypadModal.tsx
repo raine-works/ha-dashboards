@@ -218,7 +218,10 @@ export const KeypadModal: React.FC<KeypadModalProps> = ({
 		<Dialog open={isOpen} onOpenChange={(open) => !open && handleCancel()}>
 			{/* A phone: laid out like its own PIN screen, the title, dots and keys (as big as the screen
 			    allows) from the top, Confirm on the bottom edge, instead of a small block in the middle */}
-			<DialogContent className={cn('short:gap-2 short:p-4 max-sm:gap-6 sm:max-w-sm', warned && 'touch:max-lg:gap-3')}>
+			<DialogContent
+				size="compact"
+				className={cn('short:gap-2 short:p-4 max-sm:gap-6', warned && 'touch:max-lg:gap-3')}
+			>
 				<DialogHeader className="items-center text-center max-sm:mt-[6svh] sm:px-10 sm:text-center">
 					{/* A phone on its side: the keys get the height */}
 					<Shield className="short:hidden size-8 text-muted-foreground sm:max-lg:hidden" />

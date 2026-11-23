@@ -265,16 +265,26 @@ function trapTab(e: KeyboardEvent, el: HTMLElement | null) {
 export interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
 	showCloseButton?: boolean;
 	/**
-	 * Panel extension. `default`: shadcn's, sized to its content (confirmations, pickers, the keypad,
-	 * QR codes). `workspace`: every feature dialog (music, cameras, intercom, calendar, weather, energy,
+	 * Panel extension. `default`: shadcn's, sized to its content (confirmations, pickers, QR
+	 * codes). `workspace`: every feature dialog (music, cameras, intercom, calendar, weather, energy,
 	 * people, TVs, to-do, the brief, notifications, pets): 95% of the screen's width up to 100rem and
 	 * 90% of its height, a flex column whose last row (its actions, a message box) sits on the bottom
 	 * edge (`mt-auto`), the full screen on a phone like every dialog. `sheet`: `default` on wider
 	 * screens, and on a phone a sheet from the bottom edge, as tall as its content up to the screen
-	 * under the toolbar less 2rem (pickers such as the due date).
+	 * under the toolbar less 2rem (pickers such as the due date). `compact`: `default`, narrower on wider
+	 * screens (24rem), for a phone-shaped column such as the alarm keypad. `fullscreen`: the whole screen
+	 * under Home Assistant's toolbar (`--panel-top`, `--panel-height`), edge to edge without a border or
+	 * rounded corners, a flex column (Party mode).
 	 */
-	size?: 'default' | 'workspace' | 'sheet';
+	size?: 'default' | 'workspace' | 'sheet' | 'compact' | 'fullscreen';
 }
+
+// The compact size: a narrow column on wider screens (phones take the whole screen like every dialog)
+const COMPACT = 'sm:max-w-sm';
+
+// The fullscreen size: the whole screen under Home Assistant's toolbar, edge to edge
+const FULLSCREEN =
+	'translate-none top-(--panel-top) left-0 flex h-(--panel-height) max-h-none w-screen max-w-none flex-col rounded-none border-0 sm:max-w-none';
 
 // The sheet size's phone shape, applied after the phone's full-screen classes so it overrides their top and height
 const SHEET =
@@ -321,7 +331,8 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
 		useDialogFocus(localRef);
 		// A dialog that lays itself out as a flex column sizes its own rows (a scroller that shrinks);
 		// the others were grid rows, which never shrink, so on phones they keep their content height
-		const ownLayout = size === 'workspace' || /(?:^|\s)flex(?:\s|$)/.test(String(className ?? ''));
+		const ownLayout =
+			size === 'workspace' || size === 'fullscreen' || /(?:^|\s)flex(?:\s|$)/.test(String(className ?? ''));
 
 		return (
 			<div
@@ -344,6 +355,8 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
 					// its widest child's content, so a ChipRow's chips widened the dialog past its edge instead of scrolling
 					'grid-cols-1',
 					size === 'workspace' && WORKSPACE,
+					size === 'compact' && COMPACT,
+					size === 'fullscreen' && FULLSCREEN,
 					// Panel extension: phones get the whole screen under Home Assistant's toolbar (clear of the notch and home indicator),
 					// scrolling inside (never handing the scroll on to the page); listed last so it beats sizes the dialogs set for wider screens
 					'max-sm:translate-none overscroll-contain max-sm:inset-x-0 max-sm:top-(--panel-top) max-sm:bottom-0 max-sm:h-auto max-sm:max-h-none max-sm:w-full max-sm:max-w-none max-sm:overflow-y-auto max-sm:rounded-none max-sm:border-0 max-sm:p-4 max-sm:pt-[max(--spacing(4),calc(env(safe-area-inset-top)-var(--panel-top)))] max-sm:pb-[max(--spacing(4),env(safe-area-inset-bottom))]',

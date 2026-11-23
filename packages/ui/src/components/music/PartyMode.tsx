@@ -331,7 +331,8 @@ export const PartyMode: React.FC = () => {
 		>
 			<DialogContent
 				// The whole screen under Home Assistant's toolbar
-				className="translate-none top-(--panel-top) left-0 isolate flex h-(--panel-height) max-h-none w-screen max-w-none flex-col gap-4 overflow-hidden rounded-none border-0 p-6 max-lg:gap-3 max-lg:p-4 sm:max-w-none"
+				size="fullscreen"
+				className="isolate gap-4 overflow-hidden p-6 max-lg:gap-3 max-lg:p-4"
 			>
 				{source && <ArtBackdrop src={source.artwork} />}
 				<div className="flex shrink-0 items-center gap-3 pr-12">
