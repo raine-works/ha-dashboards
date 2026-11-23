@@ -1,3 +1,5 @@
+/** Gating a feature's UI on its module (lib/modules.ts): `useModule` and `<ModuleGate>`. */
+
 import type React from 'preact/compat';
 import { isModuleOn, type ModuleId, moduleWatch } from '../lib/modules';
 import { useHassSelector } from './HassContext';

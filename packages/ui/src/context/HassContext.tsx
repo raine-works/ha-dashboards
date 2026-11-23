@@ -1,3 +1,9 @@
+/**
+ * How components reach Home Assistant: the hass store behind a context that never changes, the
+ * selector hooks that subscribe a component to only what it shows (`useHassSelector`,
+ * `useEntity`), and `useHassApi` for calling services and waiting for their effect.
+ */
+
 import type React from 'preact/compat';
 import { createContext, useContext, useLayoutEffect, useMemo, useReducer, useRef } from 'preact/compat';
 import { toast } from '../components/ui/sonner';
@@ -5,7 +11,12 @@ import { createHassStore, deepEqual, type EntityWatch, type HassStore, touches, 
 import { describeServiceCall, serviceErrorMessage } from '../lib/service-calls';
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
 
+/**
+ * What `useHassApi` returns: the store and the actions on the latest hass. It's created once per
+ * store, so holding on to it (or any of its functions) never goes stale and never re-renders.
+ */
 export interface HassApi {
+	/** The hass store the selector hooks subscribe to. */
 	store: HassStore;
 	/** The latest hass object, for event handlers and effects (reading it doesn't re-render). */
 	getHass: () => HomeAssistant | null;
@@ -24,6 +35,7 @@ export interface HassApi {
 	waitFor: (test: (hass: HomeAssistant) => boolean, timeoutMs?: number) => Promise<boolean>;
 }
 
+/** Options for `HassApi.callService`. */
 export interface CallServiceOptions {
 	/** `toast` (default): report a failure and resolve undefined. `throw`: reject, for the caller to report. */
 	errors?: 'toast' | 'throw';
@@ -67,6 +79,7 @@ export const HassProvider: React.FC<{ store: HassStore; children: React.ReactNod
 /** `callService`, `getHass` and `waitFor`, stable across updates: using them never re-renders. */
 export const useHassApi = () => useContext(HassContext);
 
+/** Options for `useHassSelector`: when it can skip a Home Assistant update. */
 export interface SelectorOptions<T> {
 	/**
 	 * The entities the selector reads (domains or an entity id test). An update that changed none

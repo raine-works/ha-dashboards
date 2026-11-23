@@ -1,3 +1,5 @@
+/** Opening a camera from a link in the page's URL (a notification's tap action). */
+
 import { useEffect, useState } from 'preact/compat';
 import { linkedCamera } from '../lib/cameras';
 import { watchLocation } from './useLinkedParams';

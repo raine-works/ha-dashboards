@@ -1,3 +1,5 @@
+/** The Home dashboard's card definition: its tag, component and how it sits in Home Assistant. */
+
 import type { PanelElementOptions } from '@app/ui/panel';
 import { HomeDashboard, WIDE_QUERY } from './HomeDashboard';
 

@@ -1,3 +1,5 @@
+/** Opening something from query parameters in the page's URL (a notification's tap action). */
+
 import { useEffect, useState } from 'preact/compat';
 
 /**

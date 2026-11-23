@@ -1,8 +1,15 @@
+/**
+ * Light and dark: the mode a dashboard renders in (resolved from the card's `color_scheme` option
+ * and Home Assistant's theme mode), and reading and setting Home Assistant's own theme mode for
+ * the Appearance picker.
+ */
+
 import { createContext, useContext } from 'preact/compat';
 import { readStored, writeStored } from '../lib/storage';
 import type { HomeAssistant } from '../types/homeassistant';
 import { useHassSelector } from './HassContext';
 
+/** The mode a dashboard renders in. */
 export type ColorScheme = 'light' | 'dark';
 /** Card option `color_scheme`: follow Home Assistant (`auto`), or force one mode. */
 export type ColorSchemeSetting = ColorScheme | 'auto';
@@ -10,6 +17,7 @@ export type ColorSchemeSetting = ColorScheme | 'auto';
 /** The mode a dashboard renders in (set by definePanelElement, which also puts the class on the mount point). */
 export const ColorSchemeContext = createContext<ColorScheme>('dark');
 
+/** The mode the dashboard renders in (`ColorSchemeContext`), for components that need it in script. */
 export const useColorScheme = () => useContext(ColorSchemeContext);
 
 const prefersDark = () =>

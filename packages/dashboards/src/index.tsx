@@ -1,11 +1,15 @@
+/**
+ * The bundle's entry: registers every dashboard's card (each in its own folder: home, wall-panel).
+ * Which one a device shows, and a wall panel's name and floor, come from its dashboard's YAML
+ * (dashboards/<name>.yaml). Home Assistant loads every Lovelace resource on every dashboard, so
+ * four bundles meant four copies of the same code (~3.8MB) on every page; this is one.
+ */
+
 import { definePanelElement } from '@app/ui/panel';
 import { homePanel } from './home/panel';
 import { wallPanel } from './wall-panel/panel';
 import './styles.css';
 
-// Every dashboard's card in one bundle (each in its own folder: home, wall-panel); which one a device
-// shows, and a wall panel's name and floor, come from its dashboard's YAML (dashboards/<name>.yaml). Home Assistant loads every Lovelace resource on every
-// dashboard, so four bundles meant four copies of the same code (~3.8MB) on every page; this is one.
 const PANELS = [homePanel, wallPanel];
 
 for (const panel of PANELS) definePanelElement({ ...panel, stylesKey: 'dashboards' });

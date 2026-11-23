@@ -1,3 +1,5 @@
+/** A one-off read of a whole house, for the tools that run the dashboards' discovery on a real one. */
+
 import type { HomeAssistantConnection } from './index';
 
 /** What the dashboards see of a Home Assistant, in the frontend's own shapes (`hass`). */

@@ -1,3 +1,5 @@
+/** The wall panel card's definition: its tag, component, older tags and how it sits in Home Assistant. */
+
 import type { PanelElementOptions } from '@app/ui/panel';
 import { WallPanel } from './WallPanel';
 

@@ -1,3 +1,5 @@
+/** Callbacks with a stable identity, so memoized list rows skip re-rendering with their list. */
+
 import { useLayoutEffect, useRef, useState } from 'preact/compat';
 
 // biome-ignore lint/suspicious/noExplicitAny: any callback signature

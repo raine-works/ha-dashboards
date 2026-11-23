@@ -1,3 +1,5 @@
+/** The Home dashboard's Cameras page. */
+
 import { CameraModal, CameraThumbnail } from '@app/ui/camera';
 import { Button, EmptyState } from '@app/ui/components';
 import { useHassSelector } from '@app/ui/hass';
