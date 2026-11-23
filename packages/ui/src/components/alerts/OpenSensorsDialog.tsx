@@ -121,7 +121,7 @@ export const OpenSensorsDialog: React.FC<OpenSensorsDialogProps> = ({ isOpen, on
 
 	return (
 		<Dialog open={isOpen} onOpenChange={(value) => !value && onClose()}>
-			<DialogContent className="sm:max-w-md">
+			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>Open Doors & Windows</DialogTitle>
 					<DialogDescription>

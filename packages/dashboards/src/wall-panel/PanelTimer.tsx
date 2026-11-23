@@ -146,7 +146,7 @@ export interface PanelTimerDialogProps {
 
 export const PanelTimerDialog: React.FC<PanelTimerDialogProps> = ({ timer, isOpen, onClose }) => (
 	<Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-		<DialogContent className="sm:max-w-lg">
+		<DialogContent>
 			<DialogHeader>
 				<DialogTitle>Timer</DialogTitle>
 				<DialogDescription>

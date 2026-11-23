@@ -43,7 +43,7 @@ export const TvAudioConfirm: React.FC = () => {
 	const current = useSyncExternalStore(subscribe, () => pending);
 	return (
 		<Dialog open={!!current} onOpenChange={(open) => !open && settle(false)}>
-			<DialogContent className="sm:max-w-md">
+			<DialogContent>
 				<DialogHeader>
 					<DialogTitle className="flex items-center gap-2">
 						<Tv className="size-5 shrink-0 text-primary" />

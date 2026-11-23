@@ -198,7 +198,7 @@ export const PartyButton: React.FC<{ size?: ButtonProps['size'] }> = ({ size = '
 				Party
 			</Button>
 			<Dialog open={open} onOpenChange={setOpen}>
-				<DialogContent className="max-sm:justify-center-safe sm:max-w-md">
+				<DialogContent className="max-sm:justify-center-safe">
 					<DialogHeader className="items-center text-center sm:text-center">
 						<DialogTitle>Party</DialogTitle>
 						<DialogDescription>Guests scan to search for songs and add them to the queue</DialogDescription>

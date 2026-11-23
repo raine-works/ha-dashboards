@@ -12,7 +12,7 @@ export const BedtimeLightDialog: React.FC<{ controls: LightControls }> = ({ cont
 	const adjust = pending?.kind === 'adjust';
 	return (
 		<Dialog open={!!pending} onOpenChange={(open) => !open && controls.cancelBedtime()}>
-			<DialogContent className="sm:max-w-md">
+			<DialogContent>
 				<DialogHeader>
 					<DialogTitle className="flex items-center gap-2">
 						<Moon className="size-5 shrink-0 text-indigo-500 dark:text-indigo-400" />

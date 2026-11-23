@@ -30,7 +30,7 @@ export const GuestWifiDialog: React.FC<{ isOpen: boolean; onClose: () => void }>
 	const wifi = useGuestWifi();
 	return (
 		<Dialog open={isOpen && !!wifi} onOpenChange={(open) => !open && onClose()}>
-			<DialogContent className="max-sm:justify-center-safe sm:max-w-md">
+			<DialogContent className="max-sm:justify-center-safe">
 				<DialogHeader className="items-center text-center sm:text-center">
 					<DialogTitle>Guest Wi-Fi</DialogTitle>
 					<DialogDescription>Point your phone's camera at the code to join {wifi?.network}</DialogDescription>
