@@ -1,0 +1,17 @@
+# What Issue to PR (issue-to-pr.yml) sets up before Claude works, so it can run this repository's checks: the same
+# tools the Test workflow installs.
+name: Setup
+description: The tools this repository's checks need, for Issue to PR
+runs:
+  using: composite
+  steps:
+    - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+      with:
+        bun-version: 1.4.5
+    - shell: bash
+      run: bun install --frozen-lockfile
+    - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+      with:
+        python-version: "3.14"
+    - shell: bash
+      run: pip install -r requirements-test.txt
