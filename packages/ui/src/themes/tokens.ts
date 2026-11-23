@@ -1,7 +1,12 @@
-// What a theme sets: shadcn's color tokens (new-york v4), the dashboards' status colors (success,
-// warning, info, alarm), the chart palette and the sidebar's, for light and dark. The names are the
-// CSS variables' (without the --), which the components read through Tailwind (bg-background…).
+/**
+ * What a theme sets: shadcn's color tokens (new-york v4), the dashboards' status colors (success,
+ * warning, info, alarm), the chart palette and the sidebar's, for light and dark. The names are the
+ * CSS variables' (without the --), which the components read through Tailwind (bg-background…).
+ *
+ * @module
+ */
 
+/** Every token a theme sets, in the order its CSS is written. */
 export const TOKEN_NAMES = [
 	'background',
 	'foreground',
@@ -46,6 +51,7 @@ export const TOKEN_NAMES = [
 	'sidebar-ring',
 ] as const;
 
+/** One token's name (`background`, `primary-foreground`, `success`…). */
 export type TokenName = (typeof TOKEN_NAMES)[number];
 
 /** Every token's CSS value (oklch, hex, or a color with alpha) for one mode. */
@@ -61,6 +67,7 @@ export interface ThemeEffects {
 	glow?: boolean;
 }
 
+/** A theme: its tokens for each mode, a radius and optional effects (a preset or a custom theme). */
 export interface DashboardTheme {
 	/** Stable id (`raineworks`, `neutral`, or a custom theme's). */
 	id: string;
@@ -70,8 +77,11 @@ export interface DashboardTheme {
 	description?: string;
 	/** The base corner radius (CSS length). */
 	radius: string;
+	/** The tokens in light mode. */
 	light: Tokens;
+	/** The tokens in dark mode. */
 	dark: Tokens;
+	/** Decoration over the colors; none when unset. */
 	effects?: ThemeEffects;
 	/**
 	 * Home Assistant's own accent (its switches, sliders, the sidebar's selected item), per mode;

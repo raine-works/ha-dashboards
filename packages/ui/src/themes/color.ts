@@ -1,7 +1,12 @@
-// Color math for the themes: CSS colors (oklch, hex, rgb) to OKLCH and back to sRGB hex, which
-// Home Assistant's Companion apps need (Android parses only hex and comma rgb()). OKLab is Björn
-// Ottosson's.
+/**
+ * Color math for the themes: CSS colors (oklch, hex, rgb) to OKLCH and back to sRGB hex, which
+ * Home Assistant's Companion apps need (Android parses only hex and comma rgb()). OKLab is Björn
+ * Ottosson's.
+ *
+ * @module
+ */
 
+/** An OKLCH color: lightness (0–1), chroma (0 up, about 0.4 at most in sRGB) and hue (degrees). */
 export interface Oklch {
 	l: number;
 	c: number;
@@ -63,9 +68,11 @@ export function fitGamut(color: Oklch): Oklch {
 	return { ...color, c: lo };
 }
 
+/** OKLCH → sRGB channels (0–255), brought into gamut first and rounded. */
 export const toRgb = (color: Oklch): [number, number, number] =>
 	oklchToRgbRaw(fitGamut(color)).map((v) => Math.min(255, Math.max(0, Math.round(v)))) as [number, number, number];
 
+/** OKLCH → `#rrggbb`, brought into gamut first. */
 export const toHex = (color: Oklch) =>
 	`#${toRgb(color)
 		.map((v) => v.toString(16).padStart(2, '0'))

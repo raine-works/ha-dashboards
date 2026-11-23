@@ -1,9 +1,14 @@
-// Making a theme: from a starting theme, an accent (one color, or a two-color gradient for the
-// edges and glow), a gray base, a radius and effects; and shadcn's CSS in and out, so themes from
-// ui.shadcn.com/themes or tweakcn come in as they are. Pure, so the editor previews as you go.
+/**
+ * Making a theme: from a starting theme, an accent (one color, or a two-color gradient for the
+ * edges and glow), a gray base, a radius and effects; and shadcn's CSS in and out, so themes from
+ * ui.shadcn.com/themes or tweakcn come in as they are. Pure, so the editor previews as you go.
+ *
+ * @module
+ */
 import { cssToHex, mixHex, oklchCss, parseCssColor } from './color';
 import { type DashboardTheme, TOKEN_NAMES, type TokenName, type Tokens } from './tokens';
 
+/** One of shadcn's gray bases, which tint a theme's grays. */
 export type BaseGray = 'neutral' | 'zinc' | 'stone' | 'slate';
 
 /** shadcn's gray bases: a hue and how much of it the grays carry. */
@@ -14,18 +19,24 @@ export const BASE_GRAYS: Record<BaseGray, { name: string; hue: number; chroma: n
 	slate: { name: 'Slate', hue: 257, chroma: 0.014 },
 };
 
+/** What the theme editor asks for, which `buildTheme` turns into a theme. */
 export interface ThemeChoices {
+	/** The new theme's name. */
 	name: string;
 	/** The theme it starts from (its statuses, charts and everything else). */
 	from: DashboardTheme;
+	/** The gray base its grays are tinted toward. */
 	base: BaseGray;
 	/**
 	 * The starting theme's own accent (`keep`), one color (buttons, focus, Home Assistant's switches),
 	 * or two for a gradient (edges and glow).
 	 */
 	accent: { kind: 'keep' } | { kind: 'color'; color: string } | { kind: 'gradient'; from: string; to: string };
+	/** The base corner radius (CSS length). */
 	radius: string;
+	/** Turn on the gradient edges effect. */
 	edges: boolean;
+	/** Turn on the glow effect. */
 	glow: boolean;
 }
 
@@ -69,6 +80,7 @@ function accented(tokens: Tokens, accent: string, dark: boolean): Tokens {
 	};
 }
 
+/** A theme name as an id (`My Theme!` → `my-theme`); `theme` when nothing is left. */
 export const slug = (name: string) =>
 	name
 		.toLowerCase()

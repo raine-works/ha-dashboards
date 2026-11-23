@@ -1,3 +1,12 @@
+/**
+ * The parts of Home Assistant's frontend `hass` object, and the data in it, that the dashboards
+ * use. Typed by hand (narrower than the frontend's own types) so the cards don't depend on
+ * Home Assistant's frontend source.
+ *
+ * @module
+ */
+
+/** An entity's attributes: the few read everywhere are typed, the rest are `unknown`. */
 export interface HassEntityAttributes {
 	friendly_name?: string;
 	entity_picture?: string;
@@ -10,6 +19,7 @@ export interface HassEntityAttributes {
 	[key: string]: unknown;
 }
 
+/** An entity's state as in `hass.states`; `last_changed` / `last_updated` are ISO timestamps. */
 export interface HassEntity {
 	entity_id: string;
 	state: string;
@@ -18,6 +28,7 @@ export interface HassEntity {
 	last_updated: string;
 }
 
+/** A `state_changed` event; `old_state` is null for a new entity, `new_state` for a removed one. */
 export interface HassStateChangeEvent {
 	data: {
 		entity_id: string;
@@ -38,6 +49,7 @@ export interface HassEntityRegistryEntry {
 	platform?: string;
 }
 
+/** Device registry entry as the frontend receives it (`hass.devices`). */
 export interface HassDeviceRegistryEntry {
 	id: string;
 	area_id?: string | null;
@@ -48,20 +60,27 @@ export interface HassDeviceRegistryEntry {
 	model?: string | null;
 }
 
+/** An area (`hass.areas`), optionally on a floor. */
 export interface HassArea {
 	area_id: string;
 	name: string;
 	floor_id?: string | null;
 }
 
+/** A floor (`hass.floors`); `level` orders floors (0 is the ground floor), null when unset. */
 export interface HassFloor {
 	floor_id: string;
 	name: string;
 	level?: number | null;
 }
 
+/** The events the websocket connection fires (see `HomeAssistant.connection.addEventListener`). */
 export type ConnectionEvent = 'ready' | 'disconnected' | 'reconnect-error';
 
+/**
+ * The `hass` object Home Assistant's frontend hands a card. Everything but `states` and
+ * `callService` is optional: older frontends, the demo's mock and tests leave parts out.
+ */
 export interface HomeAssistant {
 	states: Record<string, HassEntity>;
 	connection?: {

@@ -1,17 +1,24 @@
-// A theme as a Home Assistant theme (the dict Home Assistant's frontend applies to its whole UI):
-// what the hand-written Blackout theme set, from a theme's tokens. The integration registers these
-// (custom_components/raineworks_dashboards/themes.py).
-//
-// - Hex, or rgba() for translucent colors: the Companion apps read app-header-background-color and
-//   primary-background-color and Android parses only hex and comma rgb(); Home Assistant derives
-//   its --rgb-* variables only from hex, and its rgba(var(--rgb-…)) uses need them.
-// - Home Assistant derives text-primary-color, the primary palette (ha-color-primary-05…95) and the
-//   like only for its own default theme, so a theme has to set them.
-// - Both modes are in `modes`, so Profile → Theme offers Auto, Light and Dark.
+/**
+ * A theme as a Home Assistant theme (the dict Home Assistant's frontend applies to its whole UI):
+ * what the hand-written Blackout theme set, from a theme's tokens. The integration registers these
+ * (custom_components/raineworks_dashboards/themes.py).
+ *
+ * - Hex, or rgba() for translucent colors: the Companion apps read app-header-background-color and
+ *   primary-background-color and Android parses only hex and comma rgb(); Home Assistant derives
+ *   its --rgb-* variables only from hex, and its rgba(var(--rgb-…)) uses need them.
+ * - Home Assistant derives text-primary-color, the primary palette (ha-color-primary-05…95) and the
+ *   like only for its own default theme, so a theme has to set them.
+ * - Both modes are in `modes`, so Profile → Theme offers Auto, Light and Dark.
+ *
+ * @module
+ */
 import { cssToHex, fitGamut, hexToRgbList, mixHex, type Oklch, parseCssColor, toHex, withAlpha } from './color';
 import type { DashboardTheme, Tokens } from './tokens';
 
+/** One mode's Home Assistant theme variables, by name without the `--`. */
 export type HaThemeVars = Record<string, string>;
+
+/** A Home Assistant theme: shared variables at the top level, each mode's colors in `modes`. */
 export interface HaTheme {
 	[key: string]: string | { light: HaThemeVars; dark: HaThemeVars };
 	modes: { light: HaThemeVars; dark: HaThemeVars };

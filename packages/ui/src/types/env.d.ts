@@ -1,3 +1,9 @@
+/**
+ * Ambient types for what @app/dashboard-build provides: imported assets and the compiled CSS.
+ *
+ * @module
+ */
+
 // Fonts, images and sounds are inlined as data URLs by @app/dashboard-build
 declare module '*.woff2' {
 	const dataUrl: string;

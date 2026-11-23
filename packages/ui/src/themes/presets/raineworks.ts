@@ -1,12 +1,18 @@
+/**
+ * The Raineworks theme, the default: raineworks.com's design (its packages/ui/src/styles/globals.css),
+ * shadcn's black and white with one accent, a peach-to-teal gradient blended in oklab, used only as
+ * decoration (edges, a glow, hairlines), never as a status. Controls stay black and white; statuses
+ * keep their own colors.
+ *
+ * @module
+ */
 import type { DashboardTheme } from '../tokens';
 import { neutral } from './neutral';
 
-// raineworks.com's design (its packages/ui/src/styles/globals.css): shadcn's black and white with
-// one accent, a peach-to-teal gradient blended in oklab, used only as decoration (edges, a glow,
-// hairlines), never as a status. Controls stay black and white; statuses keep their own colors.
 const PEACH = '#ea9a7e';
 const TEAL = '#2998ad';
 
+/** The Raineworks theme (the default): black and white with a peach-to-teal gradient. */
 export const raineworks: DashboardTheme = {
 	id: 'raineworks',
 	name: 'Raineworks',

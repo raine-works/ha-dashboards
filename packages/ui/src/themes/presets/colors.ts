@@ -1,3 +1,8 @@
+/**
+ * shadcn's color themes (Blue, Green, Orange, Rose, Violet): Neutral with one accent hue.
+ *
+ * @module
+ */
 import { oklchCss } from '../color';
 import type { DashboardTheme } from '../tokens';
 import { neutral } from './neutral';
@@ -37,8 +42,13 @@ function colorTheme(id: string, name: string, hue: number, chroma: number): Dash
 	};
 }
 
+/** Neutral with a blue accent. */
 export const blue = colorTheme('blue', 'Blue', 259, 0.17);
+/** Neutral with a green accent. */
 export const green = colorTheme('green', 'Green', 150, 0.15);
+/** Neutral with an orange accent. */
 export const orange = colorTheme('orange', 'Orange', 50, 0.17);
+/** Neutral with a rose accent. */
 export const rose = colorTheme('rose', 'Rose', 12, 0.18);
+/** Neutral with a violet accent. */
 export const violet = colorTheme('violet', 'Violet', 293, 0.2);
