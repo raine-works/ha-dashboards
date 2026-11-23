@@ -1,8 +1,11 @@
-// A `hass` for the demo house: what the dashboards read (states, registries, services, config, the
-// user) and do (callService changes the states the way Home Assistant would, roughly; callWS and
-// the connection's subscriptions answer with the demo's data or nothing). Each change makes a new
-// hass object with the changed entity's state replaced, as Home Assistant does, and hands it to
-// `onChange` (the page sets it on every card).
+/**
+ * A `hass` for the demo house: what the dashboards read (states, registries, services, config, the
+ * user) and do (callService changes the states the way Home Assistant would, roughly; callWS and
+ * the connection's subscriptions answer with the demo's data or nothing). Each change makes a new
+ * hass object with the changed entity's state replaced, as Home Assistant does, and hands it to
+ * `onChange` (the page sets it on every card).
+ */
+
 import type { HassEntity, HomeAssistant } from '@app/ui/types';
 import { AREAS, DEMO_DEVICES, DEMO_ENTITIES, DEMO_TODO, demoStates, FLOORS } from './house';
 

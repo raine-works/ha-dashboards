@@ -1,8 +1,11 @@
-// The demo house: a made-up two-floor home with what most houses have (lights in rooms, two
-// thermostats, a front door lock and its contact, a garage door, a blind, a fan, weather, two
-// people, a to-do list and a calendar) and none of the integrations the optional modules need
-// (Music Assistant, Alarmo, cameras, pets…), so it shows the dashboards as a new house first
-// sees them. Everything in it is made up.
+/**
+ * The demo house: a made-up two-floor home with what most houses have (lights in rooms, two
+ * thermostats, a front door lock and its contact, a garage door, a blind, a fan, weather, two
+ * people, a to-do list and a calendar) and none of the integrations the optional modules need
+ * (Music Assistant, Alarmo, cameras, pets…), so it shows the dashboards as a new house first
+ * sees them. Everything in it is made up.
+ */
+
 import type { HassArea, HassDeviceRegistryEntry, HassEntity, HassEntityRegistryEntry, HassFloor } from '@app/ui/types';
 
 const NOW = new Date().toISOString();
@@ -15,11 +18,13 @@ const entity = (entity_id: string, state: string, attributes: Record<string, unk
 	last_updated: NOW,
 });
 
+/** The floor registry: upstairs and the main floor. */
 export const FLOORS: Record<string, HassFloor> = {
 	upstairs: { floor_id: 'upstairs', name: 'Upstairs', level: 2 },
 	main_floor: { floor_id: 'main_floor', name: 'Main Floor', level: 1 },
 };
 
+/** The area registry, each room on its floor. */
 export const AREAS: Record<string, HassArea> = {
 	living_room: { area_id: 'living_room', name: 'Living Room', floor_id: 'main_floor' },
 	kitchen: { area_id: 'kitchen', name: 'Kitchen', floor_id: 'main_floor' },
@@ -181,10 +186,12 @@ const ENTITIES: Array<[HassEntity, string | null, string[]?]> = [
 	],
 ];
 
+/** A fresh copy of every entity's state, keyed by entity id (the demo hass changes its own). */
 export function demoStates(): Record<string, HassEntity> {
 	return Object.fromEntries(ENTITIES.map(([state]) => [state.entity_id, { ...state }]));
 }
 
+/** The entity registry: each entity in its area, with its labels, on no device. */
 export const DEMO_ENTITIES: Record<string, HassEntityRegistryEntry> = Object.fromEntries(
 	ENTITIES.map(([state, area, labels]) => [
 		state.entity_id,
@@ -199,6 +206,7 @@ export const DEMO_ENTITIES: Record<string, HassEntityRegistryEntry> = Object.fro
 	]),
 );
 
+/** The device registry: empty, since every entity sits in its area directly. */
 export const DEMO_DEVICES: Record<string, HassDeviceRegistryEntry> = {};
 
 /** The to-do lists' items (`todo/item/subscribe`). */

@@ -1,7 +1,10 @@
-// The demo page: one dashboard card on the demo house (`?card=home` by default; `?card=panel` a wall
-// panel on the main floor with the timer, `?floor=upstairs` for another floor), the way Lovelace
-// mounts it: setConfig with the card's options, then a new hass on every change. `?light` shows the
-// light color scheme, `?theme=<id>` another theme.
+/**
+ * The demo page: one dashboard card on the demo house (`?card=home` by default; `?card=panel` a wall
+ * panel on the main floor with the timer, `?floor=upstairs` for another floor), the way Lovelace
+ * mounts it: setConfig with the card's options, then a new hass on every change. `?light` shows the
+ * light color scheme, `?theme=<id>` another theme.
+ */
+
 import { createDemoHass } from './hass';
 
 // The dashboards bundle, served as it's built (not bundled into this page), imported as Home

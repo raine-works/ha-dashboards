@@ -1,8 +1,11 @@
-// A Model Context Protocol server over stdio, small enough to need no SDK: newline-delimited
-// JSON-RPC 2.0 with the methods a tools-only server answers (initialize, ping, tools/list,
-// tools/call). The SDK's other transports (HTTP, SSE, OAuth) would bring Express and Hono along
-// for nothing. `handle()` is pure: one message in, its response (or none, for a notification) out.
+/**
+ * A Model Context Protocol server over stdio, small enough to need no SDK: newline-delimited
+ * JSON-RPC 2.0 with the methods a tools-only server answers (initialize, ping, tools/list,
+ * tools/call). The SDK's other transports (HTTP, SSE, OAuth) would bring Express and Hono along
+ * for nothing. `handle()` is pure: one message in, its response (or none, for a notification) out.
+ */
 
+/** The MCP protocol version the server speaks, answered to `initialize`. */
 export const PROTOCOL_VERSION = '2025-06-18';
 
 /** A JSON Schema for a tool's arguments. */
@@ -13,9 +16,13 @@ export type InputSchema = {
 	additionalProperties?: boolean;
 };
 
+/** One tool the server offers (`tools/list`) and runs (`tools/call`). */
 export interface Tool {
+	/** Its name, unique on the server. */
 	name: string;
+	/** What it does and when to use it, for the assistant. */
 	description: string;
+	/** Its arguments. */
 	inputSchema: InputSchema;
 	/** True when it changes Home Assistant (shown to the assistant as not read-only). */
 	writes?: boolean;
@@ -33,6 +40,11 @@ const METHOD_NOT_FOUND = -32601;
 const INVALID_PARAMS = -32602;
 const INVALID_REQUEST = -32600;
 
+/**
+ * A server offering `tools`, introduced by `info` on `initialize`. Its `handle()` answers one
+ * message: a JSON-RPC error for an unknown method or tool or bad arguments, a tool's thrown
+ * failure as an `isError` result, and nothing for a notification.
+ */
 export function createServer(tools: Tool[], info: { name: string; version: string; instructions?: string }) {
 	const byName = new Map(tools.map((tool) => [tool.name, tool]));
 
