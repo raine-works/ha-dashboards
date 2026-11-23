@@ -113,8 +113,9 @@ module, with its detection tested.
 - A consumer's `className` is for layout only. A new look is a new variant.
 - Theme tokens only (`bg-background`, `text-muted-foreground`, status tokens `success`, `warning`,
   `info`, `alarm`), never raw palette colors for surfaces and text.
-- Two dialog sizes: `workspace` for feature dialogs, `default` for confirmations and pickers. A
-  dialog never sets its own width or height.
+- Dialog sizes: `workspace` for feature dialogs, `default` for confirmations and pickers, `sheet`
+  for a picker that rises from the bottom edge on phones (`default` elsewhere). A dialog never sets
+  its own width or height.
 - Buttons never squish: share a row with `flex-1`, never equal grid columns.
 - Wall panels are a size up for fingers (`touch:` variant, nothing under 44px). Check layouts at
   1280×800 and 960×600, and phones at 540px wide.

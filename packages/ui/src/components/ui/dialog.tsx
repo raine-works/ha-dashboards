@@ -269,10 +269,16 @@ export interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement>
 	 * QR codes). `workspace`: every feature dialog (music, cameras, intercom, calendar, weather, energy,
 	 * people, TVs, to-do, the brief, notifications, pets): 95% of the screen's width up to 100rem and
 	 * 90% of its height, a flex column whose last row (its actions, a message box) sits on the bottom
-	 * edge (`mt-auto`), the full screen on a phone like every dialog.
+	 * edge (`mt-auto`), the full screen on a phone like every dialog. `sheet`: `default` on wider
+	 * screens, and on a phone a sheet from the bottom edge, as tall as its content up to the screen
+	 * under the toolbar less 2rem (pickers such as the due date).
 	 */
-	size?: 'default' | 'workspace';
+	size?: 'default' | 'workspace' | 'sheet';
 }
+
+// The sheet size's phone shape, applied after the phone's full-screen classes so it overrides their top and height
+const SHEET =
+	'max-sm:top-auto max-sm:max-h-[calc(var(--panel-height)-2rem)] max-sm:animate-sheet-in max-sm:rounded-t-2xl max-sm:border-t';
 
 // The workspace size: one shape for every feature dialog, so none is narrower or shorter than the rest. The
 // 10.5" wall panels (touch, below lg) take the screen's height less 1rem, room for their bigger controls
@@ -345,6 +351,9 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
 					// any actions a dialog marks the same way sit at the bottom edge, not under the content with the screen empty below
 					'max-sm:flex max-sm:flex-col',
 					!ownLayout && 'max-sm:*:shrink-0',
+					// The sheet size: on phones, let go of the top and rise from the bottom edge as tall as its content,
+					// capped under the toolbar so a tall one scrolls inside instead of running up past it
+					size === 'sheet' && SHEET,
 					className,
 				)}
 				{...props}

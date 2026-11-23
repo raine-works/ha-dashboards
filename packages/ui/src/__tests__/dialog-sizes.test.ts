@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Glob } from 'bun';
 
-// AGENTS.md: two dialog sizes (DialogContent's `size`, `default` or `workspace`), and a dialog never sets
+// AGENTS.md: the dialog sizes (DialogContent's `size`: `default`, `workspace` or `sheet`), and a dialog never sets
 // its own width or height. This finds DialogContent tags whose classes size them anyway.
 
 const packages = resolve(import.meta.dir, '../../..');
@@ -47,5 +47,14 @@ describe('dialog sizes', () => {
 				sized.push(`${file}:${line} ${classes.join(' ')}`);
 		}
 		expect(sized).toEqual([]);
+	});
+
+	it('a sheet lets go of the top on phones but keeps a height cap', () => {
+		// Without the cap, a sheet anchored only at the bottom grows past the toolbar and nothing scrolls
+		const source = readFileSync(resolve(packages, 'ui/src/components/ui/dialog.tsx'), 'utf8');
+		const sheet = source.match(/const SHEET =\s*'([^']*)'/)?.[1].split(/\s+/) ?? [];
+		expect(sheet).toContain('max-sm:top-auto');
+		expect(sheet).toContain('max-sm:max-h-[calc(var(--panel-height)-2rem)]');
+		expect(source).toContain("size === 'sheet' && SHEET,\n\t\t\t\t\tclassName,");
 	});
 });
