@@ -36,6 +36,11 @@ describe('holiday messages', () => {
 		}
 	});
 
+	// Words are "…" never "...", and printed notes can't carry "…" (outside the code page), so neither appears.
+	it('never trails off with three periods', () => {
+		expect(JSON.stringify(HOLIDAY_MESSAGES)).not.toContain('...');
+	});
+
 	it("puts the holiday's category first, featured, and nothing without one", () => {
 		const categories = withHolidayCategory(ANNOUNCEMENT_PRESETS, 'halloween', (m) => m.announcements);
 		expect(categories[0]).toMatchObject({ id: 'holiday', label: '🎃 Halloween', featured: true });

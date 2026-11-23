@@ -166,7 +166,7 @@ export const HOLIDAY_MESSAGES: Record<HolidayId, HolidayMessages> = {
 			'Happy Halloween!',
 			'Costumes on by 6. Trick-or-treating soon!',
 			'Candy inspection before eating, please.',
-			'Boo! Something spooky is in the hallway...',
+			'Boo! Something spooky is in the hallway.',
 		],
 		doorbell: [
 			'Happy Halloween! Please take one piece of candy.',
