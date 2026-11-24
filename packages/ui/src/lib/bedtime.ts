@@ -6,8 +6,11 @@
  */
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
 import { isHouseholdMember } from './household';
-import { entityArea } from './lights';
+import { entityArea, HOUSEHOLD_LIGHT_LABEL } from './lights';
+import { SPEAKER_LABEL } from './music';
 import { householdPerson } from './people';
+import { nameList } from './text';
+import { TV_LABEL } from './tv';
 
 /**
  * HA label on each room's bedtime toggle, in its room's area: the raineworks_dashboards
@@ -131,7 +134,8 @@ export function otherBedtimeRooms(
 
 /**
  * The room in bedtime (its own toggle on; Home Bedtime alone doesn't count) holding any of these
- * entities (lights, a scene's switch), by their area: turning them on there asks first.
+ * entities (lights, a scene's switch), by their area: turning them on there asks first. Anything
+ * labeled Stays on at bedtime (`BEDTIME_KEEP_LABEL`) never asks.
  */
 export function bedtimeRoomOf(
 	hass: Pick<HomeAssistant, 'entities' | 'devices' | 'areas'>,
@@ -141,6 +145,8 @@ export function bedtimeRoomOf(
 	const asleep = bedtimeRooms(hass).filter((room) => states[room.entityId]?.state === 'on');
 	if (asleep.length === 0) return undefined;
 	for (const id of entityIds) {
+		// What stays on at bedtime (a night light) turns on without asking
+		if (hass.entities?.[id]?.labels?.includes(BEDTIME_KEEP_LABEL)) continue;
 		const areaId = entityArea(hass, id);
 		const room = asleep.find((r) => r.areaId === areaId);
 		if (room) return room;
@@ -197,7 +203,7 @@ export const HOME_ROUTINE: BedtimeRoutine = {
 		{ kind: 'rooms', text: 'Puts every room still awake to bed, each with its own routine', actions: [] },
 		{
 			kind: 'lights',
-			text: 'Turns off every household light and TV, and stops the music',
+			text: 'Turns off every household light and TV, and stops the music (not what stays on at bedtime)',
 			actions: ['light.turn_off', 'media_player.turn_off', 'media_player.media_stop'],
 		},
 		{ kind: 'covers', text: 'Closes every curtain, blind and garage door', actions: ['cover.close_cover'] },
@@ -215,3 +221,104 @@ export const HOME_ROUTINE: BedtimeRoutine = {
 		{ kind: 'panels', text: 'Dims the wall panel lights to 10% until bedtime ends', actions: [] },
 	],
 };
+
+/**
+ * The label for what a bedtime routine leaves alone (a night light, a TV with a sleep timer): the
+ * routines skip it, and so do their confirm dialogs' lists.
+ */
+export const BEDTIME_KEEP_LABEL = 'stays_on_at_bedtime';
+
+const WINDOW_COVER_CLASSES = ['curtain', 'blind', 'shade', 'shutter'];
+
+/** A name without its room's in front ("Master Suite Left Lamp" in the Master Suite: "Left Lamp"). */
+function withoutRoom(name: string, room: string): string {
+	return room && name.toLowerCase().startsWith(`${room.toLowerCase()} `) ? name.slice(room.length + 1) : name;
+}
+
+/** Up to three names, then how many more ("Left Lamp, Right Lamp, Floor Lamp and 2 more"). */
+export function someNames(names: string[], max = 3): string {
+	if (names.length <= max) return nameList(names);
+	return `${names.slice(0, max).join(', ')} and ${names.length - max} more`;
+}
+
+/**
+ * What a room's bedtime turns off by label, the way automations/bedtime_rooms.yaml finds it: in the
+ * toggle's own area, its lights labeled Household Light and TVs labeled Household TV (off), its
+ * speakers labeled Household Speaker (stopped) and its curtains and blinds (closed, a cover group
+ * standing for its members), leaving out anything labeled Stays on at bedtime. A step for each kind
+ * the room has, naming them; none for a toggle in no area.
+ */
+export function labeledBedtimeSteps(
+	hass: Pick<HomeAssistant, 'entities' | 'devices' | 'areas'>,
+	states: Record<string, HassEntity>,
+	toggle: string,
+): BedtimeStep[] {
+	const areaId = entityArea(hass, toggle);
+	if (!areaId) return [];
+	const room = hass.areas?.[areaId]?.name ?? '';
+	const entries = Object.values(hass.entities ?? {});
+	const kept = (id: string) => !!hass.entities?.[id]?.labels?.includes(BEDTIME_KEEP_LABEL);
+	const inRoom = (id: string) => entityArea(hass, id) === areaId && !kept(id);
+	const labeled = (label: string) =>
+		entries.filter((entry) => entry.labels?.includes(label) && inRoom(entry.entity_id)).map((e) => e.entity_id);
+	const groupMembers = new Set(
+		Object.values(states).flatMap((state) =>
+			state.entity_id.startsWith('cover.') && Array.isArray(state.attributes.entity_id)
+				? (state.attributes.entity_id as string[])
+				: [],
+		),
+	);
+	const covers = Object.values(states)
+		.filter(
+			(state) =>
+				state.entity_id.startsWith('cover.') &&
+				WINDOW_COVER_CLASSES.includes(String(state.attributes.device_class)) &&
+				!groupMembers.has(state.entity_id) &&
+				inRoom(state.entity_id),
+		)
+		.map((state) => state.entity_id);
+	const nameOf = (id: string) => String(states[id]?.attributes.friendly_name ?? id);
+	// Lights by their short names, as the light rows show them ("Floor Lamp, Left Lamp"); a TV, speaker
+	// or curtain by its whole name, which reads better alone ("the Master Suite TV")
+	const lightNames = (ids: string[]) => someNames(ids.map((id) => withoutRoom(nameOf(id), room)).sort());
+	// "the Master Suite TV", but "Lott's TV" (a possessive needs no article) and a list as it is
+	const names = (ids: string[]) => {
+		const list = someNames(ids.map(nameOf).sort());
+		return ids.length === 1 && !/'s\b/.test(list) ? `the ${list}` : list;
+	};
+
+	const steps: BedtimeStep[] = [];
+	const lights = labeled(HOUSEHOLD_LIGHT_LABEL);
+	if (lights.length)
+		steps.push({ kind: 'lights', text: `Turns off ${lightNames(lights)}`, actions: ['light.turn_off'] });
+	const tvs = labeled(TV_LABEL);
+	if (tvs.length) steps.push({ kind: 'media', text: `Turns off ${names(tvs)}`, actions: ['media_player.turn_off'] });
+	const speakers = labeled(SPEAKER_LABEL);
+	if (speakers.length)
+		steps.push({
+			kind: 'speaker',
+			text: `Stops the music on ${names(speakers)}`,
+			actions: ['media_player.media_stop'],
+		});
+	if (covers.length) steps.push({ kind: 'covers', text: `Closes ${names(covers)}`, actions: ['cover.close_cover'] });
+	return steps;
+}
+
+/**
+ * A room's whole bedtime routine, as its confirm dialog lists it: what it turns off by label
+ * (`labeledBedtimeSteps()`), then the room's extras from the house settings' `bedtime_routines`
+ * (what no label can say: a fan turned on, a speaker in the next room), for the zone the settings
+ * name, else the room's own name.
+ */
+export function bedtimeRoutineFor(
+	hass: Pick<HomeAssistant, 'entities' | 'devices' | 'areas'>,
+	states: Record<string, HassEntity>,
+	toggle: string,
+	extras: BedtimeRoutine | undefined,
+): BedtimeRoutine {
+	const areaId = entityArea(hass, toggle);
+	return {
+		zone: extras?.zone ?? (areaId ? (hass.areas?.[areaId]?.name ?? '') : ''),
+		steps: [...labeledBedtimeSteps(hass, states, toggle), ...(extras?.steps ?? [])],
+	};
+}

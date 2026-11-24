@@ -83,11 +83,13 @@ describe('the dashboards bundle', () => {
 		// soundbar's TV audio in Now Playing: what's on the TV in its room and its TV controls; to 1.28MB for
 		// the to-do dialog's Completed tab and the pets dialog's level gauges; to 1.29MB for the dialogs'
 		// history entries, so Back closes them; to 1.3MB for swiping notifications away and a swiped row's
-		// spring back; down to 1.2MB once Leaflet's JS loaded with the People map, ~1.14MB then)
+		// spring back; down to 1.2MB once Leaflet's JS loaded with the People map, ~1.14MB then; to 1.21MB
+		// for the redesign: room tiles and their dialog, a line per climate device, phone alerts, labeled
+		// header buttons and bedtime by label, ~1.2MB with them)
 		const sizes = [bundlePath, ...(await staticChunks()).map((c) => join(dirname(bundlePath), c))].map(
 			(path) => Bun.file(path).size,
 		);
-		expect(sizes.reduce((a, b) => a + b, 0)).toBeLessThan(1_200_000);
+		expect(sizes.reduce((a, b) => a + b, 0)).toBeLessThan(1_210_000);
 	});
 
 	it('names a bundle by its content', () => {
