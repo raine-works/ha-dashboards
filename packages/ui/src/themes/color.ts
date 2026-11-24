@@ -179,3 +179,26 @@ export function hslToRgb(h: number, s: number, l: number): [number, number, numb
 	const f = (n: number) => light - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
 	return [f(0), f(8), f(4)].map((v) => Math.round(v * 255)) as [number, number, number];
 }
+
+/** A color's WCAG 2.x relative luminance (0–1), from its sRGB channels. */
+function relativeLuminance([r, g, b]: [number, number, number]): number {
+	const linear = (v: number) => {
+		const s = v / 255;
+		return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+	};
+	return 0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b);
+}
+
+/**
+ * The WCAG 2.x contrast ratio (1–21) between two CSS colors, a translucent one as it shows over
+ * `backdrop`; NaN when either isn't a color this module reads.
+ */
+export function contrast(a: string, b: string, backdrop = '#000000'): number {
+	const ha = cssToHex(a, backdrop);
+	const hb = cssToHex(b, backdrop);
+	const ra = ha && parseHex(ha);
+	const rb = hb && parseHex(hb);
+	if (!ra || !rb) return Number.NaN;
+	const [hi, lo] = [relativeLuminance(ra), relativeLuminance(rb)].sort((x, y) => y - x) as [number, number];
+	return (hi + 0.05) / (lo + 0.05);
+}
