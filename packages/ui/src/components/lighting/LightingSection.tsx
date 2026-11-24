@@ -1,3 +1,10 @@
+/**
+ * The Lighting section: lights by floor and room (or configured rooms), scenes, bedtime and All
+ * off. Also the lighting package's entry point, re-exporting its rows, dialogs and controls.
+ *
+ * @module
+ */
+
 import { Lightbulb, Palette, SquareStack } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useMemo, useState } from 'preact/compat';
@@ -43,6 +50,7 @@ export {
 import { withErrorBoundary } from '../layout/ErrorBoundary';
 import { SECTION_SCROLLER } from '../layout/scroll';
 
+/** A configured room: a Lighting tab with its fixtures. */
 export interface LightRoom {
 	/** Tab label; a single room shows as "Fixtures". */
 	name: string;
@@ -51,6 +59,7 @@ export interface LightRoom {
 	extra?: React.ReactNode;
 }
 
+/** A hand-picked scene for the Scenes tab. */
 export interface LightScene {
 	/** Stateful Scenes switch (`switch.<room>_<scene>_stateful_scene`). */
 	id: string;
@@ -58,6 +67,7 @@ export interface LightScene {
 	description?: string;
 }
 
+/** The Lighting section's header, and which lights and scenes it shows. */
 export interface LightingSectionProps {
 	title: string;
 	subtitle: string;

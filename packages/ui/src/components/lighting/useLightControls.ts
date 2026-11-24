@@ -1,3 +1,11 @@
+/**
+ * Lighting's state and actions: the lights, scenes and bedtime toggles it reads, optimistic
+ * toggles, dimming and scenes, All off with its Undo, and asking before a light wakes a room in
+ * bedtime.
+ *
+ * @module
+ */
+
 import { useEffect, useMemo, useRef, useState } from 'preact/compat';
 import { CONFIRM_TIMEOUT_MS, useHassApi, useHassSelector } from '../../context/HassContext';
 import { type BedtimeRoom, bedtimeRoomOf } from '../../lib/bedtime';
@@ -15,6 +23,7 @@ import { isUnavailable } from '../../lib/values';
 import type { HassEntity, HomeAssistant } from '../../types/homeassistant';
 import { toast } from '../ui';
 
+/** A light on screen: its entity and the name its row shows. */
 export interface LightFixture {
 	/** `light.*` entity; a light group's members follow it optimistically. */
 	id: string;
@@ -84,6 +93,7 @@ export interface BedtimeConfirm {
 
 const SCENE_SUFFIX = /\s*stateful scene$/i;
 
+/** A light as its row shows it, with optimistic on/off and brightness. */
 export interface FixtureState {
 	entity?: HassEntity;
 	unavailable: boolean;
@@ -428,4 +438,5 @@ export function useLightControls(lightIds: string[], hass: LightingHass | null) 
 	};
 }
 
+/** What `useLightControls()` returns: the optimistic light, scene and All off state and actions. */
 export type LightControls = ReturnType<typeof useLightControls>;

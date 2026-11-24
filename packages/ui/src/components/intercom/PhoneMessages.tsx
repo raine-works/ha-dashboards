@@ -1,3 +1,9 @@
+/**
+ * The Messages dialog's Phones tab: a quick or typed message pushed to household members' phones.
+ *
+ * @module
+ */
+
 import { Check, Send } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useState } from 'preact/compat';

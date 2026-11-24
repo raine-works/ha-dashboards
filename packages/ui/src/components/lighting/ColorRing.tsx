@@ -1,3 +1,9 @@
+/**
+ * The color ring around a light's or a scene's control.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import { cn } from '../../lib/utils';
 

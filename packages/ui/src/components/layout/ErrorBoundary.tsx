@@ -1,3 +1,9 @@
+/**
+ * Error boundaries: a section's or dialog's crash stays local, shows what broke and retries.
+ *
+ * @module
+ */
+
 import { RefreshCw, TriangleAlert } from 'lucide-react';
 import React, { Component } from 'preact/compat';
 import { cn } from '../../lib/utils';
@@ -6,6 +12,7 @@ import { Button } from '../ui/button';
 /** A crashed part tries again on its own after this long (the entity that broke it may have recovered). */
 export const ERROR_RETRY_MS = 30_000;
 
+/** An error boundary's props: what it guards, how its fallback looks, and when it retries. */
 export interface ErrorBoundaryProps {
 	/** What crashed, for the message and the log ("Lighting", "Cameras"). */
 	name: string;

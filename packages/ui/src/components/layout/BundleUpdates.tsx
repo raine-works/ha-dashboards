@@ -1,3 +1,10 @@
+/**
+ * Keeps an open page on the latest dashboards bundle: it notices a newer deploy and reloads, or
+ * offers to.
+ *
+ * @module
+ */
+
 import { useEffect } from 'preact/compat';
 import { useHassConnection } from '../../context/HassContext';
 import { bundleFile, versionUrl } from '../../lib/bundle';

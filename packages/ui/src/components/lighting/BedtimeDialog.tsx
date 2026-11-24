@@ -1,3 +1,10 @@
+/**
+ * The confirmation before a bedtime turns on: what its routine will do, and other rooms to put to
+ * bed with it.
+ *
+ * @module
+ */
+
 import {
 	Blinds,
 	ChevronRight,
@@ -60,6 +67,7 @@ function roomStatus(room: OtherBedtimeRoom): string {
 	return "Nobody's assigned";
 }
 
+/** The bedtime dialog's toggle and room, and what cancelling and confirming do. */
 export interface BedtimeDialogProps {
 	/** The bedtime toggle about to turn on: Home Bedtime or a room's. */
 	entityId: string;

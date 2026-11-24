@@ -1,3 +1,9 @@
+/**
+ * The question before a light turns on in a room in bedtime.
+ *
+ * @module
+ */
+
 import { Lightbulb, Moon, Palette } from 'lucide-react';
 import type React from 'preact/compat';
 import { Button, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui';

@@ -1,3 +1,10 @@
+/**
+ * The "Reconnecting to Home Assistant…" banner, and the hook saying when the connection has been
+ * down long enough to show it.
+ *
+ * @module
+ */
+
 import { Loader2 } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useState } from 'preact/compat';

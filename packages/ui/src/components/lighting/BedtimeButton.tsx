@@ -1,3 +1,9 @@
+/**
+ * The bedtime button: turns a room's (or the house's) bedtime on after its dialog, or off at once.
+ *
+ * @module
+ */
+
 import { Moon } from 'lucide-react';
 import type React from 'preact/compat';
 import { useState } from 'preact/compat';
@@ -9,6 +15,7 @@ import { isUnavailable } from '../../lib/values';
 import { Button } from '../ui';
 import { BedtimeDialog } from './BedtimeDialog';
 
+/** The bedtime button's toggle, label and look. */
 export interface BedtimeButtonProps {
 	/** The bedtime toggle (`input_boolean.*`). */
 	entityId: string;

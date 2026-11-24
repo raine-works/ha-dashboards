@@ -1,3 +1,10 @@
+/**
+ * The washer and dryer: their states from the house settings' `laundry` sensors, the card showing
+ * them side by side, and the toasts when one finishes.
+ *
+ * @module
+ */
+
 import { WashingMachineIcon, WindIcon } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useState } from 'preact/compat';
@@ -11,6 +18,7 @@ import { Card, Separator, toast } from '../ui';
 
 export type { ApplianceEntities } from '../../lib/house-config';
 
+/** The laundry card's machines (the sensors each reads), and its layout classes. */
 export interface LaundryCardProps {
 	washer: ApplianceEntities;
 	dryer: ApplianceEntities;
@@ -26,7 +34,10 @@ export const laundryRoom = ({ laundry }: HouseConfig): Omit<LaundryCardProps, 'c
 	dryer: laundry.dryer ?? missing('Dryer'),
 });
 
-// Status → theme status token (running = event/blue, paused = amber, complete = green)
+/**
+ * Each machine status's classes, in theme status tokens: its text, its icon tile and its dot
+ * (running is info blue and pulses, paused is amber, complete is green, idle is muted).
+ */
 export const STATUS_STYLES: Record<ApplianceStatus, { text: string; tile: string; dot: string }> = {
 	running: { text: 'text-info', tile: 'bg-info/15 text-info', dot: 'bg-info animate-pulse' },
 	paused: { text: 'text-warning', tile: 'bg-warning/15 text-warning', dot: 'bg-warning' },
@@ -34,6 +45,7 @@ export const STATUS_STYLES: Record<ApplianceStatus, { text: string; tile: string
 	idle: { text: 'text-muted-foreground', tile: 'bg-muted text-muted-foreground', dot: '' },
 };
 
+/** A washer's or dryer's state as the laundry shows it: its view and time left, and whether it's known. */
 export interface LaundryMachineState extends LaundryMachine {
 	/** Home Assistant knows the machine (its state entity exists). */
 	known: boolean;

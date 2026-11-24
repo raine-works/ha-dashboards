@@ -1,3 +1,10 @@
+/**
+ * Lighting's rows: a light (switch, dimmer and colors button), a scene group, a room's scene chips
+ * and the All off button.
+ *
+ * @module
+ */
+
 import { Lightbulb, Loader2, Palette, Power, Sparkles } from 'lucide-react';
 import type React from 'preact/compat';
 import { memo, useState } from 'preact/compat';
@@ -17,6 +24,7 @@ export interface AdjustTarget {
 	lightIds: string[];
 }
 
+/** A light row's fixture, the section's controls, and how it opens the colors dialog. */
 export interface LightRowProps {
 	fixture: LightFixture;
 	controls: LightControls;
@@ -296,6 +304,10 @@ export const SceneChips: React.FC<{
 	);
 };
 
+/**
+ * All off: turns off every Household Light, counting the ones on (disabled while none is, or while
+ * the last All Off is still settling).
+ */
 export const AllOffButton: React.FC<{ controls: LightControls; className?: string }> = ({ controls, className }) => {
 	const count = controls.householdOn.length;
 	return (
