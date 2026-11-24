@@ -153,6 +153,8 @@ module, with its detection tested.
 - `switch.py`, `datetime.py`, `binary_sensor.py`, `sensor.py`: bedtime, the holiday mute, lock
   faults, affirmations
 - `notify.py`, `announce.py`, `todo.py`, `printer.py`, `clips.py`: actions and the clip upload
+- `push.py`: each household member's phone alerts (push categories `notify_people` skips for them;
+  Security always comes through), see [docs/phone-alerts.md](docs/phone-alerts.md)
 
 Tests: `.venv/bin/python -m pytest -q`; lint: `.venv/bin/ruff check custom_components tests` and
 `ruff format`. Each test has its own `/config` (`tests/conftest.py`).

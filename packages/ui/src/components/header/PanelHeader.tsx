@@ -34,6 +34,7 @@ export { AssistButton } from '../assist/AssistOverlay';
 export { EnergyButton } from '../energy/EnergyDialog';
 export { BirthdayEgg, HolidayEgg } from '../holiday/HolidayEgg';
 export { LaundryButton } from '../laundry/LaundryButton';
+export { PushSettingsButton } from '../notifications/PushSettings';
 export { ColorSchemeButton, ColorSchemeToggle } from './ColorSchemePicker';
 export * from './HeaderControls';
 

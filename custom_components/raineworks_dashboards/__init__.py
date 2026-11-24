@@ -24,6 +24,7 @@ from .const import CONF_SERVE_BUNDLE, DOMAIN
 from .notify import async_register_notify
 from .panels import PanelsController
 from .printer import async_register_printer
+from .push import async_register_push
 from .sensor import AFFIRMATIONS
 from .serve import BundleUploadView, server
 from .themes import (
@@ -90,6 +91,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     async_register_clip_views(hass)
     hass.http.register_view(BundleUploadView())
     async_register_notify(hass)
+    async_register_push(hass)
     async_register_announce(hass)
     async_register_printer(hass)
     hass.data[f"{DOMAIN}_todo"] = async_register_todo(hass)

@@ -36,6 +36,19 @@ notify_people:
     data:
       selector:
         object:
+    category:
+      selector:
+        select:
+          options:
+            - security
+            - doorbell
+            - packages
+            - laundry
+            - daily
+            - affirmations
+            - todo
+            - messages
+            - house
 add_todo_item:
   fields:
     list:

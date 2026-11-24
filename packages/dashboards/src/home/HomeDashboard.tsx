@@ -22,6 +22,7 @@ import {
 	OpenSensorsButton,
 	PeopleStack,
 	PetsStack,
+	PushSettingsButton,
 	SidebarButton,
 	TodoButton,
 	WeatherSummary,
@@ -179,6 +180,8 @@ const PhoneHeader: React.FC<{ onIntercom: () => void; sticky: boolean; onHeight:
 					<ModuleGate id="energy">
 						<EnergyButton size="sm" />
 					</ModuleGate>
+					{/* The signed-in member's phone alerts (nothing for anyone else) */}
+					<PushSettingsButton size="icon-sm" />
 					{/* This device's Light / Dark / Auto */}
 					<ColorSchemeButton size="icon-sm" />
 				</ChipRow>

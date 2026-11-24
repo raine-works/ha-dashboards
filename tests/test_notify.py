@@ -56,7 +56,10 @@ async def test_everyone_in_the_household_by_default(
         blocking=True,
         return_response=True,
     )
-    assert response == {"sent": ["mobile_app_alex_s_phone", "mobile_app_sam_pixel"]}
+    assert response == {
+        "sent": ["mobile_app_alex_s_phone", "mobile_app_sam_pixel"],
+        "skipped": [],
+    }
     assert dict(alex[0].data) == {
         "title": "From home",
         "message": "Dinner",
@@ -90,7 +93,7 @@ async def test_picked_people_less_the_excluded(
         blocking=True,
         return_response=True,
     )
-    assert response == {"sent": []}
+    assert response == {"sent": [], "skipped": []}
 
 
 async def test_config_entry_for_what_the_user_may_read(
