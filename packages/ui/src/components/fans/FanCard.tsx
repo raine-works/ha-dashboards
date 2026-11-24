@@ -1,32 +1,30 @@
 /**
- * Fans: a line each in one card (on or off and what it's doing); a tap opens its speed, Oscillate and
- * presets.
+ * Fans: a DeviceRow each in the Climate section's Fans group (what it's doing, a switch); a tap on its
+ * name opens its speed, Oscillate and presets.
  *
  * @module
  */
 
 import { ArrowLeftRight, Fan as FanIcon } from 'lucide-react';
 import type React from 'preact/compat';
-import { Fragment, useState } from 'preact/compat';
+import { useState } from 'preact/compat';
 import { useEntity, useHassApi, useHassSelector } from '../../context/HassContext';
 import { useHeldValue } from '../../hooks/useHeldValue';
 import { useOptimistic } from '../../hooks/useOptimistic';
 import { discoverFans, FANS_WATCH, type Fan, fanLabel, getFanView } from '../../lib/fans';
 import { pickStates } from '../../lib/hass-store';
 import { cn } from '../../lib/utils';
+import { SectionGroup } from '../layout/Section';
 import {
 	Button,
-	Card,
-	CardDescription,
-	CardHeader,
-	CardTitle,
+	DeviceRow,
 	Dialog,
 	DialogContent,
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
-	Separator,
 	Slider,
+	Switch,
 } from '../ui';
 
 /** Seconds per turn of a running fan's icon: 2.4s at its slowest, 0.6s flat out. */
@@ -34,7 +32,7 @@ const spinSeconds = (percentage: number) =>
 	`${(2.4 - (Math.min(100, Math.max(0, percentage)) / 100) * 1.8).toFixed(2)}s`;
 
 /**
- * One fan on one line: a toggle tile (its icon turning faster with the speed), then its name and state;
+ * One fan as a DeviceRow: its icon tile (the fan turning faster with the speed), name and state, and its switch;
  * a tap on them opens its speed slider, Oscillate and presets. Every tap shows at once and settles when the fan reports it.
  */
 export const FanRow: React.FC<{ fan: Fan; className?: string }> = ({ fan, className }) => {
@@ -84,35 +82,34 @@ export const FanRow: React.FC<{ fan: Fan; className?: string }> = ({ fan, classN
 	const hasOptions = view.canSetSpeed || view.canOscillate || view.presets.length > 0;
 
 	return (
-		// One line: the toggle tile, the name and what it's doing (a tap opens its speed, Oscillate and presets)
-		<div className={cn('flex items-center gap-3 px-4 py-3', className)}>
-			<Button
-				variant={on.value ? 'default' : 'secondary'}
-				size="icon-xl"
-				onClick={toggle}
+		// A DeviceRow (docs/design/components.md): its name and what it's doing open the speed, Oscillate and
+		// presets; its switch at the end turns it on and off
+		<>
+			<DeviceRow
+				icon={
+					<FanIcon
+						className={cn(on.value && 'animate-fan-spin motion-reduce:animate-none')}
+						style={{ '--fan-spin': spinSeconds(percentage || 50) } as React.CSSProperties}
+					/>
+				}
+				tone={on.value ? 'on' : 'off'}
+				name={name}
+				status={label}
+				onOpen={hasOptions && !unavailable ? () => setAdjusting(true) : undefined}
 				disabled={unavailable}
-				aria-label={`Turn ${name} ${on.value ? 'off' : 'on'}`}
-				aria-pressed={on.value}
-				className="shrink-0"
-			>
-				<FanIcon
-					className={cn('size-5', on.value && 'animate-fan-spin motion-reduce:animate-none')}
-					style={{ '--fan-spin': spinSeconds(percentage || 50) } as React.CSSProperties}
-				/>
-			</Button>
-			<button
-				type="button"
-				onClick={() => setAdjusting(true)}
-				disabled={!hasOptions || unavailable}
-				aria-label={`${name}: ${label}. Speed and modes`}
-				className="-mx-2 flex min-h-11 min-w-0 flex-1 flex-col items-start rounded-md px-2 py-1 text-left outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 enabled:hover:bg-accent/50"
-			>
-				<span className="w-full truncate font-semibold">{name}</span>
-				<span className="w-full truncate text-muted-foreground text-sm">{label}</span>
-			</button>
+				className={className}
+				trailing={
+					<Switch
+						checked={on.value}
+						onCheckedChange={toggle}
+						disabled={unavailable}
+						aria-label={`${name} ${on.value ? 'on' : 'off'}`}
+					/>
+				}
+			/>
 
 			<Dialog open={adjusting} onOpenChange={setAdjusting}>
-				<DialogContent size="sheet">
+				<DialogContent size="detail">
 					<DialogHeader>
 						<DialogTitle>{name}</DialogTitle>
 						<DialogDescription>{label}</DialogDescription>
@@ -167,7 +164,7 @@ export const FanRow: React.FC<{ fan: Fan; className?: string }> = ({ fan, classN
 					)}
 				</DialogContent>
 			</Dialog>
-		</div>
+		</>
 	);
 };
 
@@ -182,28 +179,14 @@ export const FansCard: React.FC<{ className?: string }> = ({ className }) => {
 
 	const onCount = fans.filter((f) => states[f.entityId]?.state === 'on').length;
 	return (
-		<Card className={cn('gap-0 py-0', className)}>
-			<CardHeader className="items-center gap-3 border-b px-4 py-3 [.border-b]:pb-3">
-				<div className="flex min-w-0 items-center gap-3">
-					<FanIcon className="size-5 shrink-0 text-info" />
-					<div className="min-w-0">
-						<CardTitle className="truncate text-lg">{fans.length === 1 ? 'Fan' : 'Fans'}</CardTitle>
-						<CardDescription className="truncate">
-							{fans.length === 1
-								? (fans[0].area ?? fans[0].name)
-								: onCount === 0
-									? 'All off'
-									: `${onCount} of ${fans.length} on`}
-						</CardDescription>
-					</div>
-				</div>
-			</CardHeader>
-			{fans.map((fan, i) => (
-				<Fragment key={fan.entityId}>
-					{i > 0 && <Separator />}
-					<FanRow fan={fan} />
-				</Fragment>
+		<SectionGroup
+			label={fans.length > 1 && onCount > 0 ? `Fans · ${onCount} on` : fans.length === 1 ? 'Fan' : 'Fans'}
+			surface
+			className={className}
+		>
+			{fans.map((fan) => (
+				<FanRow key={fan.entityId} fan={fan} />
 			))}
-		</Card>
+		</SectionGroup>
 	);
 };

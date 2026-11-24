@@ -13,7 +13,8 @@ import { IconTile, type IconTone } from './tile';
 
 /** A DeviceRow's content and its two ways in. */
 export interface DeviceRowProps {
-	icon: ComponentChildren;
+	/** Its icon, in an icon tile; left out where the trailing control needs the row's room (a setpoint stepper). */
+	icon?: ComponentChildren;
 	/** The icon tile's tone (`on`, a status), or a color of its own (a light's). */
 	tone?: IconTone;
 	iconStyle?: React.CSSProperties;
@@ -74,9 +75,11 @@ export const DeviceRow: React.FC<DeviceRowProps> = ({
 			data-slot="device-row"
 			className={cn('flex min-h-12 touch:min-h-14 items-center gap-3', disabled && 'opacity-50', className)}
 		>
-			<IconTile tone={tone} style={iconStyle}>
-				{icon}
-			</IconTile>
+			{icon && (
+				<IconTile tone={tone} style={iconStyle}>
+					{icon}
+				</IconTile>
+			)}
 			{onOpen ? (
 				<button
 					type="button"

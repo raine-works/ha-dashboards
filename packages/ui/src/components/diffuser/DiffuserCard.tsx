@@ -1,12 +1,13 @@
 /**
- * Scent diffusers: a row each (on or off, the oil, the fragrance, Quick scent) in one card.
+ * Scent diffusers: a DeviceRow each (on or off and the fragrance, the oil only when it's low, Quick
+ * scent), in the Climate section's Scent group.
  *
  * @module
  */
 
-import { Droplet, Loader2, SprayCan } from 'lucide-react';
+import { Loader2, SprayCan } from 'lucide-react';
 import type React from 'preact/compat';
-import { Fragment, useEffect, useState } from 'preact/compat';
+import { useEffect, useState } from 'preact/compat';
 import { useHassApi, useHassSelector } from '../../context/HassContext';
 import { useBusy } from '../../hooks/useBusy';
 import {
@@ -20,7 +21,8 @@ import {
 } from '../../lib/diffusers';
 import { pickStates } from '../../lib/hass-store';
 import { cn } from '../../lib/utils';
-import { Button, Card, CardDescription, CardHeader, CardTitle, Separator, StableLabel, toast } from '../ui';
+import { SectionGroup } from '../layout/Section';
+import { Button, DeviceRow, StableLabel, toast } from '../ui';
 
 /** The quick scent's time left, ticking every second: a leaf of its own, so only it re-renders. */
 const ScentCountdown: React.FC<{ until: number }> = ({ until }) => {
@@ -34,10 +36,10 @@ const ScentCountdown: React.FC<{ until: number }> = ({ until }) => {
 };
 
 /**
- * One diffuser: its tile (tinted while on, the spray can pulsing while it diffuses), its name and
- * status (a dot with On or Off, so the away automation can be seen working; display only), whether
- * the oil is low (EverScent reports no amount), the fragrance installed, and Quick scent, busy for
- * as long as the quick scent runs.
+ * One diffuser as a DeviceRow: its icon tile (the neutral "on" while on, the spray can pulsing while it
+ * diffuses), its name, and one line: On or Off (so the away automation can be seen working) and the
+ * fragrance, or "Oil low" in amber (EverScent reports no amount); Quick scent at the end, busy for as
+ * long as the quick scent runs.
  */
 export const DiffuserRow: React.FC<{ diffuser: Diffuser; className?: string }> = ({ diffuser, className }) => {
 	const { callService, waitFor } = useHassApi();
@@ -72,54 +74,23 @@ export const DiffuserRow: React.FC<{ diffuser: Diffuser; className?: string }> =
 		);
 	};
 
+	// One line (docs/design/components.md): on or off and the fragrance, the oil only when it's low
+	const status = [view.low ? 'Oil low' : view.label, view.fragrance].filter(Boolean).join(' · ');
 	return (
-		<div className={cn('flex flex-col gap-3 p-4', className)}>
-			<div className="flex items-center gap-3.5">
-				<div
-					aria-hidden
-					className={cn(
-						'flex size-12 shrink-0 items-center justify-center rounded-lg transition-colors',
-						on ? 'bg-success/15 text-success' : 'bg-muted text-muted-foreground',
-					)}
-				>
-					<SprayCan size={22} className={cn(view.scenting && 'animate-pulse')} />
-				</div>
-				<div className="flex min-w-0 flex-1 items-start justify-between gap-3">
-					<div className="flex min-w-0 flex-col">
-						<span className="truncate font-semibold">{name}</span>
-						<span className="flex min-w-0 items-center gap-1.5 text-muted-foreground text-sm">
-							<span
-								aria-hidden
-								className={cn('size-1.5 shrink-0 rounded-full', on ? 'bg-success' : 'bg-muted-foreground/40')}
-							/>
-							<span className="truncate">{view.label}</span>
-						</span>
-					</div>
-				</div>
-			</div>
-
-			<div className="flex items-center justify-between gap-3 text-sm">
-				<span className="flex items-center gap-1.5 text-muted-foreground">
-					<Droplet className="size-4" />
-					Oil
-				</span>
-				<span className={cn('font-medium', view.low ? 'text-warning' : 'text-success')}>
-					{view.low ? 'Low · replace soon' : 'Good'}
-				</span>
-			</div>
-
-			<div className="flex items-center gap-3">
-				<div className="flex min-w-0 flex-1 flex-col">
-					<span className="truncate font-medium">{view.fragrance ?? 'No fragrance'}</span>
-					{view.category && <span className="truncate text-muted-foreground text-sm">{view.category}</span>}
-				</div>
+		<DeviceRow
+			icon={<SprayCan className={cn(view.scenting && 'animate-pulse')} />}
+			tone={on ? 'on' : 'off'}
+			name={name}
+			status={status}
+			statusTone={view.low ? 'warning' : undefined}
+			className={className}
+			trailing={
 				<Button
-					variant="outline"
-					size="xl"
+					variant="secondary"
+					size="md"
 					onClick={quickScent}
 					disabled={!view.canQuickScent || view.quickScenting}
 					loading={busy.isBusy('scent')}
-					className="shrink-0"
 				>
 					{/* While it runs, a spinner in the icon's place and the time left, in the label's width */}
 					{view.quickScenting ? <Loader2 className="animate-spin" /> : <SprayCan />}
@@ -128,12 +99,12 @@ export const DiffuserRow: React.FC<{ diffuser: Diffuser; className?: string }> =
 						value={view.quickScenting ? 1 : 0}
 					/>
 				</Button>
-			</div>
-		</div>
+			}
+		/>
 	);
 };
 
-/** Every EverScent diffuser (discovered) in one card, a row each. Nothing when there are none. */
+/** Every EverScent diffuser (discovered) in the Scent group, a row each. Nothing when there are none. */
 export const DiffusersCard: React.FC<{ className?: string }> = ({ className }) => {
 	const diffusers = useHassSelector((hass) => (hass ? discoverDiffusers(hass, hass.states) : []), {
 		watch: DIFFUSERS_WATCH,
@@ -141,22 +112,10 @@ export const DiffusersCard: React.FC<{ className?: string }> = ({ className }) =
 	if (diffusers.length === 0) return null;
 
 	return (
-		<Card className={cn('gap-0 py-0', className)}>
-			<CardHeader className="items-center gap-3 border-b px-4 py-3 [.border-b]:pb-3">
-				<div className="flex min-w-0 items-center gap-3">
-					<SprayCan className="size-5 shrink-0 text-info" />
-					<div className="min-w-0">
-						<CardTitle className="truncate text-lg">Scent</CardTitle>
-						<CardDescription className="truncate">Whole-home diffuser</CardDescription>
-					</div>
-				</div>
-			</CardHeader>
-			{diffusers.map((diffuser, i) => (
-				<Fragment key={diffuser.power}>
-					{i > 0 && <Separator />}
-					<DiffuserRow diffuser={diffuser} />
-				</Fragment>
+		<SectionGroup label="Scent" surface className={className}>
+			{diffusers.map((diffuser) => (
+				<DiffuserRow key={diffuser.power} diffuser={diffuser} />
 			))}
-		</Card>
+		</SectionGroup>
 	);
 };

@@ -37,13 +37,20 @@ export const Section: React.FC<{
  */
 export const SectionGroup: React.FC<{
 	label?: string;
+	/** Buttons at the label's end, for the whole group (Open all / Close all). */
+	actions?: ComponentChildren;
 	surface?: boolean;
 	children: ComponentChildren;
 	/** Layout only. */
 	className?: string;
-}> = ({ label, surface, children, className }) => (
+}> = ({ label, actions, surface, children, className }) => (
 	<div className={cn('flex min-w-0 flex-col gap-2', className)}>
-		{label && <h3 className="px-1 text-muted-foreground text-overline uppercase">{label}</h3>}
+		{(label || actions) && (
+			<div className="flex min-h-8 items-center justify-between gap-2 px-1">
+				{label && <h3 className="truncate text-muted-foreground text-overline uppercase">{label}</h3>}
+				{actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+			</div>
+		)}
 		{surface ? <div className={cn(SURFACE, 'flex flex-col divide-y px-4 *:py-2')}>{children}</div> : children}
 	</div>
 );
