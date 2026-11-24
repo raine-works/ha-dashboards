@@ -197,6 +197,8 @@ class Todo:
                         due=due_label(found.get("due")),
                     ),
                     "data": push,
+                    # Each member's phone alerts: To-do (push.py)
+                    "category": "todo",
                 },
                 blocking=True,
                 return_response=True,
