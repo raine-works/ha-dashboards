@@ -43,7 +43,9 @@ can pick it, and it can be the house theme.
 
 The integration's options (Settings → Devices & services → Raineworks Dashboards → Configure →
 General → **Theme**) set the house theme: Home Assistant's default theme for anyone who hasn't
-picked their own, and the wall panels'. **Leave Home Assistant's theme** keeps whatever Home
+picked their own, and the wall panels'. It stays the default when Home Assistant reloads its
+themes (which otherwise puts a default no YAML defines back to its own), unless someone has made
+another theme the default. **Leave Home Assistant's theme** keeps whatever Home
 Assistant uses, and the dashboards then draw with Raineworks.
 
 ## For one dashboard

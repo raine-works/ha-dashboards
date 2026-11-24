@@ -84,6 +84,8 @@ class Themes:
         self.hass = hass
         self.presets: list[dict[str, Any]] = presets["themes"]
         self.custom: list[dict[str, Any]] = []
+        # The options' Theme (its id), set by async_setup_themes
+        self.house_theme: str = DEFAULT_THEME
         self._store: Store[dict[str, Any]] = Store(hass, 1, STORAGE_KEY)
 
     async def async_load(self) -> None:
@@ -129,13 +131,24 @@ class Themes:
 
     @callback
     def async_listen(self) -> Any:
-        """Register the themes again after frontend.reload_themes drops them."""
+        """Register the themes again after frontend.reload_themes drops them.
+
+        The reload also puts a default theme no YAML defines (ours) back to
+        Home Assistant's own, so the house theme is made the default again
+        when the default is Home Assistant's. A default someone set to another
+        theme is left alone.
+        """
 
         @callback
         def _updated(_event: Event) -> None:
             registered = self.hass.data.get(DATA_THEMES, {})
             if any(name not in registered for name in self.ha_themes()):
                 self.async_register()
+            if self.hass.data.get(DATA_DEFAULT_THEME, HA_DEFAULT) == HA_DEFAULT:
+                self.hass.async_create_task(
+                    self.async_set_house_theme(self.house_theme),
+                    "raineworks_dashboards house theme",
+                )
 
         return self.hass.bus.async_listen(EVENT_THEMES_UPDATED, _updated)
 
@@ -351,6 +364,7 @@ async def async_setup_themes(hass: HomeAssistant, theme_id: str) -> Themes:
         themes = Themes(hass, await hass.async_add_executor_job(load_presets))
         await themes.async_load()
         hass.data[key] = themes
+    themes.house_theme = theme_id
     themes.async_register()
     await themes.async_set_house_theme(theme_id)
     return themes

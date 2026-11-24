@@ -77,7 +77,8 @@ chart and sidebar colors, and optional effects (a two-color gradient, edges, glo
   where the Companion apps or `--rgb-*` need it, the primary palette, cards, inputs), written to
   the integration's `themes.json` by `bun scripts/themes.ts` (a test fails when it's stale). The
   integration (`themes.py`) registers them at runtime, again after `frontend.reload_themes`, makes
-  the house theme (its Theme option) the default, and keeps custom themes (each person's own, or an
+  the house theme (its Theme option) the default (again after a reload, which puts a default no YAML
+  defines back to Home Assistant's own; a default set to another theme is left alone), and keeps custom themes (each person's own, or an
   administrator's for the house).
 - **Picking**: the Appearance dialog (`components/appearance/`) saves a person's theme to their
   Home Assistant profile (a `settheme` event, as Home Assistant's Profile page does).
