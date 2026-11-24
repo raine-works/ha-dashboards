@@ -3,11 +3,14 @@ import type { HassEntity, HomeAssistant } from '../../types/homeassistant';
 import {
 	bedtimeRoomOf,
 	bedtimeRooms,
+	bedtimeRoutineFor,
 	bedtimeService,
 	discoverBedtimeToggles,
 	homeBedtimeEntity,
+	labeledBedtimeSteps,
 	memberBedtimeRoom,
 	otherBedtimeRooms,
+	someNames,
 } from '../bedtime';
 
 const hass = (entities: NonNullable<HomeAssistant['entities']>): Pick<HomeAssistant, 'entities' | 'devices'> => ({
@@ -264,5 +267,120 @@ describe("the integration's bedtime switches", () => {
 		expect(homeBedtimeEntity({})).toBe('switch.home_bedtime');
 		expect(bedtimeService('input_boolean.den_bedtime', true)).toEqual(['input_boolean', 'turn_on']);
 		expect(bedtimeService('switch.home_bedtime', false)).toEqual(['switch', 'turn_off']);
+	});
+});
+
+describe('bedtime by label', () => {
+	const state = (entity_id: string, attributes: HassEntity['attributes'] = {}, value = 'on'): HassEntity => ({
+		entity_id,
+		state: value,
+		attributes,
+		last_changed: '',
+		last_updated: '',
+	});
+	const registry: Pick<HomeAssistant, 'entities' | 'devices' | 'areas'> = {
+		areas: { kai_s_room: { area_id: 'kai_s_room', name: "Kai's Room" } },
+		devices: { tv: { id: 'tv', area_id: 'kai_s_room' } },
+		entities: {
+			'switch.kais_room_bedtime': { entity_id: 'switch.kais_room_bedtime', area_id: 'kai_s_room', labels: ['bedtime'] },
+			'light.kai_s_room_desk_lamp': {
+				entity_id: 'light.kai_s_room_desk_lamp',
+				area_id: 'kai_s_room',
+				labels: ['household_light'],
+			},
+			// A night light that stays on
+			'light.kai_s_room_night_light': {
+				entity_id: 'light.kai_s_room_night_light',
+				area_id: 'kai_s_room',
+				labels: ['household_light', 'stays_on_at_bedtime'],
+			},
+			// In the room by its device's area
+			'media_player.kai_s_room_tv': {
+				entity_id: 'media_player.kai_s_room_tv',
+				device_id: 'tv',
+				labels: ['household_tv'],
+			},
+			'media_player.kai_s_room_speaker': {
+				entity_id: 'media_player.kai_s_room_speaker',
+				area_id: 'kai_s_room',
+				labels: ['household_speaker'],
+			},
+			// Another room's light
+			'light.office_lamp': { entity_id: 'light.office_lamp', area_id: 'office', labels: ['household_light'] },
+			'cover.kai_s_room_blinds': { entity_id: 'cover.kai_s_room_blinds', area_id: 'kai_s_room' },
+			'cover.kai_s_room_left_blind': { entity_id: 'cover.kai_s_room_left_blind', area_id: 'kai_s_room' },
+		},
+	};
+	const states = {
+		'switch.kais_room_bedtime': state('switch.kais_room_bedtime', {}, 'off'),
+		'light.kai_s_room_desk_lamp': state('light.kai_s_room_desk_lamp', { friendly_name: "Kai's Room Desk Lamp" }),
+		'light.kai_s_room_night_light': state('light.kai_s_room_night_light', { friendly_name: "Kai's Room Night Light" }),
+		'media_player.kai_s_room_tv': state('media_player.kai_s_room_tv', { friendly_name: "Kai's TV" }),
+		'media_player.kai_s_room_speaker': state('media_player.kai_s_room_speaker', {
+			friendly_name: "Kai's Room Speaker",
+		}),
+		'light.office_lamp': state('light.office_lamp', { friendly_name: 'Office Lamp' }),
+		// A group over its blind: the group stands for its members
+		'cover.kai_s_room_blinds': state('cover.kai_s_room_blinds', {
+			friendly_name: "Kai's Room Blinds",
+			device_class: 'blind',
+			entity_id: ['cover.kai_s_room_left_blind'],
+		}),
+		'cover.kai_s_room_left_blind': state('cover.kai_s_room_left_blind', {
+			friendly_name: "Kai's Room Left Blind",
+			device_class: 'blind',
+		}),
+	};
+
+	it("lists what the room's routine turns off, by label in its area, without what stays on", () => {
+		expect(labeledBedtimeSteps(registry, states, 'switch.kais_room_bedtime')).toEqual([
+			{ kind: 'lights', text: 'Turns off Desk Lamp', actions: ['light.turn_off'] },
+			{ kind: 'media', text: "Turns off Kai's TV", actions: ['media_player.turn_off'] },
+			{ kind: 'speaker', text: "Stops the music on Kai's Room Speaker", actions: ['media_player.media_stop'] },
+			{ kind: 'covers', text: "Closes Kai's Room Blinds", actions: ['cover.close_cover'] },
+		]);
+	});
+
+	it("adds the house settings' extras, in their zone, else the room's name", () => {
+		const fan = { kind: 'fan' as const, text: 'Turns the fan on', actions: ['fan.turn_on'] };
+		const routine = bedtimeRoutineFor(registry, states, 'switch.kais_room_bedtime', {
+			zone: "Kai's Room and Bath",
+			steps: [fan],
+		});
+		expect(routine.zone).toBe("Kai's Room and Bath");
+		expect(routine.steps.at(-1)).toEqual(fan);
+		expect(bedtimeRoutineFor(registry, states, 'switch.kais_room_bedtime', undefined).zone).toBe("Kai's Room");
+	});
+
+	it('says "the" before a name without a possessive', () => {
+		const office = {
+			...registry,
+			areas: { ...registry.areas, office: { area_id: 'office', name: 'Office' } },
+			entities: {
+				'switch.office_bedtime': { entity_id: 'switch.office_bedtime', area_id: 'office' },
+				'media_player.office_tv': { entity_id: 'media_player.office_tv', area_id: 'office', labels: ['household_tv'] },
+			},
+		};
+		const officeStates = {
+			'media_player.office_tv': state('media_player.office_tv', { friendly_name: 'Office TV' }),
+		};
+		expect(labeledBedtimeSteps(office, officeStates, 'switch.office_bedtime')[0].text).toBe('Turns off the Office TV');
+	});
+
+	it('has nothing for a toggle in no area', () => {
+		expect(labeledBedtimeSteps(registry, states, 'switch.nowhere')).toEqual([]);
+	});
+
+	it('never asks before turning on what stays on at bedtime', () => {
+		const asleep = { ...states, 'switch.kais_room_bedtime': state('switch.kais_room_bedtime') };
+		expect(bedtimeRoomOf(registry, asleep, ['light.kai_s_room_night_light'])).toBeUndefined();
+		expect(bedtimeRoomOf(registry, asleep, ['light.kai_s_room_desk_lamp'])?.name).toBe("Kai's Room");
+	});
+});
+
+describe('someNames', () => {
+	it('names up to three, then how many more', () => {
+		expect(someNames(['A', 'B'])).toBe('A and B');
+		expect(someNames(['A', 'B', 'C', 'D', 'E'])).toBe('A, B, C and 2 more');
 	});
 });

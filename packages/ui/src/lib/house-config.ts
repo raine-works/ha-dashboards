@@ -68,8 +68,9 @@ export interface HouseConfig {
 	/** The birthdays calendar; else the one named "Birthdays". */
 	birthdayCalendar?: string;
 	/**
-	 * What each room's bedtime toggle does when it turns on, by toggle, as its confirm lists it.
-	 * Keep in step with the room's bedtime automation.
+	 * Each room's bedtime extras, by toggle: what its routine does beyond what it turns off by label
+	 * (a fan turned on, a speaker in the next room), and the zone its confirm names. The confirm lists
+	 * the labeled lights, TVs, speakers and curtains itself (`bedtimeRoutineFor()` in lib/bedtime.ts).
 	 */
 	bedtimeRoutines: Record<string, BedtimeRoutine>;
 	/** Modules turned off (`false`), by id (lib/modules.ts); the rest are on while detected. */

@@ -29,6 +29,7 @@ import {
 	BEDTIME_DOMAINS,
 	type BedtimeStepKind,
 	bedtimeRooms,
+	bedtimeRoutineFor,
 	HOME_ROUTINE,
 	isHomeBedtime,
 	type OtherBedtimeRoom,
@@ -86,8 +87,10 @@ export interface BedtimeDialogProps {
 }
 
 /**
- * Before a bedtime toggle turns on: the zone it's for and what its routine will do (the house
- * settings' `bedtime_routines` / `HOME_ROUTINE` in lib/bedtime.ts, kept in step with the automations by a test).
+ * Before a bedtime toggle turns on: the zone it's for and what its routine will do. A room's, from
+ * its labeled lights, TVs, speakers and curtains (`bedtimeRoutineFor()`; anything labeled Stays on at
+ * bedtime left out) and the house settings' `bedtime_routines` extras; Home Bedtime's, `HOME_ROUTINE`
+ * in lib/bedtime.ts, kept in step with its automation by a test.
  */
 export const BedtimeDialog: React.FC<BedtimeDialogProps> = ({
 	entityId,
@@ -101,7 +104,14 @@ export const BedtimeDialog: React.FC<BedtimeDialogProps> = ({
 	const [house, setHouse] = useState(false);
 	const home = house || isHomeBedtime(entityId);
 	const { bedtimeRoutines } = useHouseConfig();
-	const routine = home ? HOME_ROUTINE : bedtimeRoutines[entityId];
+	// A room's: what it turns off by label (its lights, TVs, speakers and curtains, the way its
+	// automation finds them), then its extras from the house settings; read while the dialog is open
+	const extras = bedtimeRoutines[entityId];
+	const roomRoutine = useHassSelector(
+		(hass) => (hass && open && !home ? bedtimeRoutineFor(hass, hass.states, entityId, extras) : undefined),
+		{ watch: (id) => id.startsWith('light.') || id.startsWith('media_player.') || id.startsWith('cover.') },
+	);
+	const routine = home ? HOME_ROUTINE : roomRoutine;
 	const member = !!onConfirmHouse;
 	// Every other room: those nobody's home in can be put to bed with this one (asked, so off until
 	// picked); the others show whether their people have started theirs

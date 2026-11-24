@@ -75,12 +75,11 @@ house:
     - name: Turntable
       uri: sendspin_source://audio_source/turntable
       signal: binary_sensor.turntable_signal
-  bedtime_routines:                           # what each room's bedtime does, for its confirm dialog
+  bedtime_routines:                           # a room's bedtime extras, beyond what its labels say
     switch.bedroom_bedtime:
-      zone: Bedroom
+      zone: Bedroom and Bath                    # else the room's own name
       steps:
-        - { kind: lights, text: Turns off the bedroom's lights, actions: [light.turn_off] }
-        - { kind: covers, text: Closes the curtains, actions: [cover.close_cover] }
+        - { kind: fan, text: Turns the fan on, actions: [fan.turn_on] }
   modules:                                    # turn a feature off
     holidays: false
 ```
@@ -91,3 +90,21 @@ house:
   `locks`, `climate`, `alert` or `panels`. Its `actions` name the actions your automation runs, so a
   test can check the list stays true.
 - Module ids are in [Modules](reference/modules.md).
+
+## Bedtime
+
+Each room's bedtime (the integration's Bedtime switches) and Home Bedtime turn things off by label,
+so a new lamp, TV or speaker joins bedtime once it's labeled and in its room:
+
+| Label | At bedtime |
+| :--- | :--- |
+| **Household Light** (`household_light`) | Turned off |
+| **Household TV** (`household_tv`) | Turned off |
+| **Household Speaker** (`household_speaker`) | Its music stopped |
+| **Stays on at bedtime** (`stays_on_at_bedtime`) | Left alone, and turning it on in a room in bedtime doesn't ask first (a night light, a TV with a sleep timer) |
+
+A room's bedtime covers what's in its own area (and closes its curtains and blinds); Home Bedtime
+covers the whole house. What a room's routine does beyond that (a fan turned on, a speaker in the
+next room) goes in `bedtime_routines`, so its confirm dialog lists it too. The routines themselves
+are your own automations, triggered by the Bedtime switches; the dialog lists the labeled things
+from the same labels the automations use.
