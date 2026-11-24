@@ -19,5 +19,5 @@
 	"issue_tracker": "https://github.com/raine-works/ha-dashboards/issues",
 	"requirements": [],
 	"single_config_entry": true,
-	"version": "1.0.5"
+	"version": "1.0.6"
 }
