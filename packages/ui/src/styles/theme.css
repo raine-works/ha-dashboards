@@ -364,7 +364,14 @@
 		::after {
 			corner-shape: squircle;
 		}
-		.rounded-full {
+		/* Every circle and pill: rounded-full, and the ones drawn here (the Assist orb with its turning
+		   ring and ripple, the round Assist button, the voice meter's bars) */
+		.rounded-full,
+		.assist-orb,
+		.assist-orb::before,
+		.assist-orb::after,
+		.assist-button[data-shape="round"],
+		.assist-meter > span {
 			corner-shape: round;
 		}
 	}

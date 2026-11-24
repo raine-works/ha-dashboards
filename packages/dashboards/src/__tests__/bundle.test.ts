@@ -62,6 +62,8 @@ describe('the dashboards bundle', () => {
 		expect(text).toMatch(/@supports \(?corner-shape: ?squircle\)?/);
 		expect(text).toContain('corner-shape:squircle');
 		expect(text).toContain('corner-shape:round');
+		// A circle drawn in CSS (the Assist orb) keeps its round curve too
+		expect(text).toMatch(/\.assist-orb[^{}]*\{[^{}]*corner-shape:round/);
 	});
 
 	it("embeds Geist, raineworks.com's typeface, and no longer Poppins", async () => {
