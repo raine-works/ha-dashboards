@@ -1,27 +1,41 @@
 /**
- * Fans: a row each (on or off, the speed, Oscillate and presets) in one card.
+ * Fans: a line each in one card (on or off and what it's doing); a tap opens its speed, Oscillate and
+ * presets.
  *
  * @module
  */
 
 import { ArrowLeftRight, Fan as FanIcon } from 'lucide-react';
 import type React from 'preact/compat';
-import { Fragment } from 'preact/compat';
+import { Fragment, useState } from 'preact/compat';
 import { useEntity, useHassApi, useHassSelector } from '../../context/HassContext';
 import { useHeldValue } from '../../hooks/useHeldValue';
 import { useOptimistic } from '../../hooks/useOptimistic';
 import { discoverFans, FANS_WATCH, type Fan, fanLabel, getFanView } from '../../lib/fans';
 import { pickStates } from '../../lib/hass-store';
 import { cn } from '../../lib/utils';
-import { Button, Card, CardDescription, CardHeader, CardTitle, ChipRow, Separator, Slider } from '../ui';
+import {
+	Button,
+	Card,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	Separator,
+	Slider,
+} from '../ui';
 
 /** Seconds per turn of a running fan's icon: 2.4s at its slowest, 0.6s flat out. */
 const spinSeconds = (percentage: number) =>
 	`${(2.4 - (Math.min(100, Math.max(0, percentage)) / 100) * 1.8).toFixed(2)}s`;
 
 /**
- * One fan: a toggle tile (its icon turning faster with the speed), name and state, the speed with a
- * slider, then Oscillate and the fan's presets. Every tap shows at once and settles when the fan reports it.
+ * One fan on one line: a toggle tile (its icon turning faster with the speed), then its name and state;
+ * a tap on them opens its speed slider, Oscillate and presets. Every tap shows at once and settles when the fan reports it.
  */
 export const FanRow: React.FC<{ fan: Fan; className?: string }> = ({ fan, className }) => {
 	const { callService } = useHassApi();
@@ -35,6 +49,8 @@ export const FanRow: React.FC<{ fan: Fan; className?: string }> = ({ fan, classN
 	const speed = useHeldValue(view.percentage, (held, reported) => Math.abs(held - reported) <= view.step);
 	// Whole percents: a three-speed fan's slider steps are 33.333…
 	const percentage = on.value ? Math.round(speed.value) : 0;
+	// The speed and modes dialog
+	const [adjusting, setAdjusting] = useState(false);
 
 	const toggle = () => {
 		on.set(!on.value);
@@ -65,81 +81,92 @@ export const FanRow: React.FC<{ fan: Fan; className?: string }> = ({ fan, classN
 		canSetSpeed: view.canSetSpeed,
 	});
 
+	const hasOptions = view.canSetSpeed || view.canOscillate || view.presets.length > 0;
+
 	return (
-		// The tile, name and speed on top; the slider and chips under them, the row's full width
-		<div className={cn('flex flex-col gap-3 p-4', className)}>
-			<div className="flex items-center gap-3.5">
-				<Button
-					variant={on.value ? 'default' : 'secondary'}
-					size="icon-xl"
-					onClick={toggle}
-					disabled={unavailable}
-					aria-label={`Turn ${name} ${on.value ? 'off' : 'on'}`}
-					aria-pressed={on.value}
-					className="shrink-0"
-				>
-					<FanIcon
-						className={cn('size-5', on.value && 'animate-fan-spin motion-reduce:animate-none')}
-						style={{ '--fan-spin': spinSeconds(percentage || 50) } as React.CSSProperties}
-					/>
-				</Button>
-				<div className="flex min-w-0 flex-1 items-start justify-between gap-3">
-					<div className="flex min-w-0 flex-col">
-						<span className="truncate font-semibold">{name}</span>
-						<span className="truncate text-muted-foreground text-sm">{label}</span>
-					</div>
-					{/* Room for "100%", so the name never shifts as the speed changes */}
-					{view.canSetSpeed && !unavailable && (
-						<span className="min-w-[4ch] shrink-0 text-right font-light text-2xl tabular-nums leading-none">
-							{percentage}
-							<span className="text-muted-foreground text-sm">%</span>
-						</span>
-					)}
-				</div>
-			</div>
-
-			{view.canSetSpeed && (
-				<Slider
-					min={0}
-					max={100}
-					step={view.step}
-					value={percentage}
-					disabled={unavailable}
-					onValueChange={speed.hold}
-					onValueCommit={setSpeed}
-					aria-label={`${name} speed`}
+		// One line: the toggle tile, the name and what it's doing (a tap opens its speed, Oscillate and presets)
+		<div className={cn('flex items-center gap-3 px-4 py-3', className)}>
+			<Button
+				variant={on.value ? 'default' : 'secondary'}
+				size="icon-xl"
+				onClick={toggle}
+				disabled={unavailable}
+				aria-label={`Turn ${name} ${on.value ? 'off' : 'on'}`}
+				aria-pressed={on.value}
+				className="shrink-0"
+			>
+				<FanIcon
+					className={cn('size-5', on.value && 'animate-fan-spin motion-reduce:animate-none')}
+					style={{ '--fan-spin': spinSeconds(percentage || 50) } as React.CSSProperties}
 				/>
-			)}
+			</Button>
+			<button
+				type="button"
+				onClick={() => setAdjusting(true)}
+				disabled={!hasOptions || unavailable}
+				aria-label={`${name}: ${label}. Speed and modes`}
+				className="-mx-2 flex min-h-11 min-w-0 flex-1 flex-col items-start rounded-md px-2 py-1 text-left outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 enabled:hover:bg-accent/50"
+			>
+				<span className="w-full truncate font-semibold">{name}</span>
+				<span className="w-full truncate text-muted-foreground text-sm">{label}</span>
+			</button>
 
-			{/* Chips that scroll sideways, so a fan with many presets still fits a narrow column */}
-			{(view.canOscillate || view.presets.length > 0) && (
-				<ChipRow>
-					{view.canOscillate && (
-						<Button
-							variant={oscillating.value ? 'default' : 'outline'}
-							size="sm"
-							onClick={toggleOscillation}
-							disabled={unavailable}
-							aria-pressed={oscillating.value}
-						>
-							<ArrowLeftRight />
-							Oscillate
-						</Button>
+			<Dialog open={adjusting} onOpenChange={setAdjusting}>
+				<DialogContent size="sheet">
+					<DialogHeader>
+						<DialogTitle>{name}</DialogTitle>
+						<DialogDescription>{label}</DialogDescription>
+					</DialogHeader>
+					{view.canSetSpeed && (
+						<div className="flex items-center gap-4">
+							<Slider
+								min={0}
+								max={100}
+								step={view.step}
+								value={percentage}
+								disabled={unavailable}
+								onValueChange={speed.hold}
+								onValueCommit={setSpeed}
+								aria-label={`${name} speed`}
+								className="flex-1"
+							/>
+							{/* Room for "100%", so the slider never shifts as the speed changes */}
+							<span className="min-w-[4ch] shrink-0 text-right font-light text-2xl tabular-nums leading-none">
+								{percentage}
+								<span className="text-muted-foreground text-sm">%</span>
+							</span>
+						</div>
 					)}
-					{view.presets.map((mode) => (
-						<Button
-							key={mode}
-							variant={on.value && preset.value === mode ? 'default' : 'outline'}
-							size="sm"
-							onClick={() => setPreset(mode)}
-							disabled={unavailable}
-							aria-pressed={on.value && preset.value === mode}
-						>
-							{mode}
-						</Button>
-					))}
-				</ChipRow>
-			)}
+					{(view.canOscillate || view.presets.length > 0) && (
+						<div className="flex flex-wrap gap-2">
+							{view.canOscillate && (
+								<Button
+									variant={oscillating.value ? 'default' : 'outline'}
+									size="lg"
+									onClick={toggleOscillation}
+									disabled={unavailable}
+									aria-pressed={oscillating.value}
+								>
+									<ArrowLeftRight />
+									Oscillate
+								</Button>
+							)}
+							{view.presets.map((mode) => (
+								<Button
+									key={mode}
+									variant={on.value && preset.value === mode ? 'default' : 'outline'}
+									size="lg"
+									onClick={() => setPreset(mode)}
+									disabled={unavailable}
+									aria-pressed={on.value && preset.value === mode}
+								>
+									{mode}
+								</Button>
+							))}
+						</div>
+					)}
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 };

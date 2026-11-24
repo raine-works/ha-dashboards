@@ -31,6 +31,11 @@ import {
 	CardDescription,
 	CardHeader,
 	CardTitle,
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
 	EmptyState,
 	Separator,
 	ToggleGroup,
@@ -84,15 +89,34 @@ export function formatStatus(entity: HassEntity): string {
 const setpointKey = (entity: HassEntity | undefined) =>
 	[entity?.attributes.temperature, entity?.attributes.target_temp_low, entity?.attributes.target_temp_high].join('/');
 
+/** An HVAC mode's label ("Auto" for Home Assistant's heat_cool), or the mode itself capitalized. */
+const modeLabel = (mode: string) =>
+	HVAC_MODES.find((m) => m.id === mode)?.label ?? capitalize(mode.replaceAll('_', ' '));
+
+/**
+ * A zone's one line under its name: its mode first (the mode buttons are a tap away, so the line says
+ * which is on), then the temperature inside, humidity and what it's doing ("Heat · 69° inside ·
+ * Heating").
+ */
+export function formatZoneLine(entity: HassEntity): string {
+	return [entity.state ? modeLabel(entity.state) : null, formatStatus(entity) || null].filter(Boolean).join(' · ');
+}
+
+/**
+ * A zone: its name and line (a tap opens its mode), and the setpoint between − and +. One line a
+ * zone, so the thermostats take a third of the room they did; the mode buttons are in its dialog.
+ */
 const ZoneControl: React.FC<{ entityId: string; name: string }> = ({ entityId, name }) => {
 	const { callService, getHass, waitFor } = useHassApi();
 	const entity = useEntity(entityId);
 	const mode = useOptimistic(entity?.state ?? '');
+	const [modeOpen, setModeOpen] = useState(false);
 	// Setpoint steps on their way: the setpoint pulses until the thermostat reports a new one
 	const [adjusting, setAdjusting] = useState(0);
 	if (!entity) return null;
 
 	const isOff = mode.value === 'off';
+	const shown = { ...entity, state: mode.value || entity.state };
 	const adjust = async (step: number) => {
 		const before = setpointKey(entity);
 		setAdjusting((n) => n + 1);
@@ -106,61 +130,67 @@ const ZoneControl: React.FC<{ entityId: string; name: string }> = ({ entityId, n
 		await waitFor((hass) => setpointKey(hass.states[entityId]) !== before);
 		setAdjusting((n) => Math.max(0, n - 1));
 	};
+	const setMode = (hvacMode: string) => {
+		if (!hvacMode) return;
+		mode.set(hvacMode);
+		callService('climate', 'set_hvac_mode', { entity_id: entityId, hvac_mode: hvacMode });
+	};
 
 	return (
-		<div className="flex flex-col gap-3 touch:max-lg:gap-2">
-			{/* Status on its own line under the name and stepper, so neither truncates it */}
-			<div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1">
-				<div className="truncate font-semibold">{name}</div>
-				<div className="flex shrink-0 items-center gap-2 max-lg:gap-1">
-					<Button
-						variant="outline"
-						size="icon-xl"
-						className="max-lg:size-10 touch:max-lg:size-11"
-						onClick={() => adjust(-1)}
-						disabled={isOff}
-						aria-label={`Decrease ${name} temperature`}
-					>
-						<Minus className="size-5" />
-					</Button>
-					<span
-						className={cn(
-							'min-w-24 whitespace-nowrap text-center font-semibold text-2xl tabular-nums max-lg:min-w-12 max-lg:text-base',
-							adjusting > 0 && 'animate-pulse',
-						)}
-					>
-						{formatTarget(entity)}
-					</span>
-					<Button
-						variant="outline"
-						size="icon-xl"
-						className="max-lg:size-10 touch:max-lg:size-11"
-						onClick={() => adjust(1)}
-						disabled={isOff}
-						aria-label={`Increase ${name} temperature`}
-					>
-						<Plus className="size-5" />
-					</Button>
-				</div>
-				<div className="col-span-2 truncate text-muted-foreground text-sm">{formatStatus(entity)}</div>
+		<div className="flex items-center gap-3">
+			<button
+				type="button"
+				onClick={() => setModeOpen(true)}
+				aria-label={`${name}: ${formatZoneLine(shown)}. Change mode`}
+				className="-mx-2 flex min-h-11 min-w-0 flex-1 flex-col items-start rounded-md px-2 py-1 text-left outline-none hover:bg-accent/50 focus-visible:ring-[3px] focus-visible:ring-ring/50"
+			>
+				<span className="w-full truncate font-semibold">{name}</span>
+				<span className="w-full truncate text-muted-foreground text-sm">{formatZoneLine(shown)}</span>
+			</button>
+			<div className="flex shrink-0 items-center gap-1">
+				<Button
+					variant="outline"
+					size="icon-lg"
+					onClick={() => adjust(-1)}
+					disabled={isOff}
+					aria-label={`Decrease ${name} temperature`}
+				>
+					<Minus />
+				</Button>
+				<span
+					className={cn(
+						'min-w-16 whitespace-nowrap text-center font-semibold text-xl tabular-nums',
+						adjusting > 0 && 'animate-pulse',
+					)}
+				>
+					{formatTarget(shown)}
+				</span>
+				<Button
+					variant="outline"
+					size="icon-lg"
+					onClick={() => adjust(1)}
+					disabled={isOff}
+					aria-label={`Increase ${name} temperature`}
+				>
+					<Plus />
+				</Button>
 			</div>
 
-			<ToggleGroup
-				variant="outline"
-				size="lg"
-				value={mode.value}
-				onValueChange={(hvacMode) => {
-					mode.set(hvacMode);
-					callService('climate', 'set_hvac_mode', { entity_id: entityId, hvac_mode: hvacMode });
-				}}
-				className="w-full"
-			>
-				{HVAC_MODES.map(({ id, label }) => (
-					<ToggleGroupItem key={id} value={id}>
-						{label}
-					</ToggleGroupItem>
-				))}
-			</ToggleGroup>
+			<Dialog open={modeOpen} onOpenChange={setModeOpen}>
+				<DialogContent size="sheet">
+					<DialogHeader>
+						<DialogTitle>{name}</DialogTitle>
+						<DialogDescription>{formatStatus(entity) || 'Thermostat'}</DialogDescription>
+					</DialogHeader>
+					<ToggleGroup variant="outline" size="xl" value={mode.value} onValueChange={setMode} className="w-full">
+						{HVAC_MODES.map(({ id, label }) => (
+							<ToggleGroupItem key={id} value={id}>
+								{label}
+							</ToggleGroupItem>
+						))}
+					</ToggleGroup>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 };
