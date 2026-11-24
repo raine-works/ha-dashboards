@@ -44,6 +44,7 @@ Sends a push to household members' phones (their Companion apps). No people: the
 | `title` | yes |  | A few words, such as who it's from. |
 | `message` | yes |  | What to say. |
 | `data` |  |  | The Companion app's data (tag, group, channel, clickAction, url, actions, image…). |
+| `category` |  |  | What kind of push it is, so people who turned that kind off in the Home dashboard don't get it. Security always comes through; no category goes to everyone. |
 
 ## `raineworks_dashboards.notify_todo_assignee`
 

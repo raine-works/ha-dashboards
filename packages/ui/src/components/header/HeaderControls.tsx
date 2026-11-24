@@ -8,6 +8,7 @@
 import {
 	AlertTriangle,
 	Bell,
+	BellRing,
 	CalendarDays,
 	Cctv,
 	LayoutGrid,
@@ -52,6 +53,7 @@ import { EnergyDialog, HouseWatts } from '../energy/EnergyDialog';
 import { useEnergyModel } from '../energy/useEnergy';
 import { IntercomDialog } from '../intercom/IntercomDialog';
 import { NotificationsDialog, useNotifications } from '../notifications/NotificationsDialog';
+import { PushSettingsDialog, usePushPreferences } from '../notifications/PushSettings';
 import { PeopleDialog } from '../people/PeopleDialog';
 import { PetsDialog } from '../pets/PetsDialog';
 import { TodoDialog } from '../todo/TodoDialog';
@@ -489,7 +491,7 @@ export const CamerasButton: React.FC<HeaderButtonProps> = ({ size = 'icon-xl', c
 	);
 };
 
-type MoreDialog = 'brief' | 'intercom' | 'tv' | 'energy' | 'wifi' | 'appearance';
+type MoreDialog = 'brief' | 'intercom' | 'tv' | 'energy' | 'wifi' | 'appearance' | 'push';
 
 /** A tile in the More menu: the icon over its label and a line of detail, two across. */
 const MORE_TILE =
@@ -526,6 +528,8 @@ export const MoreButton: React.FC<{ tvRemote?: boolean; colorSchemePicker?: bool
 	const tvsOn = tvs.filter((tv) => tv.state === 'on').length;
 	const wallPanel = useWallPanel();
 	const guestWifi = !!useGuestWifi() && wallPanel && guestWifiModule;
+	// The signed-in member's phone alerts, beside Appearance (the Home dashboard's personal settings)
+	const push = usePushPreferences();
 	const close = () => {
 		setDialog(null);
 		clearLink();
@@ -576,7 +580,12 @@ export const MoreButton: React.FC<{ tvRemote?: boolean; colorSchemePicker?: bool
 						{tvTile && tile('tv', TvIcon, 'TVs', tvsOn > 0 ? `${tvsOn} on` : undefined)}
 					</div>
 					{/* The theme and Light / Dark / Auto (the Home dashboard; the wall panels follow the house) */}
-					{colorSchemePicker && <div className="flex border-t pt-2">{tile('appearance', Palette, 'Appearance')}</div>}
+					{colorSchemePicker && (
+						<div className="flex gap-2 border-t pt-2">
+							{tile('appearance', Palette, 'Appearance')}
+							{push.preferences && tile('push', BellRing, 'Phone alerts')}
+						</div>
+					)}
 				</PopoverContent>
 			</Popover>
 			<DailyBriefDialog isOpen={dialog === 'brief'} onClose={close} tab={linkedBriefTab(link)} />
@@ -585,6 +594,12 @@ export const MoreButton: React.FC<{ tvRemote?: boolean; colorSchemePicker?: bool
 			<EnergyDialog isOpen={dialog === 'energy'} onClose={close} />
 			<GuestWifiDialog isOpen={dialog === 'wifi'} onClose={close} />
 			<AppearanceDialog isOpen={dialog === 'appearance'} onClose={close} />
+			<PushSettingsDialog
+				isOpen={dialog === 'push'}
+				onClose={close}
+				preferences={push.preferences}
+				onChange={push.set}
+			/>
 		</>
 	);
 };

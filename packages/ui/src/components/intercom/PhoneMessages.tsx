@@ -80,7 +80,12 @@ export const PhoneMessages: React.FC<{
 		if (typed) setMessage('');
 		else setSending(trimmed);
 		const sent = phoneMessage(phoneMessageSender(firstName, wallPanel), trimmed);
-		callService(...notifyPeopleAction(getHass() ?? {}), { people: selected, ...sent }, { errors: 'throw' })
+		// Messages, a push category each member can turn off (the integration's push settings)
+		callService(
+			...notifyPeopleAction(getHass() ?? {}),
+			{ people: selected, category: 'messages', ...sent },
+			{ errors: 'throw' },
+		)
 			.then(() => setStatus({ text: `Sent to ${nameList(names)}` }))
 			.catch(() => {
 				setStatus({ text: `Couldn't send to ${nameList(names)}`, isError: true });

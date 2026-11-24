@@ -110,8 +110,8 @@ YAML, which wins key by key. Turn a module off with `house: { modules: { holiday
 
 The integration also gives the dashboards their household (a [Warden](https://github.com/raine-works/ha-warden)
 group, or every person with a device tracker), per-room bedtime switches, lock fault sensors, voice
-clip uploads any signed-in user can make, and actions for announcements, phone pushes, to-dos and
-the receipt printer.
+clip uploads any signed-in user can make, each member's [phone alerts](docs/phone-alerts.md) (which
+pushes they get), and actions for announcements, phone pushes, to-dos and the receipt printer.
 
 ## Development
 
