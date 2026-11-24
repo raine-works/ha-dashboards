@@ -17,7 +17,8 @@ export const raineworks: DashboardTheme = {
 	id: 'raineworks',
 	name: 'Raineworks',
 	description: 'Black and white with a peach-to-teal edge and glow',
-	radius: '0.625rem',
+	// Generous corners, so the squircle shows: the icon tiles and big buttons full squircles
+	radius: '1rem',
 	light: {
 		// The neutrals and status colors are Neutral's (docs/design/color.md), which every theme shares
 		...neutral.light,

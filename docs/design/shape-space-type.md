@@ -38,19 +38,23 @@ is why it beats clip-path masks.
 
 ### Radius scale
 
-Set explicitly by role (`rounded-chip`, `rounded-control`, `rounded-control-lg`, `rounded-icon`,
-`rounded-tile`, `rounded-dialog`), not derived from one `--radius`.
+Set by role (`rounded-chip`, `rounded-control`, `rounded-control-lg`, `rounded-icon`,
+`rounded-tile`, `rounded-dialog`), each scaled by the theme's corners (`--corner-scale`: the theme
+editor's **Corners** ÷ 0.625rem, pixels times it, since Home Assistant's rem is 14px), so a theme
+shapes everything in proportion. Raineworks, the default, uses
+1rem: the icon tiles and the big buttons are full squircles (a corner about half their height), the
+look of an app icon. The other presets keep 0.625rem.
 
-| Role | Radius |
-| :--- | :--- |
-| Chip, badge, small input (≤ 32px tall) | 8px |
-| Button, 36–44px | 12px |
-| Button, 48–56px | 14–16px |
-| Icon tile, 40–48px | 12–14px (about 28% of its size) |
-| Card, room tile | 20px; 24px on wall panels |
-| Dialog; a phone sheet's top corners | 28px |
-| Slider, switch, progress | 8px |
-| Avatar, the PIN pad's keys | A circle (faces read as circles) |
+| Role | Base | At 0.625rem (× 1) | Raineworks (1rem, × 1.6) |
+| :--- | :--- | :--- | :--- |
+| Chip, badge, small input (≤ 32px tall) | 8px | 8px | 12.8px |
+| Button, 36–44px | 12px | 12px | 19.2px |
+| Button, 48–56px | 16px | 16px | 25.6px |
+| Icon tile, 40–48px | 14px | 14px | 22.4px |
+| Card, room tile | 20px (24px on wall panels) | 20px (24px) | 32px (38.4px) |
+| Dialog; a phone sheet's top corners | 28px | 28px | 44.8px |
+| Slider, switch, progress (`rounded-md`) | `--radius` − 2px | 6.75px | 12px |
+| Avatar, the PIN pad's keys | A circle (faces read as circles) | | |
 
 ## Spacing
 

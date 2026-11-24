@@ -262,14 +262,18 @@
 	--radius-xl: calc(var(--radius) + 4px);
 	--radius-2xl: calc(var(--radius) + 8px);
 
-	/* The design's shapes, by role (docs/design/shape-space-type.md): rounded-chip, rounded-control… */
-	--radius-chip: 8px;
-	--radius-control: 12px;
-	--radius-control-lg: 16px;
-	--radius-icon: 14px;
-	/* 20px; 24px on the wall panels (--tile-radius, set by surface below) */
-	--radius-tile: var(--tile-radius);
-	--radius-dialog: 28px;
+	/* The design's shapes, by role (docs/design/shape-space-type.md): rounded-chip, rounded-control…,
+	   each its size at the default corners times the theme's --corner-scale (its Corners ÷ 0.625rem,
+	   themes/css.ts), so a theme shapes everything in proportion. Pixels, not multiples of --radius:
+	   Home Assistant's rem is 14px. Raineworks' 1rem (1.6) makes the icon tiles and the big buttons
+	   full squircles (a corner about half their height). The tile's is 24px on the wall panels
+	   (--tile-base, set by surface below) */
+	--radius-chip: calc(8px * var(--corner-scale, 1));
+	--radius-control: calc(12px * var(--corner-scale, 1));
+	--radius-control-lg: calc(16px * var(--corner-scale, 1));
+	--radius-icon: calc(14px * var(--corner-scale, 1));
+	--radius-tile: calc(var(--tile-base) * var(--corner-scale, 1));
+	--radius-dialog: calc(28px * var(--corner-scale, 1));
 
 	/* The type scale, Geist at about 1.2 (text-caption, text-label…; with its line height and tracking) */
 	--text-overline: 0.75rem;
@@ -335,7 +339,7 @@
 	:host {
 		--pad: 20px;
 		--gap: 16px;
-		--tile-radius: 20px;
+		--tile-base: 20px;
 	}
 	@media (max-width: 639px) {
 		:host {
@@ -346,7 +350,7 @@
 	[data-touch] {
 		--pad: 24px;
 		--gap: 16px;
-		--tile-radius: 24px;
+		--tile-base: 24px;
 	}
 	@media (max-width: 1279px) {
 		[data-touch] {
