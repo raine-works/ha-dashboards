@@ -29,7 +29,9 @@ editor, with a preview in light and dark on the dashboards' own buttons, toggles
   sliders and selected items), or **a gradient**, two colors for Raineworks-style edges and glow,
   each of which can be turned off.
 - **Grays**: Neutral, Zinc, Stone or Slate, shadcn's bases.
-- **Corners**: from square to round.
+- **Corners**: from square to round. Every corner follows it in proportion (buttons, tiles, cards,
+  dialogs); where the browser draws them (Chrome, Android, the wall panels), corners are squircles.
+  Raineworks uses 1rem, the others 0.625rem.
 - **Import** takes a theme from [ui.shadcn.com/themes](https://ui.shadcn.com/themes),
   [tweakcn](https://tweakcn.com) or a project's `globals.css` (its `:root { … }` and
   `.dark { … }`); **Copy CSS** gives yours back in the same format.

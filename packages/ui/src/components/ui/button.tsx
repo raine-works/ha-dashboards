@@ -42,13 +42,13 @@ const buttonVariants = cva(
 				lg: "h-10 touch:h-12 rounded-md px-6 touch:text-base has-[>svg]:px-4 max-lg:gap-1.5 touch:[&_svg:not([class*='size-'])]:size-5 [&_svg]:-translate-y-px",
 				// Touch-friendly wall panel size (44px+ hit target). Below lg (the 10.5" panels) the icon sits
 				// closer to its label, leaving the room to the button's sides
-				xl: 'h-12 rounded-lg px-6 text-base has-[>svg]:px-5 max-lg:gap-1.5 [&_svg]:-translate-y-px',
+				xl: 'h-12 rounded-control-lg px-6 text-base has-[>svg]:px-5 max-lg:gap-1.5 [&_svg]:-translate-y-px',
 				// Full screen video controls (a phone held away, a laptop across the room): 56px targets
 				'2xl':
-					"h-14 rounded-xl px-6 text-lg has-[>svg]:px-5 [&_svg:not([class*='size-'])]:size-6 [&_svg]:-translate-y-px",
+					"h-14 rounded-control-lg px-6 text-lg has-[>svg]:px-5 [&_svg:not([class*='size-'])]:size-6 [&_svg]:-translate-y-px",
 				// The wall panel and desktop header's buttons: the icon over a short label ("To-do", "Cameras"),
 				// so every button says what it opens, 56px tall and as narrow as its label
-				tile: "h-14 min-w-14 flex-col gap-1 px-2 font-medium text-[11px] leading-none has-[>svg]:px-2 [&_svg:not([class*='size-'])]:size-5",
+				tile: "h-14 min-w-14 flex-col rounded-control-lg gap-1 px-2 font-medium text-[11px] leading-none has-[>svg]:px-2 [&_svg:not([class*='size-'])]:size-5",
 				// The design's sizes (docs/design/components.md), replacing the ones above as each phase lands:
 				// md, most buttons (44px); action, a dialog's main action and a header tile (52px, 56 on the panels)
 				md: "h-11 gap-2 rounded-control px-4 has-[>svg]:px-3 [&_svg:not([class*='size-'])]:size-5",
@@ -62,8 +62,8 @@ const buttonVariants = cva(
 				icon: "size-9 touch:size-11 touch:[&_svg:not([class*='size-'])]:size-5",
 				'icon-sm': 'size-8 touch:size-11',
 				'icon-lg': "size-10 touch:size-12 touch:[&_svg:not([class*='size-'])]:size-5",
-				'icon-xl': 'size-12 rounded-lg',
-				'icon-2xl': "size-14 rounded-xl [&_svg:not([class*='size-'])]:size-6",
+				'icon-xl': 'size-12 rounded-control-lg',
+				'icon-2xl': "size-14 rounded-control-lg [&_svg:not([class*='size-'])]:size-6",
 			},
 		},
 		defaultVariants: {

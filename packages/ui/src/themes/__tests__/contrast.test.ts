@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'bun:test';
+import { readFileSync } from 'node:fs';
 import { buildTheme } from '../build';
 import { contrast, cssToHex, mixHex } from '../color';
+import { cornerScale } from '../css';
 import { PRESET_THEMES } from '../index';
 import { isNight, NIGHT_TOKENS } from '../night';
 import type { Tokens } from '../tokens';
@@ -92,5 +94,27 @@ describe('the night level', () => {
 			expect(l(NIGHT_TOKENS.background ?? '')).toBeLessThan(l(theme.dark.background));
 			expect(l(NIGHT_TOKENS.foreground ?? '')).toBeLessThan(l(theme.dark.foreground));
 		}
+	});
+});
+
+describe('corners', () => {
+	const css = readFileSync(new URL('../../styles/theme.css', import.meta.url), 'utf8');
+
+	it("follow the theme's corners, every role", () => {
+		for (const role of ['chip', 'control', 'control-lg', 'icon', 'tile', 'dialog'])
+			expect(css, role).toMatch(new RegExp(`--radius-${role}: calc\\([^;]*var\\(--corner-scale, 1\\)\\)`));
+	});
+
+	it("scale by the theme's radius against the default 0.625rem", () => {
+		expect(cornerScale('0.625rem')).toBe(1);
+		expect(cornerScale('1rem')).toBe(1.6);
+		expect(cornerScale('0rem')).toBe(0);
+		expect(cornerScale('10px')).toBe(1);
+		expect(cornerScale('round')).toBe(1);
+	});
+
+	it('are full squircles in Raineworks, the default', () => {
+		const raineworks = PRESET_THEMES.find((t) => t.id === 'raineworks');
+		expect(raineworks?.radius).toBe('1rem');
 	});
 });
