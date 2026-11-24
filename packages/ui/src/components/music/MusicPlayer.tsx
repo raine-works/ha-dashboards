@@ -91,7 +91,7 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({
 				onValueChange={(value) => setTab(value as MusicTab)}
 				className={cn('min-w-0 flex-1 gap-4', contained && 'min-h-0')}
 			>
-				<TabsList className="h-11 w-full shrink-0">
+				<TabsList>
 					<TabsTrigger value="now">Now playing</TabsTrigger>
 					<TabsTrigger value="queue">Queue</TabsTrigger>
 					<TabsTrigger value="browse">Browse</TabsTrigger>

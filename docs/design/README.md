@@ -13,6 +13,7 @@ breaks one of these pages changes the page first.
 | [Shape, space and type](shape-space-type.md) | Squircles and the radius scale, spacing and density, the Geist type scale, depth, icons, motion |
 | [Components](components.md) | The building blocks every feature is made of, and the ones to retire |
 | [Overhaul plan](overhaul-plan.md) | What's wrong today (the audit) and the phased plan to get there |
+| [The dialogs](dialogs.md) | Phase 4: what the feature dialogs had in common, and each one's plan |
 
 ## The short version
 

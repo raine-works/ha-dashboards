@@ -639,7 +639,7 @@ const TvPanel: React.FC<{ tv: Tv; controls: TvControls; remote: boolean }> = ({ 
 			{/* Apps or the remote, in the same room (so the panel never grows taller); apps alone without the remote */}
 			{remote ? (
 				<Tabs value={tab} onValueChange={(value) => setTab(value as 'apps' | 'remote')} className="shrink-0">
-					<TabsList className="h-11">
+					<TabsList>
 						<TabsTrigger value="apps">Apps</TabsTrigger>
 						<TabsTrigger value="remote">Remote</TabsTrigger>
 					</TabsList>

@@ -20,12 +20,14 @@ const buttonVariants = cva(
 				default: 'bg-primary text-primary-foreground hover:bg-primary/90',
 				destructive:
 					'bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40',
-				outline:
-					'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50',
+				// The design has no outline role (docs/design/components.md: primary, secondary, quiet, danger): an
+				// outline button draws as the tonal secondary, so unpicked chips and a dialog's other buttons stay calm
+				// beside its one primary action, and a picked chip (`default`) stands out filled
+				outline: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
 				secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
 				// Panel extension: status variants backed by the theme's status tokens
-				// Outline weight (like `outline`) tinted with the status color, so it sits evenly beside outline buttons
-				warning: 'border border-warning/60 bg-warning/15 text-warning shadow-xs hover:bg-warning/25',
+				// Tonal like `secondary`, tinted with the status color, so it sits evenly beside the other buttons
+				warning: 'bg-warning/15 text-warning hover:bg-warning/25',
 				// Panel extension: the Assist button, the one control in the Assist colors (a gradient ring
 				// over a tinted fill, filled while pressed: `.assist-button` in theme.css)
 				assist: 'assist-button shadow-xs',

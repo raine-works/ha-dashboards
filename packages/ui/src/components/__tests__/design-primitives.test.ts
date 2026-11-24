@@ -54,3 +54,21 @@ describe('the More menu', () => {
 		expect(moreItems({})).toEqual([]);
 	});
 });
+
+describe('the design roles in the stock components', () => {
+	it('draws outline buttons tonal, with no border (the design has no outline role)', async () => {
+		const { buttonVariants } = await import('../ui/button');
+		const outline = buttonVariants({ variant: 'outline' });
+		expect(outline).toContain('bg-secondary');
+		expect(outline).not.toMatch(/(^|\s)border(\s|$)/);
+	});
+
+	it('has one segmented control, and tonal chips that fill when picked', async () => {
+		const { toggleVariants } = await import('../ui/toggle-group');
+		expect(toggleVariants({ variant: 'outline' })).toContain('data-[state=on]:bg-card');
+		expect(toggleVariants({ variant: 'outline' })).not.toMatch(/(^|\s)border(\s|$)/);
+		const chip = toggleVariants({ variant: 'chip' });
+		expect(chip).toContain('bg-secondary');
+		expect(chip).toContain('data-[state=on]:bg-primary');
+	});
+});
