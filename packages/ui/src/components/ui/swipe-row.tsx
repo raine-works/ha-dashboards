@@ -58,7 +58,7 @@ const SLIDE_OUT_MS = 180;
 
 const TONE = {
 	success: 'bg-success text-success-foreground',
-	destructive: 'bg-destructive text-alarm-foreground',
+	destructive: 'bg-alarm text-alarm-foreground',
 	info: 'bg-info text-info-foreground',
 } as const;
 
