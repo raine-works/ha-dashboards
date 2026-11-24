@@ -1,5 +1,9 @@
-// Panel extension (not shadcn): renders the Markdown subset `lib/markdown.ts` parses, as elements
-// (never HTML), in the surrounding text's color and size.
+/**
+ * Panel extension (not shadcn): renders the Markdown subset `lib/markdown.ts` parses, as elements
+ * (never HTML), in the surrounding text's color and size.
+ *
+ * @module
+ */
 
 import type React from 'preact/compat';
 import { type MarkdownSpan, parseMarkdown } from '../../lib/markdown';

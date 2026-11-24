@@ -1,7 +1,13 @@
+/**
+ * shadcn/ui's Textarea (new-york v4), ported to preact/compat.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import { cn } from '../../lib/utils';
 
-// shadcn/ui new-york v4 Textarea, ported to preact/compat
+/** A text box that grows with its content (`field-sizing-content`), with `aria-invalid` showing an error. */
 function Textarea({ className, ...props }: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
 	return (
 		<textarea

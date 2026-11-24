@@ -1,12 +1,16 @@
+/**
+ * shadcn/ui's Calendar (new-york v4) without react-day-picker (and its date-fns, ~95KB a panel): the
+ * same markup, classes and data attributes for single-date picking. Six weeks a month, always, so
+ * paging months never changes its height. Arrow keys move the focused day (Page Up/Down: months).
+ *
+ * @module
+ */
+
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'preact/compat';
 import { monthGrid } from '../../lib/calendar';
 import { cn } from '../../lib/utils';
 import { Button, type ButtonProps, buttonVariants } from './button';
-
-// shadcn/ui calendar (new-york v4) without react-day-picker (and its date-fns, ~95KB a panel): the
-// same markup, classes and data attributes for single-date picking. Six weeks a month, always, so
-// paging months never changes its height. Arrow keys move the focused day (Page Up/Down: months).
 
 const sameDay = (a: Date | undefined, b: Date | undefined) =>
 	!!a && !!b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
@@ -16,19 +20,26 @@ const addMonths = (date: Date, months: number) => new Date(date.getFullYear(), d
 
 const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
+/** The calendar's props: shadcn's, for single-date picking. */
 export interface CalendarProps {
 	/** Only single-date picking is ported. */
 	mode?: 'single';
+	/** The picked day, if any. */
 	selected?: Date;
+	/** A day was tapped: the day, or `undefined` when it was the picked one (unpicking it). */
 	onSelect?: (date: Date | undefined) => void;
 	/** The month shown first (default: the selected one, else this month). */
 	defaultMonth?: Date;
+	/** Show the neighbouring months' days that fill the first and last weeks (default: true). */
 	showOutsideDays?: boolean;
+	/** Days that can't be picked. */
 	disabled?: (date: Date) => boolean;
+	/** The month arrows' button variant (default: `ghost`). */
 	buttonVariant?: ButtonProps['variant'];
 	className?: string;
 }
 
+/** A month to pick a day from, with arrows to page the months. */
 function Calendar({
 	selected,
 	onSelect,
@@ -169,6 +180,7 @@ function Calendar({
 	);
 }
 
+/** One day of the calendar, a ghost button filled with the primary color when it's the picked day. */
 function CalendarDayButton({ day, selected, className, ...props }: ButtonProps & { day: Date; selected: boolean }) {
 	return (
 		<Button

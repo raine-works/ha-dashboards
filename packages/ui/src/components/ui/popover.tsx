@@ -1,3 +1,11 @@
+/**
+ * shadcn/ui's Popover (new-york v4) without Radix: an anchored panel portaled to the panel's mount
+ * point (so it escapes scrolling dialogs), positioned below its trigger (above when there's no
+ * room), kept on screen, and closed by Escape or a tap outside.
+ *
+ * @module
+ */
+
 import React, {
 	cloneElement,
 	createPortal,
@@ -10,10 +18,6 @@ import React, {
 } from 'preact/compat';
 import { cn } from '../../lib/utils';
 import { DialogPortalContainer } from './dialog';
-
-// shadcn/ui popover (new-york v4) without Radix: an anchored panel portaled to the panel's mount
-// point (so it escapes scrolling dialogs), positioned below its trigger (above when there's no
-// room), kept on screen, and closed by Escape or a tap outside.
 
 interface PopoverContextValue {
 	open: boolean;
@@ -29,13 +33,19 @@ const usePopover = () => {
 	return context;
 };
 
+/** The popover's props: controlled (`open`) or not (`defaultOpen`). */
 export interface PopoverProps {
+	/** Shown (controlled). */
 	open?: boolean;
+	/** Shown at first (uncontrolled). */
 	defaultOpen?: boolean;
+	/** Opened or closed (the trigger, Escape, a tap outside). */
 	onOpenChange?: (open: boolean) => void;
+	/** Its `PopoverTrigger` (or `PopoverAnchor`) and `PopoverContent`. */
 	children: React.ReactNode;
 }
 
+/** A popover's state, shared by its trigger and content. */
 function Popover({ open: controlled, defaultOpen = false, onOpenChange, children }: PopoverProps) {
 	const [uncontrolled, setUncontrolled] = useState(defaultOpen);
 	const open = controlled ?? uncontrolled;
@@ -47,6 +57,7 @@ function Popover({ open: controlled, defaultOpen = false, onOpenChange, children
 	return <PopoverContext.Provider value={{ open, setOpen, anchor }}>{children}</PopoverContext.Provider>;
 }
 
+/** A button's attributes, and `asChild`. */
 export interface PopoverTriggerProps extends React.HTMLAttributes<HTMLButtonElement> {
 	/** Use the single child (e.g. a Button) as the trigger instead of a plain button. */
 	asChild?: boolean;
@@ -58,6 +69,7 @@ function setAnchor(anchor: { current: HTMLElement | null }, el: HTMLElement | nu
 	anchor.current = el;
 }
 
+/** What opens and closes the popover, and what it sits by. */
 function PopoverTrigger({ asChild, children, onClick, ...props }: PopoverTriggerProps) {
 	const { open, setOpen, anchor } = usePopover();
 	const child =
@@ -91,11 +103,15 @@ const FOCUSABLE =
 
 const EDGE = 8;
 
+/** A div's attributes and where the popover sits against its trigger. */
 export interface PopoverContentProps extends React.HTMLAttributes<HTMLDivElement> {
+	/** Which of the trigger's edges it lines up with (default: centered). */
 	align?: 'start' | 'center' | 'end';
+	/** The gap to the trigger, px (default: 4). */
 	sideOffset?: number;
 }
 
+/** The popover's panel, while open; focus moves into it, and back to the trigger when it closes. */
 function PopoverContent({ className, align = 'center', sideOffset = 4, style, ...props }: PopoverContentProps) {
 	const { open, setOpen, anchor } = usePopover();
 	const container = useContext(DialogPortalContainer);
@@ -229,6 +245,7 @@ function PopoverContent({ className, align = 'center', sideOffset = 4, style, ..
 	return container ? createPortal(panel, container) : panel;
 }
 
+/** Something other than the trigger for the popover to sit by. */
 function PopoverAnchor({ children }: { children: React.ReactElement }) {
 	const { anchor } = usePopover();
 	return cloneElement(children, {
@@ -236,14 +253,17 @@ function PopoverAnchor({ children }: { children: React.ReactElement }) {
 	});
 }
 
+/** The popover's title and description. */
 function PopoverHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
 	return <div data-slot="popover-header" className={cn('flex flex-col gap-1 text-sm', className)} {...props} />;
 }
 
+/** The popover's title. */
 function PopoverTitle({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
 	return <div data-slot="popover-title" className={cn('font-medium', className)} {...props} />;
 }
 
+/** The line under the popover's title, in muted text. */
 function PopoverDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
 	return <p data-slot="popover-description" className={cn('text-muted-foreground', className)} {...props} />;
 }

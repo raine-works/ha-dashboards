@@ -1,3 +1,9 @@
+/**
+ * Panel extension for shadcn's chart: a tooltip's row.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 
 /**

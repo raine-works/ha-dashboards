@@ -1,3 +1,12 @@
+/**
+ * shadcn/ui's Dialog (new-york v4), ported to Preact without Radix: portalled into the panel's mount
+ * point, modal (focus moved in and trapped, the page behind locked), stacked (Escape closes the top
+ * one), closed by Back (`dialog-history.ts`) and after a while idle, with the panel's sizes and a
+ * crash kept inside the dialog.
+ *
+ * @module
+ */
+
 import { XIcon } from 'lucide-react';
 import React, { createPortal, useEffect, useId, useLayoutEffect, useRef, useSyncExternalStore } from 'preact/compat';
 import { cn } from '../../lib/utils';
@@ -112,8 +121,11 @@ function lockPageScroll() {
 	};
 }
 
+/** The dialog's props (controlled). */
 export interface DialogProps {
+	/** Shown. */
 	open: boolean;
+	/** The dialog asks to close (`false`): Escape, a tap outside, its X, Back, the idle timeout. */
 	onOpenChange?: (open: boolean) => void;
 	/** Auto-close after this many ms without interaction; 0 disables. Requires onOpenChange. */
 	idleTimeoutMs?: number;
@@ -122,6 +134,7 @@ export interface DialogProps {
 	 * Requires onOpenChange.
 	 */
 	history?: boolean;
+	/** Its `DialogContent`. */
 	children: React.ReactNode;
 }
 
@@ -131,6 +144,7 @@ function titleText(container: HTMLElement | null, titleId: string) {
 	return root.getElementById(titleId)?.textContent;
 }
 
+/** A modal dialog: the overlay that blurs the screen behind, and its content while `open`. */
 const Dialog: React.FC<DialogProps> = ({
 	open,
 	onOpenChange,
@@ -262,7 +276,9 @@ function trapTab(e: KeyboardEvent, el: HTMLElement | null) {
 	}
 }
 
+/** A div's attributes, its close button and its size. */
 export interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
+	/** The X in the top corner (default: true; shown only when the dialog can close). */
 	showCloseButton?: boolean;
 	/**
 	 * Panel extension. `default`: shadcn's, sized to its content (confirmations, pickers, QR
@@ -319,6 +335,7 @@ const DialogClose: React.FC<{ className?: string }> = ({ className }) => {
 	);
 };
 
+/** The dialog's box (`role="dialog"`), sized by `size`, labelled by its `DialogTitle`. */
 const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
 	({ className, children, showCloseButton = true, size = 'default', onKeyDown, ...props }, ref) => {
 		const { onOpenChange, titleId } = React.useContext(DialogContext);
@@ -392,6 +409,7 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
 );
 DialogContent.displayName = 'DialogContent';
 
+/** The dialog's title and description, clear of the close button. */
 const DialogHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
 	({ className, ...props }, ref) => (
 		<div
@@ -405,6 +423,7 @@ const DialogHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLD
 );
 DialogHeader.displayName = 'DialogHeader';
 
+/** The dialog's actions: stacked on a phone (at its bottom edge), in a row at the end elsewhere. */
 const DialogFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
 	({ className, ...props }, ref) => (
 		<div
@@ -418,6 +437,7 @@ const DialogFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLD
 );
 DialogFooter.displayName = 'DialogFooter';
 
+/** The dialog's title (Title Case): its accessible name, and its name in the URL while open. */
 const DialogTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTMLHeadingElement>>(
 	({ className, ...props }, ref) => {
 		const { titleId } = React.useContext(DialogContext);
@@ -434,6 +454,7 @@ const DialogTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HT
 );
 DialogTitle.displayName = 'DialogTitle';
 
+/** The line under the dialog's title, in muted text. */
 const DialogDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
 	({ className, ...props }, ref) => (
 		<p ref={ref} data-slot="dialog-description" className={cn('text-muted-foreground text-sm', className)} {...props} />

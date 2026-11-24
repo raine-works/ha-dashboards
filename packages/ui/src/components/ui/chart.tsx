@@ -1,5 +1,9 @@
-// shadcn/ui new-york v4 chart, ported to preact/compat (Recharts runs on it through the build's
-// React aliases). Import it only from code loaded with import(): Recharts stays out of the bundle.
+/**
+ * shadcn/ui's chart (new-york v4), ported to preact/compat (Recharts runs on it through the build's
+ * React aliases). Import it only from code loaded with import(): Recharts stays out of the bundle.
+ *
+ * @module
+ */
 
 import * as React from 'preact/compat';
 import type { TooltipValueType } from 'recharts';
@@ -12,6 +16,10 @@ const THEMES = { light: '', dark: '.dark' } as const;
 const INITIAL_DIMENSION = { width: 320, height: 200 } as const;
 type TooltipNameType = number | string;
 
+/**
+ * A chart's series by data key: the label and icon the tooltip and legend show, and a color (one,
+ * or one per light and dark theme) written as `--color-<key>` for the chart's marks to use.
+ */
 export type ChartConfig = Record<
 	string,
 	{
@@ -36,6 +44,10 @@ function useChart() {
 	return context;
 }
 
+/**
+ * A chart's box: Recharts' ResponsiveContainer around `children`, with the `config`'s colors as CSS
+ * variables and Recharts' parts styled with the theme's tokens.
+ */
 function ChartContainer({
 	id,
 	className,
@@ -74,6 +86,7 @@ function ChartContainer({
 	);
 }
 
+/** The `<style>` setting a chart's `--color-<key>` variables, per theme; nothing without colors. */
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 	const colorConfig = Object.entries(config).filter(([, config]) => config.theme ?? config.color);
 
@@ -103,8 +116,10 @@ ${colorConfig
 	);
 };
 
+/** Recharts' Tooltip; give it `content={<ChartTooltipContent />}`. */
 const ChartTooltip = RechartsPrimitive.Tooltip;
 
+/** The tooltip's card: a label, then each series' indicator, name (from the config) and value. */
 function ChartTooltipContent({
 	active,
 	payload,
@@ -232,8 +247,10 @@ function ChartTooltipContent({
 	);
 }
 
+/** Recharts' Legend; give it `content={<ChartLegendContent />}`. */
 const ChartLegend = RechartsPrimitive.Legend;
 
+/** The legend: each series' icon or swatch and its label from the config. */
 function ChartLegendContent({
 	className,
 	hideIcon = false,

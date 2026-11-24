@@ -1,3 +1,9 @@
+/**
+ * Panel extension: a count on a header button's corner.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 
 /**

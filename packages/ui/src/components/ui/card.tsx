@@ -1,6 +1,13 @@
+/**
+ * shadcn/ui's Card (new-york v4), ported to Preact.
+ *
+ * @module
+ */
+
 import React from 'preact/compat';
 import { cn } from '../../lib/utils';
 
+/** A bordered surface: a `CardHeader`, a `CardContent` and a `CardFooter`. */
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
 	<div
 		ref={ref}
@@ -11,6 +18,7 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
 ));
 Card.displayName = 'Card';
 
+/** The card's header: a title and description, with a `CardAction` at the end when there is one. */
 const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
 	({ className, ...props }, ref) => (
 		<div
@@ -26,6 +34,7 @@ const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 );
 CardHeader.displayName = 'CardHeader';
 
+/** The card's title. */
 const CardTitle = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
 	({ className, ...props }, ref) => (
 		<div ref={ref} data-slot="card-title" className={cn('font-semibold leading-none', className)} {...props} />
@@ -33,6 +42,7 @@ const CardTitle = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivE
 );
 CardTitle.displayName = 'CardTitle';
 
+/** The line under the card's title, in muted text. */
 const CardDescription = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
 	({ className, ...props }, ref) => (
 		<div ref={ref} data-slot="card-description" className={cn('text-muted-foreground text-sm', className)} {...props} />
@@ -40,6 +50,7 @@ const CardDescription = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HT
 );
 CardDescription.displayName = 'CardDescription';
 
+/** A control at the header's end, beside the title and description. */
 const CardAction = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
 	({ className, ...props }, ref) => (
 		<div
@@ -52,6 +63,7 @@ const CardAction = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDiv
 );
 CardAction.displayName = 'CardAction';
 
+/** The card's body. */
 const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
 	({ className, ...props }, ref) => (
 		<div ref={ref} data-slot="card-content" className={cn('px-6', className)} {...props} />
@@ -59,6 +71,7 @@ const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDi
 );
 CardContent.displayName = 'CardContent';
 
+/** The card's footer row. */
 const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
 	({ className, ...props }, ref) => (
 		<div

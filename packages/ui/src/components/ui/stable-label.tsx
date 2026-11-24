@@ -1,6 +1,13 @@
+/**
+ * Panel extension: a label that changes without changing size.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import { cn } from '../../lib/utils';
 
+/** The label's texts and which one shows. */
 export interface StableLabelProps {
 	/** Every text the label can show; it's as wide as the widest, so switching never resizes it. */
 	options: readonly React.ReactNode[];

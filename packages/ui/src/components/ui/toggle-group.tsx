@@ -1,7 +1,15 @@
+/**
+ * shadcn/ui's ToggleGroup (new-york v4), ported to Preact without Radix: single-select only, with
+ * an `xl` size for wall panels.
+ *
+ * @module
+ */
+
 import { cva, type VariantProps } from 'class-variance-authority';
 import React from 'preact/compat';
 import { cn } from '../../lib/utils';
 
+/** shadcn's Toggle classes by `variant` and `size`, which the group's items use. */
 const toggleVariants = cva(
 	"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium text-sm outline-none transition-[color,box-shadow] hover:bg-muted hover:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
 	{
@@ -39,12 +47,15 @@ const ToggleGroupContext = React.createContext<ToggleGroupContextValue>({
 	size: 'default',
 });
 
+/** A div's attributes, the items' `variant` and `size`, and the picked value (controlled). */
 export interface ToggleGroupProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'onChange'>, ToggleVariantProps {
 	/** Single-select value. */
 	value: string;
+	/** An item was tapped: its value. */
 	onValueChange: (value: string) => void;
 }
 
+/** A row of joined toggles, one of them on. */
 const ToggleGroup: React.FC<ToggleGroupProps> = ({
 	className,
 	variant,
@@ -68,10 +79,13 @@ const ToggleGroup: React.FC<ToggleGroupProps> = ({
 	</div>
 );
 
+/** A button's attributes and the item's value (the group's `variant` and `size` win over its own). */
 export interface ToggleGroupItemProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, ToggleVariantProps {
+	/** What picking it sets the group to. */
 	value: string;
 }
 
+/** One of the group's toggles (`aria-pressed`, `data-state="on"` while picked). */
 const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupItemProps>(
 	({ className, children, variant, size, value, ...props }, ref) => {
 		const context = React.useContext(ToggleGroupContext);

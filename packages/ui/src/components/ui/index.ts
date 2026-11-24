@@ -1,3 +1,10 @@
+/**
+ * The panel's primitives: shadcn/ui (new-york v4) ported to Preact, and the panel's own
+ * extensions, under one import.
+ *
+ * @module
+ */
+
 export * from './alert';
 export * from './avatar';
 export * from './badge';

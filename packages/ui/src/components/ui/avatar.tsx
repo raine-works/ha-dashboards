@@ -1,3 +1,10 @@
+/**
+ * shadcn/ui's Avatar (new-york v4), ported to Preact without Radix: the fallback shows while the
+ * image is missing or fails to load.
+ *
+ * @module
+ */
+
 import React, { useEffect, useState } from 'preact/compat';
 import { cn } from '../../lib/utils';
 
@@ -11,6 +18,7 @@ const AvatarContext = React.createContext<AvatarContextValue>({
 	setImageFailed: () => {},
 });
 
+/** A round avatar holding an `AvatarImage` and an `AvatarFallback`. */
 const Avatar = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTMLSpanElement>>(
 	({ className, children, ...props }, ref) => {
 		const [imageFailed, setImageFailed] = useState(false);
@@ -29,6 +37,7 @@ const Avatar = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTMLSpanEl
 );
 Avatar.displayName = 'Avatar';
 
+/** The avatar's picture; renders nothing without a `src` or once it fails to load. */
 const AvatarImage = React.forwardRef<HTMLImageElement, React.ImgHTMLAttributes<HTMLImageElement>>(
 	({ className, src, alt = '', ...props }, ref) => {
 		const { imageFailed, setImageFailed } = React.useContext(AvatarContext);
@@ -54,6 +63,7 @@ const AvatarImage = React.forwardRef<HTMLImageElement, React.ImgHTMLAttributes<H
 );
 AvatarImage.displayName = 'AvatarImage';
 
+/** What shows (initials, an icon) while the avatar has no picture. */
 const AvatarFallback = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTMLSpanElement>>(
 	({ className, ...props }, ref) => {
 		const { imageFailed } = React.useContext(AvatarContext);

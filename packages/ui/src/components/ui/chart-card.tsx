@@ -1,11 +1,21 @@
+/**
+ * Panel extension: the card a chart sits in, its legend's swatches and its loading state. Light on
+ * its own (no Recharts), so a dialog can lay its charts out before they load.
+ *
+ * @module
+ */
+
 import { Loader2 } from 'lucide-react';
 import type React from 'preact/compat';
 import { cn } from '../../lib/utils';
 
 /** A legend entry: a series' name and color. */
 export interface ChartLegendItem {
+	/** The series' key (unique in the legend). */
 	key: string;
+	/** What the legend calls it. */
 	name: string;
+	/** Its CSS color. */
 	color: string;
 }
 

@@ -1,3 +1,9 @@
+/**
+ * Panel extension: a row of chips that scrolls sideways.
+ *
+ * @module
+ */
+
 import React, { useEffect, useState } from 'preact/compat';
 import { cn } from '../../lib/utils';
 

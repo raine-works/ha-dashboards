@@ -1,7 +1,14 @@
+/**
+ * shadcn/ui's Badge (new-york v4), ported to Preact, with the panel's status variants.
+ *
+ * @module
+ */
+
 import { cva, type VariantProps } from 'class-variance-authority';
 import type React from 'preact/compat';
 import { cn } from '../../lib/utils';
 
+/** The badge's classes by variant: shadcn's, plus `warning`, `success` and `info` from the status tokens. */
 const badgeVariants = cva(
 	'inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden whitespace-nowrap rounded-md border px-2 py-0.5 font-medium text-xs transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 [&>svg]:pointer-events-none [&>svg]:size-3',
 	{
@@ -25,8 +32,10 @@ const badgeVariants = cva(
 	},
 );
 
+/** A span's attributes and the badge's `variant`. */
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement>, VariantProps<typeof badgeVariants> {}
 
+/** A small inline label: a status, a count, a tag. */
 function Badge({ className, variant, ...props }: BadgeProps) {
 	return <span data-slot="badge" className={cn(badgeVariants({ variant }), className)} {...props} />;
 }

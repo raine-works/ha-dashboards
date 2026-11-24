@@ -1,6 +1,13 @@
+/**
+ * shadcn/ui's Input (new-york v4), ported to Preact.
+ *
+ * @module
+ */
+
 import React from 'preact/compat';
 import { cn } from '../../lib/utils';
 
+/** A text field (any `<input>` type), with `aria-invalid` showing an error. */
 const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
 	({ className, type, ...props }, ref) => (
 		<input

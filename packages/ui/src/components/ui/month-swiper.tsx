@@ -1,7 +1,11 @@
-// Panel extension (not shadcn): a month of days to pick from that swipes to the months beside it.
-// A native scroll-snap carousel of the previous, shown and next month (the platform's own momentum);
-// once it settles on a neighbour, that month becomes the shown one and the carousel recenters on it
-// unseen, so it swipes on forever. The arrows glide to a neighbour the same way.
+/**
+ * Panel extension (not shadcn): a month of days to pick from that swipes to the months beside it.
+ * A native scroll-snap carousel of the previous, shown and next month (the platform's own momentum);
+ * once it settles on a neighbour, that month becomes the shown one and the carousel recenters on it
+ * unseen, so it swipes on forever. The arrows glide to a neighbour the same way.
+ *
+ * @module
+ */
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'preact/compat';
@@ -15,12 +19,15 @@ const WEEKDAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 /** Without scrollend, the carousel counts as settled this long after its last scroll. */
 const SETTLE_MS = 120;
 
+/** The month swiper's props (controlled: the month shown and the day picked). */
 export interface MonthSwiperProps {
 	/** The first of the month shown. */
 	month: Date;
+	/** Swiped or paged to another month: its first day. */
 	onMonthChange: (month: Date) => void;
 	/** The picked day, `YYYY-MM-DD`. */
 	selected?: string;
+	/** A day was tapped, `YYYY-MM-DD`. */
 	onSelect: (day: string) => void;
 	className?: string;
 }
@@ -63,6 +70,7 @@ const centerSlide = (el: HTMLElement) => {
 	el.scrollLeft = el.clientWidth;
 };
 
+/** The month's days under its name and arrows, swiping sideways to the months beside it. */
 export const MonthSwiper: React.FC<MonthSwiperProps> = ({ month, onMonthChange, selected, onSelect, className }) => {
 	const [scroller, setScroller] = useState<HTMLDivElement | null>(null);
 	const shown = month.getFullYear() * 12 + month.getMonth();
