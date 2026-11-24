@@ -257,7 +257,7 @@ const LightingSectionContent: React.FC<LightingSectionProps> = ({
 				>
 					<SectionHeader icon={<Lightbulb />} title={title}>
 						{wallPanel ? (
-							<BedtimeButton entityId={homeBedtime} name="Home" labeled compact />
+							<BedtimeButton entityId={homeBedtime} name="Home" labeled />
 						) : (
 							memberRoom && <BedtimeButton entityId={memberRoom.entityId} name={memberRoom.name} labeled houseOption />
 						)}

@@ -23,8 +23,6 @@ export interface BedtimeButtonProps {
 	name: string;
 	/** A labeled button (the section header's) or a moon alone (a room's header). */
 	labeled?: boolean;
-	/** The label gives way to the moon below lg (a wall panel's narrow Lighting column). */
-	compact?: boolean;
 	/** The signed-in member's own toggle: its dialog also offers Home Bedtime for the whole house. */
 	houseOption?: boolean;
 	className?: string;
@@ -39,7 +37,6 @@ export const BedtimeButton: React.FC<BedtimeButtonProps> = ({
 	entityId,
 	name,
 	labeled = false,
-	compact = false,
 	houseOption = false,
 	className,
 }) => {
@@ -71,7 +68,7 @@ export const BedtimeButton: React.FC<BedtimeButtonProps> = ({
 				className={cn('shrink-0', className)}
 			>
 				<Moon className={labeled ? undefined : 'size-5'} />
-				{labeled && <span className={cn(compact && 'max-lg:hidden')}>Bedtime</span>}
+				{labeled && <span>Bedtime</span>}
 			</Button>
 			{confirming && (
 				<BedtimeDialog

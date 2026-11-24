@@ -277,6 +277,16 @@
 		outline-offset: 2px;
 	}
 
+	/* No scrollbars anywhere in the dashboards: every list and column still scrolls (by touch, wheel,
+	   trackpad or keyboard), but a bar never takes room or draws over the content. The page's own,
+	   while a dashboard is on it, is hidden by definePanelElement (hidePageScrollbar() in panel/chrome.ts) */
+	* {
+		scrollbar-width: none;
+	}
+	*::-webkit-scrollbar {
+		display: none;
+	}
+
 	:host {
 		display: block;
 		width: 100%;

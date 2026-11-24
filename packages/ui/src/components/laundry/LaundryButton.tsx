@@ -43,11 +43,18 @@ export const LaundryButton: React.FC<{ size?: ButtonProps['size']; className?: s
 					className={cn('relative', className)}
 				>
 					<Icon className={style.text} />
-					{summary.label && (
-						// The label goes below xl (a dot says the same), so it takes little of the header's room
-						<span className="tabular-nums max-xl:hidden">{summary.label}</span>
+					{size === 'tile' ? (
+						// A tile: what it's doing under the icon ("32m", "Done") at every width
+						<span className="tabular-nums">{summary.label || summary.name}</span>
+					) : (
+						<>
+							{summary.label && (
+								// The label goes below xl (a dot says the same), so it takes little of the header's room
+								<span className="tabular-nums max-xl:hidden">{summary.label}</span>
+							)}
+							<span className={cn('absolute top-1.5 right-1.5 size-2 rounded-full xl:hidden', style.dot)} />
+						</>
 					)}
-					<span className={cn('absolute top-1.5 right-1.5 size-2 rounded-full xl:hidden', style.dot)} />
 				</Button>
 			)}
 			<Dialog open={open} onOpenChange={setOpen}>

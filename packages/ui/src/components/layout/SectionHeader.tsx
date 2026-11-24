@@ -24,7 +24,8 @@ export function SectionHeader({
 	className?: string;
 }) {
 	return (
-		<div className={cn('flex min-h-11 items-center justify-between gap-3 px-1', className)}>
+		// Its buttons wrap under the title in a narrow column (the 10.5" panels), never squeezing it
+		<div className={cn('flex min-h-11 flex-wrap items-center justify-between gap-x-3 gap-y-2 px-1', className)}>
 			<div className="flex min-w-0 items-center gap-2.5 text-muted-foreground [&_svg]:size-5 [&_svg]:shrink-0">
 				{icon}
 				<h2 className="truncate font-semibold text-foreground text-xl tracking-tight">{title}</h2>

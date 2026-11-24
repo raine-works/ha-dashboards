@@ -117,25 +117,28 @@ export const PushSettingsDialog: React.FC<{
  * A header button (a bell) opening the member's phone alerts; nothing for anyone who isn't a
  * household member, or a house without the integration.
  */
-export const PushSettingsButton: React.FC<{ size?: ButtonProps['size']; className?: string }> = ({
-	size = 'icon-sm',
-	className,
-}) => {
+export const PushSettingsButton: React.FC<{
+	size?: ButtonProps['size'];
+	/** "Alerts" beside the bell (the phone header's chips). */
+	label?: boolean;
+	className?: string;
+}> = ({ size = 'icon-sm', label, className }) => {
 	const { preferences, set } = usePushPreferences();
 	const [open, setOpen] = useState(false);
 	if (!preferences) return null;
-	const label = `Phone alerts: ${enabledCount(preferences)} of ${preferences.categories.length} on`;
+	const title = `Phone alerts: ${enabledCount(preferences)} of ${preferences.categories.length} on`;
 	return (
 		<>
 			<Button
 				variant="outline"
 				size={size}
-				aria-label={label}
-				title={label}
+				aria-label={title}
+				title={title}
 				className={className}
 				onClick={() => setOpen(true)}
 			>
 				<BellRing />
+				{label && <span>Alerts</span>}
 			</Button>
 			<PushSettingsDialog isOpen={open} onClose={() => setOpen(false)} preferences={preferences} onChange={set} />
 		</>

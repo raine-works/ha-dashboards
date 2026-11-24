@@ -132,11 +132,39 @@ export const MusicButton: React.FC<{ size?: ButtonProps['size']; onOpen?: () => 
 	// As the player shows it (a pause just tapped shows at once)
 	const playing = useShownState(active?.entityId, active?.state ?? 'idle') === 'playing';
 	const xl = size === 'xl';
+	const tile = size === 'tile';
 	const show = () => (onOpen ? onOpen() : setOpen(true));
 
 	return (
 		<>
-			{active ? (
+			{active && tile ? (
+				// A tile: the cover over "Music" below xl; from xl the cover beside the title and artist
+				<Button
+					variant="outline"
+					size="tile"
+					onClick={show}
+					aria-label={`Music: ${active.title} on ${active.name}${actives.length > 1 ? `, ${actives.length} playing` : ''}`}
+					title={`${active.title}${active.artist ? ` · ${active.artist}` : ''} on ${speakerNames(active, players)}`}
+					className={cn('min-w-0 xl:flex-row xl:gap-3 xl:pr-4 xl:pl-2', className)}
+				>
+					<span className="relative size-6 shrink-0 xl:size-10">
+						<CoverWithBars player={active} playing={playing} className="size-full" />
+						{actives.length > 1 && (
+							<span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 font-semibold text-[10px] text-primary-foreground tabular-nums ring-2 ring-background">
+								{actives.length}
+							</span>
+						)}
+					</span>
+					<span className="xl:hidden">Music</span>
+					{/* A fixed width, so a new track never resizes the header */}
+					<span className="flex w-36 min-w-0 shrink flex-col gap-0.5 text-left max-xl:hidden">
+						<span className="truncate font-semibold text-sm leading-tight">{active.title}</span>
+						<span className="truncate font-normal text-muted-foreground text-xs leading-tight">
+							{byline(active, players)}
+						</span>
+					</span>
+				</Button>
+			) : active ? (
 				<Button
 					variant="outline"
 					size={size}
@@ -170,13 +198,14 @@ export const MusicButton: React.FC<{ size?: ButtonProps['size']; onOpen?: () => 
 			) : (
 				<Button
 					variant="outline"
-					size={xl ? 'icon-xl' : 'icon-lg'}
+					size={tile ? 'tile' : xl ? 'icon-xl' : 'icon-lg'}
 					onClick={show}
 					aria-label="Music"
 					title="Music"
 					className={className}
 				>
 					<Music />
+					{tile && <span>Music</span>}
 				</Button>
 			)}
 			{!onOpen && <MusicDialog isOpen={open} onClose={() => setOpen(false)} initialPlayer={active?.entityId} />}

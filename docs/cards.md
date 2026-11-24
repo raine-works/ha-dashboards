@@ -9,8 +9,8 @@ For desktops, laptops and phones (the Companion app included).
 ![The Home dashboard in light mode](images/home-light.png)
 
 - **Wide screens** (1024px and up): the header (clock, weather, calendar, what's open, music,
-  people and pets, and a More menu) over Lighting, Security and Climate side by side, each column
-  scrolling on its own.
+  people and pets, and a More menu; every button its icon over a label) over Lighting, Security and
+  Climate side by side, each column scrolling on its own.
 - **Lighting is rooms first**: a tile per room, by floor (what's on, its scene, a power button for
   its lights). A tap on a room opens its lights, scenes, colors and bedtime; a light that's off
   shows only its name until it's on.
@@ -21,6 +21,8 @@ For desktops, laptops and phones (the Companion app included).
   a tab bar: Lights, Security, Assist (the voice button, in the middle), Climate, Music. Cameras
   open from Security.
 - Home Assistant's toolbar is hidden (the card's header has a button for the sidebar).
+- No scrollbars: lists and columns scroll by touch, wheel or keyboard without a bar, and the page's
+  own is hidden while a dashboard is on it.
 - Links: `?view=security` (or `lights`, `climate`, `music`, `cameras`) opens a tab, `?camera=<entity>`
   opens a camera, `?brief=1` the daily brief, `?todo=<list>&item=<uid>` a to-do item.
 

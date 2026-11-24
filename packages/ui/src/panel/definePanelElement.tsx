@@ -29,7 +29,7 @@ import { activeTheme, loadThemeCatalog, subscribeThemeCatalog } from '../themes/
 import { themeCss, themeEffects } from '../themes/css';
 import type { DashboardTheme } from '../themes/tokens';
 import type { HomeAssistant } from '../types/homeassistant';
-import { hideToolbar, keepSidebarHidden } from './chrome';
+import { hidePageScrollbar, hideToolbar, keepSidebarHidden } from './chrome';
 import { ensurePanelFonts } from './fonts';
 
 type PreactRoot = ReturnType<typeof createRoot>;
@@ -114,6 +114,8 @@ export function definePanelElement({
 		private _renderedScheme: string | null = null;
 		private _stopFitting: (() => void) | null = null;
 		private _showToolbar: (() => void) | null = null;
+		// Shows the page's scrollbar again (hidePageScrollbar())
+		private _showPageScrollbar: (() => void) | null = null;
 		/** The connection the household was last asked over (asked again after a reconnect). */
 		private _householdFor: unknown = null;
 		public config: Record<string, unknown> = {};
@@ -160,6 +162,8 @@ export function definePanelElement({
 			this._render();
 			// Before measuring the space above the element, which the toolbar took
 			if (hideChrome && !this._showToolbar) this._showToolbar = hideToolbar(this);
+			// No scrollbar on the page while the dashboard is on it
+			this._showPageScrollbar ??= hidePageScrollbar();
 			// A custom theme saved, or the house theme changed: draw with it
 			this._stopCatalog ??= subscribeThemeCatalog(() => {
 				this._themeId = '';
@@ -182,6 +186,8 @@ export function definePanelElement({
 			this._stopFitting = null;
 			this._showToolbar?.();
 			this._showToolbar = null;
+			this._showPageScrollbar?.();
+			this._showPageScrollbar = null;
 		}
 
 		/**

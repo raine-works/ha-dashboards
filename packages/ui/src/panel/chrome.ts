@@ -53,6 +53,34 @@ export function hideToolbar(card: Element): () => void {
 	};
 }
 
+const PAGE_SCROLLBAR_STYLE_ID = 'raineworks-dashboards-no-scrollbar';
+const PAGE_SCROLLBAR_CSS =
+	'html,body{scrollbar-width:none}html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}';
+let pageScrollbarUsers = 0;
+
+/**
+ * Hide the page's own scrollbar while a dashboard is on it (the Home dashboard's phone layout scrolls
+ * the page); returns a function that shows it again once the last dashboard on the page leaves, so
+ * Home Assistant's other pages keep theirs.
+ */
+export function hidePageScrollbar(): () => void {
+	if (typeof document === 'undefined') return () => {};
+	if (!document.getElementById(PAGE_SCROLLBAR_STYLE_ID)) {
+		const style = document.createElement('style');
+		style.id = PAGE_SCROLLBAR_STYLE_ID;
+		style.textContent = PAGE_SCROLLBAR_CSS;
+		document.head.appendChild(style);
+	}
+	pageScrollbarUsers++;
+	let released = false;
+	return () => {
+		if (released) return;
+		released = true;
+		pageScrollbarUsers--;
+		if (pageScrollbarUsers <= 0) document.getElementById(PAGE_SCROLLBAR_STYLE_ID)?.remove();
+	};
+}
+
 /** The sidebar setting each card last asked to change, so it asks once per change, not per update. */
 const askedFrom = new WeakMap<Element, string>();
 

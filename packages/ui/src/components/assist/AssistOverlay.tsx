@@ -73,6 +73,7 @@ export const AssistButton: React.FC<{ size?: ButtonProps['size']; round?: boolea
 			className={className}
 		>
 			<Sparkles className={cn('size-5', !active && 'assist-twinkle')} />
+			{size === 'tile' && <span>Assist</span>}
 		</Button>
 	);
 };

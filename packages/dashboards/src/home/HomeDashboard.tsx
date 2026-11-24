@@ -171,7 +171,7 @@ const PhoneHeader: React.FC<{ onIntercom: () => void; sticky: boolean; onHeight:
 				<ChipRow className="justify-end-safe -m-2 min-w-0 flex-1 p-2">
 					<OpenSensorsButton size="sm" iconOnly />
 					<ModuleGate id="notifications">
-						<NotificationsButton size="icon-sm" />
+						<NotificationsButton size="sm" label />
 					</ModuleGate>
 					<ModuleGate id="laundry">
 						<LaundryButton size="sm" />
@@ -181,9 +181,9 @@ const PhoneHeader: React.FC<{ onIntercom: () => void; sticky: boolean; onHeight:
 						<EnergyButton size="sm" />
 					</ModuleGate>
 					{/* The signed-in member's phone alerts (nothing for anyone else) */}
-					<PushSettingsButton size="icon-sm" />
+					<PushSettingsButton size="sm" label />
 					{/* This device's Light / Dark / Auto */}
-					<ColorSchemeButton size="icon-sm" />
+					<ColorSchemeButton size="sm" label />
 				</ChipRow>
 			</div>
 			{/* What opens a dialog, a labeled tile each, in alphabetical order, sharing the width (a missing
