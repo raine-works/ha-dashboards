@@ -34,8 +34,10 @@ open dashboards (`--force` uploads even when Home Assistant already serves that 
 
 ## The integration
 
+Python is pinned in `.python-version` (the release CI runs too); `uv venv` picks it up.
+
 ```bash
-uv venv --python 3.14 .venv && uv pip install -r requirements-test.txt
+uv venv .venv && uv pip install -r requirements-test.txt
 .venv/bin/python -m pytest -q
 .venv/bin/ruff check custom_components tests && .venv/bin/ruff format custom_components tests
 ```
