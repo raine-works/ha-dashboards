@@ -33,7 +33,7 @@ const buttonVariants = cva(
 				link: 'text-primary underline-offset-4 hover:underline',
 			},
 			size: {
-				// Text sizes lift icons 1px: next to Poppins text, icons sit ~1px below the cap
+				// Text sizes lift icons 1px: next to Geist text, icons sit ~1px below the cap
 				// height (measured). Icon-only sizes stay geometrically centered.
 				// `touch:` (wall panels): a size up for fingers, nothing under 44px
 				default:

@@ -17,6 +17,7 @@ import {
 	PRIVATE_SCENE_LABEL,
 	ringColors,
 	sceneLights,
+	showsLightControls,
 } from '../lights';
 
 const light = (attributes: HassEntity['attributes'], state = 'on'): HassEntity => ({
@@ -58,6 +59,17 @@ const states: Record<string, HassEntity> = {
 	'light.master_suite_left_lamp': light({ friendly_name: 'Master Suite Left Lamp' }),
 	'light.desk_lamp': light({ friendly_name: 'Desk Lamp' }),
 };
+
+describe('showsLightControls', () => {
+	it('shows the dimmer and colors only while a light is on', () => {
+		expect(showsLightControls(true, false)).toBe(true);
+		expect(showsLightControls(false, false)).toBe(false);
+	});
+
+	it('keeps them while the dimmer is held, even once the light reports off', () => {
+		expect(showsLightControls(false, true)).toBe(true);
+	});
+});
 
 describe('lightCapabilities', () => {
 	it('treats on/off-only lights as neither dimmable nor adjustable', () => {

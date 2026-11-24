@@ -57,11 +57,17 @@ describe('the dashboards bundle', () => {
 		expect(await Bun.file(bundlePath).text()).toContain('import("./chunk-');
 	});
 
+	it("embeds Geist, raineworks.com's typeface, and no longer Poppins", async () => {
+		const text = await Bun.file(bundlePath).text();
+		expect(text).toContain("font-family:'Geist'");
+		expect(text).not.toContain('Poppins');
+	});
+
 	it('stays within its budget', async () => {
 		// Budget: every card (the music player, TVs with their app icons, the brief player, to-do date
 		// picker, error boundaries, Assist with its Markdown answers, camera zoom, the clip player,
 		// the Party QR code (uqr), Queue tab, energy dialog, litter box controls, the Daily dialog's Study tab, the intercom's quick messages and podcast episodes; ~90KB of it React Compiler memoization) + CSS (~90KB)
-		// + Sonner + embedded Poppins (~56KB) + Leaflet's CSS, once for all four dashboards (Leaflet's JS, ~160KB,
+		// + Sonner + embedded Geist (~28KB) + Leaflet's CSS, once for all four dashboards (Leaflet's JS, ~160KB,
 		// loads with the People dialog's map since it moved behind import(): 1.30MB → 1.14MB up front)
 		// What a page loads up front: the bundle and its static chunks (the energy charts' Recharts,
 		// ~420KB, loads on demand and isn't counted; the code it shares with the bundle, Preact and

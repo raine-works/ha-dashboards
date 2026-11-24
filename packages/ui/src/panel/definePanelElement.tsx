@@ -84,7 +84,7 @@ const panelStyles = (key: string) => globalThis.__panelStyles?.[key] ?? '';
 
 /**
  * Register a Lovelace custom element that renders `component` into a ShadowRoot with the
- * panel's compiled Tailwind CSS, the bundled Poppins font, a dark-mode mount point, the
+ * panel's compiled Tailwind CSS, the bundled Geist font, a dark-mode mount point, the
  * dialog portal container, and live Home Assistant state. The tag and each alias are defined
  * only when not already (a second bundle on the page keeps the first's). Returns the element's
  * class.

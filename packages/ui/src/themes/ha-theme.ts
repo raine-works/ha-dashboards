@@ -24,7 +24,7 @@ export interface HaTheme {
 	modes: { light: HaThemeVars; dark: HaThemeVars };
 }
 
-const FONT = "Poppins, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+const FONT = "Geist, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
 /** The palette steps Home Assistant 2026's newer components read (--ha-color-primary-05…95). */
 const PALETTE_STEPS = [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95];
 

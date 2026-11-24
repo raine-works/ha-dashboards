@@ -20,6 +20,7 @@ import { CoversCard } from '../covers/CoverCard';
 import { DiffusersCard } from '../diffuser/DiffuserCard';
 import { FansCard } from '../fans/FanCard';
 import { withErrorBoundary } from '../layout/ErrorBoundary';
+import { SectionHeader } from '../layout/SectionHeader';
 import { SECTION_SCROLLER } from '../layout/scroll';
 import {
 	Badge,
@@ -185,13 +186,7 @@ const ClimateSectionContent: React.FC = () => {
 	return (
 		<section className="flex h-full min-h-0 flex-col gap-4 max-lg:gap-3">
 			{/* Section Header */}
-			<div className="flex items-center gap-3 px-2">
-				<Thermometer className="size-6 shrink-0 text-sky-600 dark:text-sky-400" />
-				<div>
-					<h2 className="font-semibold text-lg leading-tight">Climate</h2>
-					<p className="text-muted-foreground text-sm max-lg:hidden">Thermostats, scent, curtains and fans</p>
-				</div>
-			</div>
+			<SectionHeader icon={<Thermometer />} title="Climate" />
 
 			{/* Scrolls under the section title when the cards don't fit (a short window, more curtains),
 			    to the screen's bottom edge like the other columns */}
@@ -204,13 +199,9 @@ const ClimateSectionContent: React.FC = () => {
 								<ThermometerSun className="size-5 shrink-0 text-info" />
 								<div className="min-w-0">
 									<CardTitle className="truncate text-lg">Thermostats</CardTitle>
-									<CardDescription className={cn('truncate', !overridden && 'touch:max-lg:hidden')}>
-										{overridden
-											? 'Set by hand; pick a preset to apply it'
-											: presets
-												? 'Presets apply to every zone'
-												: 'Setpoint and mode'}
-									</CardDescription>
+									{overridden && (
+										<CardDescription className="truncate">Set by hand; pick a preset to apply it</CardDescription>
+									)}
 								</div>
 							</div>
 							{overridden && (

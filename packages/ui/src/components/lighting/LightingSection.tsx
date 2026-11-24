@@ -48,6 +48,7 @@ export {
 } from './useLightControls';
 
 import { withErrorBoundary } from '../layout/ErrorBoundary';
+import { SectionHeader } from '../layout/SectionHeader';
 import { SECTION_SCROLLER } from '../layout/scroll';
 
 /** A configured room: a Lighting tab with its fixtures. */
@@ -70,7 +71,6 @@ export interface LightScene {
 /** The Lighting section's header, and which lights and scenes it shows. */
 export interface LightingSectionProps {
 	title: string;
-	subtitle: string;
 	/** Configured rooms, a tab each. */
 	rooms?: LightRoom[];
 	/**
@@ -101,7 +101,6 @@ export interface LightingSectionProps {
 /** Lights (every floor's, this one first, or configured rooms) plus stateful scenes. Optimistic toggles reconcile when Home Assistant reports the change. */
 const LightingSectionContent: React.FC<LightingSectionProps> = ({
 	title,
-	subtitle,
 	rooms = [],
 	floor,
 	allFloors = false,
@@ -263,25 +262,14 @@ const LightingSectionContent: React.FC<LightingSectionProps> = ({
 							'sticky top-[calc(var(--panel-top)+var(--page-header,0px))] z-20 -mx-4 -my-2 bg-background px-4 py-2',
 					)}
 				>
-					<div className="flex items-center justify-between gap-3 px-2">
-						<div className="flex min-w-0 items-center gap-3">
-							<Lightbulb className="size-6 shrink-0 text-warning" />
-							<div className="min-w-0">
-								<h2 className="truncate font-semibold text-lg leading-tight">{title}</h2>
-								<p className="truncate text-muted-foreground text-sm max-lg:hidden">{subtitle}</p>
-							</div>
-						</div>
-						<div className="flex shrink-0 items-center gap-2">
-							{wallPanel ? (
-								<BedtimeButton entityId={homeBedtime} name="Home" labeled compact />
-							) : (
-								memberRoom && (
-									<BedtimeButton entityId={memberRoom.entityId} name={memberRoom.name} labeled houseOption />
-								)
-							)}
-							<AllOffButton controls={controls} />
-						</div>
-					</div>
+					<SectionHeader icon={<Lightbulb />} title={title}>
+						{wallPanel ? (
+							<BedtimeButton entityId={homeBedtime} name="Home" labeled compact />
+						) : (
+							memberRoom && <BedtimeButton entityId={memberRoom.entityId} name={memberRoom.name} labeled houseOption />
+						)}
+						<AllOffButton controls={controls} />
+					</SectionHeader>
 					{tabs.length > 1 && tabList}
 				</div>
 
