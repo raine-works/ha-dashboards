@@ -1,3 +1,9 @@
+/**
+ * The Daily dialog's Study tab: this week's Come, Follow Me lesson and today's scripture, from
+ * `script.daily_scripture`.
+ *
+ * @module
+ */
 import type { HomeAssistant } from '../types/homeassistant';
 import { callForResponse } from './service-calls';
 import { trimmedString as str } from './values';
@@ -15,7 +21,9 @@ export const DAILY_SCRIPTURE_SCRIPT = 'daily_scripture';
  */
 export const SCRIPTURE_AUDIO_FILE = 'daily-scripture-';
 
+/** This week's Come, Follow Me lesson. */
 export interface StudyLesson {
+	/** The lesson's title. */
 	title: string;
 	/** "October 26–November 1" */
 	dates: string;
@@ -29,21 +37,29 @@ export interface StudyLesson {
 	url?: string;
 }
 
+/** A paragraph of a lesson, or one of its section headings. */
 export interface LessonBlock {
+	/** A section heading ("Scripture Helps"), not a paragraph. */
 	heading: boolean;
+	/** Its text. */
 	text: string;
 }
 
+/** Today's scripture. */
 export interface DailyScripture {
 	/** "Lamentations 3:22–26" */
 	reference: string;
+	/** The verses. */
 	text: string;
 	/** The chapter's summary (its heading in the scriptures). */
 	summary?: string;
 }
 
+/** What `script.daily_scripture` gives; either part can be missing. */
 export interface DailyStudy {
+	/** This week's lesson. */
 	lesson?: StudyLesson;
+	/** Today's scripture. */
 	scripture?: DailyScripture;
 }
 

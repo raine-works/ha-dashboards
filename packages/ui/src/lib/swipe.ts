@@ -1,5 +1,9 @@
-// A row swiped sideways to act on it (SwipeRow): the gesture as a reducer, so the component keeps it
-// in state with no refs (the React Compiler skips a component that writes one).
+/**
+ * A row swiped sideways to act on it (SwipeRow): the gesture as a reducer, so the component keeps it
+ * in state with no refs (the React Compiler skips a component that writes one).
+ *
+ * @module
+ */
 
 /** Which way: `start` = toward the right (the action revealed on the left), `end` = toward the left. */
 export type SwipeSide = 'start' | 'end';
@@ -18,16 +22,27 @@ const FLICK_MIN_PX = 48;
 // A side with no action pulls back against the finger
 const RESIST = 0.2;
 
+/** Where a swipe gesture is. */
 export interface SwipeState {
-	/** `settling`: let go short of acting, springing back to rest (reset when it's there). */
+	/**
+	 * `pending`: down, not yet moved past the slop; `dragging`: moving sideways; `committed`: let go
+	 * past the commit point (the row acts); `settling`: let go short of acting, springing back to rest
+	 * (reset when it's there).
+	 */
 	phase: 'idle' | 'pending' | 'dragging' | 'committed' | 'settling';
+	/** Where the drag started (px; moved to the slop's end once dragging). */
 	startX: number;
+	/** Where the touch started vertically (px). */
 	startY: number;
+	/** The row's offset now (px, after `swipeOffset`). */
 	dx: number;
+	/** The row's width (px). */
 	width: number;
 	/** px/ms, positive to the right. */
 	velocity: number;
+	/** The last move's x (px). */
 	lastX: number;
+	/** The last move's time (ms). */
 	lastT: number;
 	/** The side it's past the commit point of (or committed to). */
 	armed: SwipeSide | null;
@@ -37,6 +52,7 @@ export interface SwipeState {
 	swallowClick: boolean;
 }
 
+/** A row at rest, with no gesture. */
 export const SWIPE_IDLE: SwipeState = {
 	phase: 'idle',
 	startX: 0,
@@ -51,6 +67,7 @@ export const SWIPE_IDLE: SwipeState = {
 	swallowClick: false,
 };
 
+/** The pointer events (and timers) the reducer takes; `t` is a timestamp in ms. */
 export type SwipeAction =
 	| { type: 'down'; x: number; y: number; t: number; width: number }
 	| { type: 'move'; x: number; y: number; t: number }
@@ -61,7 +78,9 @@ export type SwipeAction =
 
 /** Which sides have an action. */
 export interface SwipeSides {
+	/** Swiping right acts. */
 	start: boolean;
+	/** Swiping left acts. */
 	end: boolean;
 }
 
@@ -87,6 +106,10 @@ const settle = (dx: number, swallowClick: boolean): SwipeState =>
 		? { ...SWIPE_IDLE, swallowClick }
 		: { ...SWIPE_IDLE, phase: 'settling', settleFrom: sideOf(dx), swallowClick };
 
+/**
+ * The gesture's next state after an action: a vertical move gives the touch back to the page, a
+ * swipe past `SWIPE_COMMIT_SHARE` of the width (or a flick) commits, anything short settles back.
+ */
 export function swipeReducer(state: SwipeState, action: SwipeAction, sides: SwipeSides): SwipeState {
 	switch (action.type) {
 		case 'down':

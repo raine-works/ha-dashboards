@@ -1,3 +1,9 @@
+/**
+ * To-do lists: discovery, the header badge's count, due dates as labels and as service data, and
+ * assignment to household members (an "Assigned to" line in an item's description).
+ *
+ * @module
+ */
 import type { HassEntity } from '../types/homeassistant';
 import { nameList } from './text';
 import { dayKey, daysBetween, formatTime, pad2 } from './time';
@@ -13,23 +19,33 @@ export const TODO_FEATURE = {
 	SET_DESCRIPTION: 64,
 } as const;
 
+/** A `todo.*` list. */
 export interface TodoList {
+	/** Its entity id. */
 	entityId: string;
+	/** Its friendly name. */
 	name: string;
 	/** Items still to do (the entity's state). */
 	open: number;
+	/** Its `TODO_FEATURE` bits (test with `todoSupports`). */
 	features: number;
 }
 
+/** A to-do item, as `todo/item/list` gives it. */
 export interface TodoItem {
+	/** Its id in the list. */
 	uid: string;
+	/** Its text. */
 	summary: string;
+	/** Done or not. */
 	status: 'needs_action' | 'completed';
 	/** `2026-10-20` or an ISO date-time. */
 	due?: string | null;
+	/** Its description (an "Assigned to" line, then its note). */
 	description?: string | null;
 }
 
+/** Whether a list supports a `TODO_FEATURE` (never for no list). */
 export const todoSupports = (list: TodoList | undefined, feature: number) => !!list && (list.features & feature) !== 0;
 
 /** Every `todo.*` list (Chores, Shopping list, …), by name, with its open count. */
@@ -74,6 +90,7 @@ function parseDue(due: string): { date: Date; hasTime: boolean } {
 	return { date: new Date(due), hasTime: true };
 }
 
+/** How urgent a due date is. */
 export type DueTone = 'overdue' | 'today' | 'upcoming';
 
 /** A due date as a label and urgency: "Overdue · Oct 17", "Today", "Today 5:00 PM", "Tomorrow", "Sat", "Oct 31". */
@@ -102,7 +119,9 @@ export const toDueDate = dayKey;
 
 /** A picked due: a local day, with a time of day (`17:30`) for lists that take one. */
 export interface Due {
+	/** The day, `YYYY-MM-DD`. */
 	date: string;
+	/** The time of day, `HH:MM` (24-hour). */
 	time?: string;
 }
 

@@ -1,3 +1,9 @@
+/**
+ * Security: the door locks and garage bays, what their buttons show, the alarm keypad's chimes, and
+ * the arming check over everything labeled Alarm System.
+ *
+ * @module
+ */
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
 import { isOpeningEntity, sensorName } from './alerts';
 import type { EntityWatch } from './hass-store';
@@ -21,6 +27,7 @@ export const securityWatch =
 		return !entity || entity.attributes.device_class === deviceClass;
 	};
 
+/** A door lock, with its door's contact sensor. */
 export interface DoorLock {
 	/** `lock.*` */
 	id: string;
@@ -30,6 +37,7 @@ export interface DoorLock {
 	contactId?: string;
 }
 
+/** A garage door. */
 export interface GarageBay {
 	/** `cover.*` with device class garage. */
 	id: string;
@@ -81,6 +89,7 @@ export function discoverGarageBays(
 		.map((cover) => ({ id: cover.entity_id, name: shorten(nameOf(cover), /\s+garage(\s+door)?$/i) }));
 }
 
+/** What a lock button shows (`lockStatus`). */
 export type LockStatus = 'locked' | 'unlocked' | 'locking' | 'unlocking' | 'jammed' | 'offline';
 
 /**
@@ -102,6 +111,7 @@ export function lockFaultsIn(states: Record<string, HassEntity | undefined>, loc
 	return faults;
 }
 
+/** The lock ids on the house's own list (`LOCK_FAULTS_ENTITY`'s JSON); none when it's missing or not a list. */
 export function lockFaults(entity: HassEntity | undefined): Set<string> {
 	try {
 		const faults: unknown = JSON.parse(entity?.state ?? '[]');
@@ -155,17 +165,18 @@ export function garagePendingDone(pending: GaragePending, state: string | undefi
 /** One countdown chime, and the wait until the next. */
 export type CountdownBeep = Beep;
 
-// The exit delay: a single soft E6, struck and left to ring
+/** The exit delay: a single soft E6, struck and left to ring. */
 export const ARMING_CHIME: Chime = { notes: [{ frequency: 1318.5 }], decayMs: 90, lengthMs: 350 };
-// The entry delay: a rising E6 → A6 pair, asking for attention without alarming
+/** The entry delay: a rising E6 → A6 pair, asking for attention without alarming. */
 export const ENTRY_CHIME: Chime = {
 	notes: [{ frequency: 1318.5 }, { frequency: 1760, atMs: 110 }],
 	decayMs: 100,
 	lengthMs: 450,
 };
 
-// The PIN pad's keys: a short tick of the same voice, digits a G6, delete a lower C6 so it sounds different
+/** The PIN pad's digit keys: a short tick of the same voice, a G6. */
 export const KEY_CHIME: Chime = { notes: [{ frequency: 1568 }], decayMs: 30, lengthMs: 120 };
+/** The PIN pad's delete key: a lower C6, so it sounds different. */
 export const DELETE_CHIME: Chime = { notes: [{ frequency: 1046.5 }], decayMs: 30, lengthMs: 120 };
 
 // The last stretch of a delay chimes faster, like an alarm keypad's
@@ -196,6 +207,7 @@ export const ALARM_SYSTEM_LABEL = 'alarm_system';
 export const ALARM_SYSTEM_WATCH: EntityWatch = (id) =>
 	id === LOCK_FAULTS_ENTITY || id.startsWith('binary_sensor.') || id.startsWith('lock.') || id.startsWith('siren.');
 
+/** What an Alarm System part is. */
 export type SystemPartKind = 'sensor' | 'lock' | 'siren';
 
 /**
@@ -205,11 +217,15 @@ export type SystemPartKind = 'sensor' | 'lock' | 'siren';
  */
 export type SystemPartStatus = 'ok' | 'open' | 'unlocked' | 'offline' | 'jammed' | 'tampered';
 
+/** An entity labeled Alarm System, with what it's doing. */
 export interface SystemPart {
+	/** Its entity id. */
 	id: string;
+	/** What it is. */
 	kind: SystemPartKind;
 	/** "Front Entry", "Kitchen Window", "Living Room camera", "Kitchen siren" */
 	name: string;
+	/** What it's doing. */
 	status: SystemPartStatus;
 }
 
@@ -289,10 +305,13 @@ export function describeProblem(part: SystemPart): string {
 	return `${subject} is offline`;
 }
 
+/** How many parts of one kind there are, and how many work. */
 export interface SystemGroup {
+	/** The kind. */
 	kind: SystemPartKind;
 	/** Working (not offline, jammed or tampered with). */
 	ready: number;
+	/** Every part of the kind. */
 	total: number;
 }
 

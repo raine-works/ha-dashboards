@@ -1,8 +1,16 @@
-// Washer/dryer status from SmartThings-style sensors
+/**
+ * Washer and dryer status from SmartThings-style sensors: each machine's view, and the header
+ * chip's summary.
+ *
+ * @module
+ */
 
+/** Where a washer or dryer is in its cycle. */
 export type ApplianceStatus = 'running' | 'paused' | 'complete' | 'idle';
 
+/** A machine's state as the laundry card shows it. */
 export interface ApplianceView {
+	/** Where it is in its cycle. */
 	status: ApplianceStatus;
 	/** Primary line, e.g. "42m left", "Paused", "Complete", "Idle". */
 	headline: string;
@@ -50,6 +58,12 @@ export function formatTimeLeft(minutes: string | number | undefined): string {
 	return mins > 0 ? `${hours}h ${mins}m left` : `${hours}h left`;
 }
 
+/**
+ * A machine's view from its sensors.
+ * @param machineState The machine state sensor (`run`, `pause`, `stop`…).
+ * @param jobState The job state sensor (`wash`, `rinse`, `finish`…).
+ * @param timeRemaining Minutes left, as the sensor reports them.
+ */
 export function getApplianceView(machineState?: string, jobState?: string, timeRemaining?: string): ApplianceView {
 	if (machineState === 'run') {
 		return {
@@ -88,8 +102,11 @@ export interface LaundrySummary {
 	description: string;
 }
 
+/** A washer or dryer, as `laundrySummary` takes it. */
 export interface LaundryMachine {
+	/** "Washer", "Dryer". */
 	name: string;
+	/** Its view (`getApplianceView`). */
 	view: ApplianceView;
 	/** Minutes left while running (`sensor.*_time_remaining`). */
 	minutesLeft?: string | number;
@@ -98,6 +115,10 @@ export interface LaundryMachine {
 // Running first (the soonest done), then paused, then done
 const SUMMARY_ORDER: Record<ApplianceStatus, number> = { running: 0, paused: 1, complete: 2, idle: 3 };
 
+/**
+ * The header chip for the machines: the soonest running one, else a paused one, else a done one.
+ * @returns Null while every machine is idle (or there are none).
+ */
 export function laundrySummary(machines: LaundryMachine[]): LaundrySummary | null {
 	const minutes = (m: LaundryMachine) => {
 		const n = Number(m.minutesLeft);

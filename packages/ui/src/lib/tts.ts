@@ -1,6 +1,10 @@
-// The house's voice: one text-to-speech engine and voice everywhere (the house settings' `tts`,
-// lib/house-config.ts), the voice named on every call so a change of the engine's default never
-// changes it. Without settings, the first `tts.*` Home Assistant has, in its own default voice.
+/**
+ * The house's voice: one text-to-speech engine and voice everywhere (the house settings' `tts`,
+ * lib/house-config.ts), the voice named on every call so a change of the engine's default never
+ * changes it. Without settings, the first `tts.*` Home Assistant has, in its own default voice.
+ *
+ * @module
+ */
 
 import type { HassEntity } from '../types/homeassistant';
 import { houseConfig } from './house-config';
@@ -32,6 +36,7 @@ export function isStreamingTts(engine: string | undefined): boolean {
  * `tts.speak` in the house's voice, and with the settings' fallback engine when that fails (an
  * outage, a limit reached), so a message to the door is always spoken. `call` makes the
  * `tts.speak` call and must reject on failure; rejects only when every engine fails (or there's none).
+ * @returns Which voice spoke it: the house's, or the fallback.
  */
 export async function speakWithFallback(
 	call: (data: Record<string, unknown>) => Promise<unknown>,

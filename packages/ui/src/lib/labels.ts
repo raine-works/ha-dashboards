@@ -1,3 +1,8 @@
+/**
+ * Labels in the entity registry: whether a house uses one at all.
+ *
+ * @module
+ */
 import type { HomeAssistant } from '../types/homeassistant';
 
 // The labels the entity registry uses, worked out once per registry (Home Assistant replaces the

@@ -1,3 +1,9 @@
+/**
+ * Words: title case, a list of names in a sentence, a capital first letter.
+ *
+ * @module
+ */
+
 // Short words that stay lowercase inside a title ("Someone Is at the Door")
 const MINOR_WORDS = new Set([
 	'a',

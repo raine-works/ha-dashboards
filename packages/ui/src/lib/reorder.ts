@@ -1,5 +1,9 @@
-// Drag to reorder a list of equal-height rows (the music queue): where a row dragged `dy` pixels
-// lands, and how far each other row slides to make room for it.
+/**
+ * Drag to reorder a list of rows (the music queue, the to-do list): where a row dragged `dy`
+ * pixels lands, how far each other row slides to make room for it, and the scroll near an edge.
+ *
+ * @module
+ */
 
 /** The index a row dragged from `from` by `dy` pixels lands on, within `count` rows of `rowHeight`. */
 export function dragTarget(from: number, dy: number, rowHeight: number, count: number): number {

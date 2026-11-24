@@ -1,36 +1,56 @@
+/**
+ * The household's people: where each is (zone, position, distance from home), their phone's
+ * battery, who's signed in, and street names for people outside every zone.
+ *
+ * @module
+ */
 import type { HassEntity } from '../types/homeassistant';
 import type { EntityWatch } from './hass-store';
 import { isHouseholdMember } from './household';
 
+/** A zone a person is in. */
 export interface PersonZone {
+	/** The `zone.*` entity id (empty when the state names a zone that isn't there). */
 	entityId: string;
+	/** The zone's name. */
 	name: string;
 }
 
+/** A person's phone battery. */
 export interface PersonBattery {
 	/** 0–100 */
 	level: number;
+	/** Charging (or full and still plugged in). */
 	charging: boolean;
 	/** Battery is reported full (iOS "Full"); counts as charging when still plugged in. */
 	full: boolean;
 }
 
+/** A person as the dashboards show them (`getPersonView`). */
 export interface PersonView {
+	/** Their `person.*` entity id. */
 	entityId: string;
+	/** Their friendly name. */
 	name: string;
 	/** First word of the friendly name, for tight spaces. */
 	shortName: string;
+	/** One or two letters for an avatar without a picture. */
 	initials: string;
+	/** Their picture's URL. */
 	picture?: string;
+	/** Home Assistant has them home. */
 	isHome: boolean;
 	/** Smallest zone the person is in (home included), or null when away from every zone. */
 	zone: PersonZone | null;
 	/** Zone name, "Away" or "Unknown". */
 	locationLabel: string;
+	/** Their latitude, when known. */
 	latitude: number | null;
+	/** Their longitude, when known. */
 	longitude: number | null;
 	/** Straight-line distance from zone.home in meters, when both positions are known. */
 	distanceFromHome: number | null;
+	/** Their phone's battery, when it reports one. */
 	battery: PersonBattery | null;
 	/** When the tracker last reported (ISO timestamp). */
 	updated: string;
@@ -41,6 +61,7 @@ const num = (value: unknown): number | null => {
 	return Number.isFinite(n) ? n : null;
 };
 
+/** "AB" from "Alex Brown" (first and last words), "AL" from "Alex", "?" from nothing. */
 export function initialsFor(name: string): string {
 	const words = name.trim().split(/\s+/).filter(Boolean);
 	if (words.length === 0) return '?';
@@ -120,6 +141,7 @@ function zoneFor(person: HassEntity, states: Record<string, HassEntity>): Person
 	return { entityId: byName?.entity_id ?? '', name: byName ? zoneName(byName) : person.state };
 }
 
+/** A `person.*` entity as a `PersonView`, its battery from its tracker (the `source`, else the first). */
 export function getPersonView(person: HassEntity, states: Record<string, HassEntity>): PersonView {
 	const name = person.attributes.friendly_name ?? person.entity_id.split('.')[1];
 	const trackers = Array.isArray(person.attributes.device_trackers) ? person.attributes.device_trackers : [];
@@ -202,6 +224,7 @@ export function locatedPeople(people: PersonView[]): (PersonView & { latitude: n
 
 // Reverse geocoding (OpenStreetMap Nominatim) for people outside every zone -------------
 
+/** The parts of a Nominatim reverse lookup's `address` that `formatPlace` reads. */
 export interface NominatimAddress {
 	road?: string;
 	neighbourhood?: string;
@@ -231,6 +254,7 @@ let queue: Promise<unknown> = Promise.resolve();
 /**
  * Street and town for a position, cached per ~100 m cell. Requests are serialized at
  * ≥1 s apart to respect Nominatim's usage policy.
+ * @returns Null when the lookup fails (never rejects); a failed cell is asked again after five minutes.
  */
 export function reverseGeocode(lat: number, lon: number, fetcher: typeof fetch = fetch): Promise<string | null> {
 	const key = `${lat.toFixed(3)},${lon.toFixed(3)}`;

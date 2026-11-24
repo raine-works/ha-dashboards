@@ -1,4 +1,8 @@
-// Small date and time helpers shared across the libs: local calendar days and m:ss clocks.
+/**
+ * Small date and time helpers shared across the libs: local calendar days and m:ss clocks.
+ *
+ * @module
+ */
 
 /** `7` → `07`. */
 export const pad2 = (n: number) => n.toString().padStart(2, '0');

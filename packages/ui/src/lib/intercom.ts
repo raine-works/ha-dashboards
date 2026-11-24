@@ -1,3 +1,9 @@
+/**
+ * The intercom: which speakers can take an announcement, how a voice clip or a text message gets
+ * to them (and to TVs), and the quick messages for speakers and phones.
+ *
+ * @module
+ */
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
 import { INTEGRATION } from './household';
 import { isSpeaker, isTvAudio } from './music';
@@ -6,16 +12,23 @@ import { houseTtsEngine, houseTtsOptions, speakWithFallback } from './tts';
 import { isUnavailable } from './values';
 import { encodeWav } from './wav';
 
+/** A Music Assistant speaker the intercom can announce on. */
 export interface IntercomSpeaker {
+	/** The speaker's `media_player` entity id. */
 	entityId: string;
+	/** Its friendly name, else its object id with spaces. */
 	name: string;
+	/** False while Home Assistant reports it unavailable or unknown. */
 	available: boolean;
+	/** Whether it's playing something now. */
 	isPlaying: boolean;
 	/** Playing its TV's sound (a soundbar on its TV input): left out of announcements. */
 	tvAudio: boolean;
 }
 
+/** Where an announcement goes and how it sounds. */
 export interface BroadcastOptions {
+	/** The speakers' `media_player` entity ids (a group's members collapse to its leader). */
 	speakers: string[];
 	/**
 	 * TVs to say it on too (Raineworks TV's `media_player`s): spoken over whatever's on, the show
@@ -30,7 +43,7 @@ export interface BroadcastOptions {
 
 // Clips staged in HA local media are removed after they've had time to play
 const RECORDING_CLEANUP_MS = 60000;
-// Sweep threshold for clips the timed cleanup missed
+/** How old a clip in local media gets before `purgeStaleRecordings` sweeps it (the timed cleanup missed it). */
 export const RECORDING_MAX_AGE_MS = 10 * 60 * 1000;
 
 /** Music Assistant players (MA tags its entities with `mass_player_type`), browser players and hidden ones left out. */
@@ -132,8 +145,11 @@ export function announceTargets(states: Record<string, HassEntity | undefined>, 
 }
 
 /**
- * Upload a voice clip to HA local media and announce it on the selected Music Assistant
- * players.
+ * Upload a voice clip (the integration's clip upload, else HA local media) and announce it on the
+ * selected Music Assistant players and TVs.
+ * @param samples Mono samples in -1…1, encoded to a WAV with a short silence at each end.
+ * @throws When the connection isn't ready, the upload fails (local media needs an admin), or a
+ *   service call fails.
  */
 export async function broadcastRecording(
 	hass: HomeAssistant,
@@ -167,6 +183,7 @@ export async function broadcastRecording(
 /**
  * Delete intercom clips (intercom_<epoch ms>.wav) older than maxAgeMs from HA local media.
  * The filename carries its upload time, so no file metadata is needed. Admin only.
+ * @returns How many clips it deleted: 0 for non-admins, or when the integration takes the clips.
  */
 export async function purgeStaleRecordings(
 	hass: HomeAssistant,

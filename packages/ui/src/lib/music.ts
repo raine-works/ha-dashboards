@@ -1,3 +1,10 @@
+/**
+ * Music Assistant through Home Assistant: which speakers the dashboards list, each player's state
+ * as the music player shows it, groups and volume, search and the library, the queue, podcasts
+ * and the Party dashboard.
+ *
+ * @module
+ */
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
 import { houseConfig } from './house-config';
 import { labelInUse } from './labels';
@@ -5,7 +12,7 @@ import { callForResponse } from './service-calls';
 import { formatClock } from './time';
 import { isUnavailable, finiteNumber as num } from './values';
 
-// media_player supported_features bits used by the player
+/** The `media_player` `supported_features` bits the player reads. */
 export const MEDIA_FEATURE = {
 	PAUSE: 1,
 	SEEK: 2,
@@ -21,15 +28,24 @@ export const MEDIA_FEATURE = {
 	GROUPING: 524288,
 } as const;
 
+/** A player's repeat mode. */
 export type RepeatMode = 'off' | 'all' | 'one';
+/** A player's state (anything Home Assistant reports beyond these counts as unavailable). */
 export type PlaybackState = 'playing' | 'paused' | 'idle' | 'off' | 'unavailable';
 
+/** A Music Assistant speaker as the music player shows it (`toMusicPlayer`). */
 export interface MusicPlayer {
+	/** Its `media_player` entity id. */
 	entityId: string;
+	/** Its friendly name. */
 	name: string;
+	/** Its playback state. */
 	state: PlaybackState;
+	/** What's playing: the track, the live input's name, or "TV audio". */
 	title?: string;
+	/** The track's artist. */
 	artist?: string;
+	/** The track's album. */
 	album?: string;
 	/** Artwork URL (Home Assistant's proxy when available, so it works wherever HA does). */
 	artwork?: string;
@@ -37,8 +53,11 @@ export interface MusicPlayer {
 	duration?: number;
 	/** 0–100. */
 	volume: number;
+	/** Muted. */
 	muted: boolean;
+	/** Shuffle on. */
 	shuffle: boolean;
+	/** Repeat mode. */
 	repeat: RepeatMode;
 	/** Whole sync group, leader first (empty when not grouped). */
 	groupMembers: string[];
@@ -46,6 +65,7 @@ export interface MusicPlayer {
 	leader?: string;
 	/** Seconds into the track at `positionUpdatedAt` (epoch ms). */
 	position?: number;
+	/** When `position` was reported (epoch ms). */
 	positionUpdatedAt?: number;
 	/** When the state last changed (epoch ms). */
 	lastChanged?: number;
@@ -65,6 +85,10 @@ export interface MusicPlayer {
 	 * the speaker's source; the queue scripts then find the speaker's own from its entity.
 	 */
 	queueId?: string;
+	/**
+	 * `MEDIA_FEATURE` bits it supports, less what a live input or the TV's sound can't do (test with
+	 * `supports`).
+	 */
 	features: number;
 }
 
@@ -75,7 +99,9 @@ export interface MusicPlayer {
  * speaker's `media_content_id` once started from Music Assistant's Browse.
  */
 export interface LiveInput {
+	/** Its name ("Turntable"). */
 	name: string;
+	/** Its `<provider>://audio_source/<client id>` URI. */
 	uri: string;
 	/** Binary sensor that's on while audio reaches the input (the record is playing). */
 	signal?: string;
@@ -156,6 +182,7 @@ export function discoverMusicPlayers(states: Record<string, HassEntity>, hass?: 
 /** A string with something in it, else undefined. */
 const text = (v: unknown) => (typeof v === 'string' && v !== '' ? v : undefined);
 
+/** A Music Assistant `media_player` entity as a `MusicPlayer`. */
 export function toMusicPlayer(entity: HassEntity): MusicPlayer {
 	const a = entity.attributes;
 	const members = Array.isArray(a.group_members) ? a.group_members.map(String) : [];
@@ -192,6 +219,7 @@ export function toMusicPlayer(entity: HassEntity): MusicPlayer {
 	};
 }
 
+/** Whether a player supports a `MEDIA_FEATURE`. */
 export const supports = (player: Pick<MusicPlayer, 'features'>, feature: number) => (player.features & feature) !== 0;
 
 /**
@@ -247,12 +275,15 @@ export function currentPosition(player: MusicPlayer, now = Date.now()): number {
 	return player.duration ? Math.min(position, player.duration) : position;
 }
 
+/** Where a track was when it started moving to another speaker. */
 export interface ResumePoint {
+	/** The track's title. */
 	title?: string;
 	/** Seconds into the track when the move started. */
 	position: number;
 	/** When the move started (epoch ms). */
 	at: number;
+	/** The track's length in seconds (none for a live stream). */
 	duration?: number;
 	/** Still playing: the track kept going during the move. */
 	playing: boolean;
@@ -342,6 +373,7 @@ export const nextRepeat = (mode: RepeatMode): RepeatMode => (mode === 'off' ? 'a
 
 // --- Music Assistant library ------------------------------------------------------------------
 
+/** What Music Assistant's library and search list. */
 export type MediaType = 'artist' | 'album' | 'track' | 'playlist' | 'radio' | 'podcast';
 
 /** What something plays: music, a radio station, a podcast, or the spoken daily brief (or scripture). */
@@ -363,14 +395,19 @@ export function mediaKindOf(typeOrUri: string | undefined): MediaKind {
 	return 'music';
 }
 
+/** Something in Music Assistant's library or search results, to browse, play or queue. */
 export interface MediaItem {
 	/** A podcast's episode is played (and queued) but never browsed or searched for. */
 	mediaType: MediaType | 'podcast_episode';
+	/** Music Assistant's URI for it. */
 	uri: string;
+	/** Its name. */
 	name: string;
 	/** Artists, or the album for a track without artists. */
 	subtitle?: string;
+	/** Its artists' names. */
 	artists?: string[];
+	/** Its cover URL. */
 	image?: string;
 }
 
@@ -405,6 +442,7 @@ export function toMediaItems(raw: unknown): MediaItem[] {
 	});
 }
 
+/** A search's results by media type. */
 export interface SearchResults {
 	artists: MediaItem[];
 	albums: MediaItem[];
@@ -414,6 +452,7 @@ export interface SearchResults {
 	podcasts: MediaItem[];
 }
 
+/** `music_assistant.search`'s response as `SearchResults` (a missing type is empty). */
 export function toSearchResults(raw: unknown): SearchResults {
 	const r = (raw ?? {}) as Record<string, unknown>;
 	return {
@@ -426,22 +465,31 @@ export function toSearchResults(raw: unknown): SearchResults {
 	};
 }
 
+/** The current or next song in a speaker's queue (`music_assistant.get_queue`). */
 export interface QueueItem {
 	/** Music Assistant's queue item id (the same song queued twice has two). */
 	id?: string;
+	/** Its title ("Unknown" when Music Assistant gives none). */
 	name: string;
+	/** Its artists, joined. */
 	artist?: string;
+	/** Its cover, else its album's. */
 	image?: string;
+	/** Seconds. */
 	duration?: number;
-	/** Its artists and album, to open their pages (Music Assistant gives their URIs). */
+	/** Its artists, to open their pages (Music Assistant gives their URIs). */
 	artistItems?: MediaItem[];
+	/** Its album, to open its page. */
 	albumItem?: MediaItem;
 }
 
+/** What `music_assistant.get_queue` tells of a speaker's queue. */
 export interface QueueSummary {
 	/** Items in the queue. */
 	count: number;
+	/** The playing song. */
 	current?: QueueItem;
+	/** The song after it. */
 	next?: QueueItem;
 }
 
@@ -555,6 +603,13 @@ export async function findMusicConfigEntry(hass: Hass, playerEntityId?: string):
 	}
 }
 
+/**
+ * Search Music Assistant (`music_assistant.search`).
+ * @param configEntryId Music Assistant's config entry (`findMusicConfigEntry`).
+ * @param types Only these media types; all when absent.
+ * @param filters `artist`: Music Assistant's (fuzzy) artist filter; `byArtist` narrows it.
+ * @throws When Home Assistant refuses the call.
+ */
 export async function searchMusic(
 	hass: Hass,
 	configEntryId: string,
@@ -568,6 +623,11 @@ export async function searchMusic(
 	return toSearchResults(await callMusicAssistant(hass, 'search', data));
 }
 
+/**
+ * One media type from Music Assistant's library (`music_assistant.get_library`).
+ * @param options `favorite`: favorites only; `orderBy`: Music Assistant's sort key (`last_played`…).
+ * @throws When Home Assistant refuses the call.
+ */
 export async function getLibrary(
 	hass: Hass,
 	configEntryId: string,
@@ -659,12 +719,18 @@ export function queueIsCurrent(queue: QueueSummary | undefined, title: string | 
 	return !current.id || current.id !== queue.next?.id;
 }
 
+/**
+ * A speaker's current and next songs (`music_assistant.get_queue`).
+ * @returns Undefined when Music Assistant has no queue for it.
+ * @throws When Home Assistant refuses the call.
+ */
 export async function getQueue(hass: Hass, entityId: string): Promise<QueueSummary | undefined> {
 	return toQueueSummary(await callMusicAssistant(hass, 'get_queue', {}, { entity_id: entityId }), entityId);
 }
 
 /** Music Assistant's Party guest join link (`music_assistant.get_party_url`); `url` is null while guest access is off. */
 export interface PartyLink {
+	/** The join link, or null while guest access is off (or it couldn't be asked). */
 	url: string | null;
 	/** 200 when Music Assistant answered; 0 when it couldn't be asked (no raine-works/ha-music-assistant). */
 	status: number;
@@ -672,12 +738,18 @@ export interface PartyLink {
 
 /** A TV Music Assistant can cast its Party Dashboard to (lyrics and the join QR code). */
 export interface PartyTv {
+	/** Its Music Assistant display `media_player` entity id. */
 	id: string;
+	/** Its friendly name. */
 	name: string;
 	/** Showing the Party Dashboard now. */
 	showing: boolean;
 }
 
+/**
+ * The Party guest join link; `status` 0 without raine-works' Music Assistant actions.
+ * @throws When Home Assistant refuses the call.
+ */
 export async function getPartyLink(hass: Hass): Promise<PartyLink> {
 	if (hasMusicActions(hass)) {
 		const response = await callForResponse<{ url?: unknown }>(hass, 'music_assistant', 'get_party_url');
@@ -710,6 +782,7 @@ export function partyDisplays(
 		.sort((a, b) => a.name.localeCompare(b.name));
 }
 
+/** `partyDisplays` from what `hass` has; none before its states arrive. */
 export async function getPartyTvs(hass: Hass, tvNames: ReadonlySet<string> = new Set()): Promise<PartyTv[]> {
 	return hass.states ? partyDisplays({ states: hass.states, entities: hass.entities }, tvNames) : [];
 }
@@ -734,11 +807,17 @@ export interface QueueEntry {
 	id: string;
 	/** Its place in the queue (0 = the first item, played or not). */
 	index: number;
+	/** Its title ("Unknown" when Music Assistant gives none). */
 	name: string;
+	/** Its artist. */
 	artist?: string;
+	/** Its album. */
 	album?: string;
+	/** Seconds. */
 	duration?: number;
+	/** Its cover URL. */
 	image?: string;
+	/** Music Assistant's URI for the song. */
 	uri?: string;
 }
 
@@ -750,6 +829,7 @@ export interface QueuePage {
 	total: number;
 	/** The first entry's index. */
 	offset: number;
+	/** The page's songs, in queue order. */
 	entries: QueueEntry[];
 	/** The playlist or album the queue was started from. */
 	source?: MediaItem;
@@ -760,6 +840,10 @@ const count = (v: unknown, fallback = 0) => {
 	return Number.isFinite(n) ? n : fallback;
 };
 
+/**
+ * A `music_assistant.get_queue_items` answer as a `QueuePage`: undefined unless its status is 200;
+ * entries without an id are dropped.
+ */
 export function toQueuePage(response: unknown): QueuePage | undefined {
 	const r = response as Record<string, unknown> | undefined;
 	if (!r || Number(r.status) !== 200) return undefined;
@@ -820,6 +904,7 @@ export async function getQueuePage(
 	return toQueuePage(page && typeof page === 'object' ? { status: 200, ...page } : undefined);
 }
 
+/** An edit to a queue entry: play from it, remove it, move it `shift` places, or resume the parked queue. */
 export type QueueEdit =
 	| { action: 'play' }
 	| { action: 'remove' }
@@ -863,7 +948,9 @@ export function applyQueueEdit(entries: QueueEntry[], id: string, edit: QueueEdi
 
 /** One of a podcast's episodes (`music_assistant.get_podcast_episodes`). */
 export interface PodcastEpisode {
+	/** Music Assistant's URI for it. */
 	uri: string;
+	/** Its title ("Untitled episode" when it has none). */
 	name: string;
 	/** When it came out (ISO). */
 	released?: string;
@@ -871,19 +958,28 @@ export interface PodcastEpisode {
 	duration?: number;
 	/** Where the listener left off, in seconds (0 = not started). */
 	resume: number;
+	/** Listened to the end. */
 	played: boolean;
 	/** Its show notes as plain text, cut short. */
 	description?: string;
+	/** Its own cover URL. */
 	image?: string;
 }
 
 /** A page of a podcast's episodes, newest first. */
 export interface EpisodePage {
+	/** Episodes the podcast has in all. */
 	total: number;
+	/** The first episode's place among them. */
 	offset: number;
+	/** The page's episodes. */
 	episodes: PodcastEpisode[];
 }
 
+/**
+ * A `music_assistant.get_podcast_episodes` answer as an `EpisodePage`: undefined unless its status
+ * is 200; episodes without a URI are dropped.
+ */
 export function toEpisodePage(response: unknown): EpisodePage | undefined {
 	const r = response as Record<string, unknown> | undefined;
 	if (!r || Number(r.status) !== 200) return undefined;
