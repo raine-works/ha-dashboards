@@ -39,7 +39,7 @@ Tokens and primitives, so every later change is small.
 - **Color:** the neutral and status tokens in [Color](color.md); `alarm` = `destructive`; every
   preset passing; a contrast test per theme and mode; a lint against raw palette classes.
 - **Shape:** the radius tokens and the `corner-shape` block; check the panels' WebView version.
-- **Space:** density tokens (`--pad`, `--gap`) by `data-density` per surface.
+- **Space:** density tokens (`--pad`, `--gap`) per surface.
 - **Type:** the scale as Tailwind theme sizes; arbitrary sizes removed.
 - **Primitives:** `Button` roles and sizes (old sizes mapped, so nothing breaks), `Section`,
   `Tile`, `StatusTile`, `DeviceRow`, the `detail` dialog size; each in the demo house.

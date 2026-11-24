@@ -16,8 +16,9 @@ is why it beats clip-path masks.
 ```css
 /* theme.css: the radii are the design; the squircle is a bonus where it's drawn */
 @supports (corner-shape: squircle) {
-	[data-slot], .squircle { corner-shape: squircle; }
-	.rounded-full { corner-shape: round; } /* avatars and round keys stay circles */
+	* { corner-shape: squircle; }
+	::before, ::after { corner-shape: inherit; } /* a ring around a circle stays a circle */
+	.rounded-full, .assist-orb { corner-shape: round; } /* avatars, round keys and the orb stay circles */
 }
 ```
 
@@ -37,7 +38,8 @@ is why it beats clip-path masks.
 
 ### Radius scale
 
-Set explicitly (`--radius-xs` … `--radius-2xl`), no longer derived from one `--radius`.
+Set explicitly by role (`rounded-chip`, `rounded-control`, `rounded-control-lg`, `rounded-icon`,
+`rounded-tile`, `rounded-dialog`), not derived from one `--radius`.
 
 | Role | Radius |
 | :--- | :--- |
@@ -66,8 +68,8 @@ Set explicitly (`--radius-xs` … `--radius-2xl`), no longer derived from one `-
 | Section gutters; page edge | 16px phone, 24px desktop and panel; plus safe areas |
 | Tiles in a grid | 12px phone, 16px elsewhere |
 
-**Density per surface**, as tokens (`--pad`, `--gap`) set by `data-density` on the mount point, so
-components never hard-code their padding:
+**Density per surface**, as tokens (`--pad`, `--gap`; `p-pad`, `gap-gap`) set in theme.css by the
+surface (the wall panels' `data-touch`) and its width, so components never hard-code their padding:
 
 | Surface | Density | Pad / gap | Smallest target |
 | :--- | :--- | :--- | :--- |
@@ -82,7 +84,9 @@ tiles two across; desktop up to 1600px wide.
 ## Typography
 
 **Geist** for everything (raineworks.com's face), Geist Mono only for codes. Changing numbers use
-`tabular-nums`. A scale of about 1.2:
+`tabular-nums`. A scale of about 1.2, as Tailwind sizes carrying their line height, weight and
+tracking (`text-display`, `text-figure`, `text-heading`, `text-title`, `text-body`, `text-label`,
+`text-caption`, `text-overline`, in the table's order):
 
 | Role | Size / line height | Weight | Tracking |
 | :--- | :--- | :--- | :--- |

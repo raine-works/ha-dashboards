@@ -43,8 +43,8 @@ Roles, not raw steps (the model is [Radix's 12-step scale](https://www.radix-ui.
 | `primary` / `-foreground` | `oklch(0.205 0 0)` / `oklch(0.985 0 0)` | `oklch(0.93 0 0)` / `oklch(0.205 0 0)` | The main action; and "on" |
 
 **Dark elevation is lightness, not shadow** (shadows don't show on dark; Material 3 and Apple raise
-a surface's lightness instead): page 0.145, card 0.19, floating 0.22. Today the card is 1.10:1 from
-the page and only the hairline separates them.
+a surface's lightness instead): page 0.145, card 0.19, floating 0.22. Before these, the card was 1.10:1
+from the page and only the hairline separated them.
 
 ## The brand gradient
 
@@ -70,12 +70,12 @@ the status color itself.
 | `destructive` = `alarm` | `oklch(0.52 0.21 27)` | `oklch(0.68 0.20 22)` | 6.2 / 5.3 / 6.2 | ~5.6 / ~4.8 / ~6.3 |
 
 Contrast computed by the color research (WCAG 2.x, with APCA as a cross-check); the values marked ~
-were estimated and must be re-checked when applied.
+were estimated; `contrast.test.ts` now holds every one at 4.5:1 or more.
 
-- **`alarm` is `destructive`**: one red for danger. Today they're four different reds across light
+- **`alarm` is `destructive`**: one red for danger. There were four different reds across light
   and dark, some outside what a screen can show.
-- **Every theme** gets status colors that pass, not only Raineworks (the Neutral preset's dark
-  status solids are 3.0–3.5:1 today, and every other theme inherits them).
+- **Every theme** gets status colors that pass, not only Raineworks: they're the Neutral preset's,
+  which every other theme inherits (its dark status solids were 3.0–3.5:1).
 - **No raw palette classes** (`text-violet-*`, `sky`, `indigo`, `cyan`, `emerald`, `amber`): about
   twenty uses today compete with the status tokens.
 
