@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { actionLeads, STATUS_ICON_TONES, type StatusTone } from '../ui/status-tile';
+import { actionLeads, detailClasses, STATUS_ICON_TONES, type StatusTone } from '../ui/status-tile';
 import { ICON_TONES } from '../ui/tile';
 
 // docs/design/color.md: theme tokens only, never raw palette colors
@@ -25,5 +25,18 @@ describe('status tiles', () => {
 	it("lead with the action only when the state needs it (a safe house's Disarm stays quiet)", () => {
 		const leads = (['ok', 'attention', 'danger', 'neutral'] as StatusTone[]).filter(actionLeads);
 		expect(leads).toEqual(['attention', 'danger']);
+	});
+});
+
+describe("a status tile's detail", () => {
+	it('is one line unless it must be read whole', () => {
+		expect(detailClasses()).toContain('truncate');
+		// A refusal to arm names the sensors Arm anyway would bypass: never cut off
+		expect(detailClasses(true)).not.toContain('truncate');
+	});
+
+	it('warns in amber, keeping its words', () => {
+		expect(detailClasses(false, 'warning')).toContain('text-warning');
+		expect(detailClasses()).toContain('text-muted-foreground');
 	});
 });

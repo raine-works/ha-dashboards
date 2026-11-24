@@ -41,9 +41,10 @@ import {
 import { serviceErrorMessage } from '../../lib/service-calls';
 import { cn } from '../../lib/utils';
 import { withErrorBoundary } from '../layout/ErrorBoundary';
+import { SectionGroup } from '../layout/Section';
 import { SectionHeader } from '../layout/SectionHeader';
 import { SECTION_SCROLLER } from '../layout/scroll';
-import { Button, type ButtonProps, Card, EmptyState, toast } from '../ui';
+import { Button, type ButtonProps, DeviceRow, EmptyState, toast } from '../ui';
 import { AlarmCard } from './AlarmCard';
 import { CamerasCard } from './CamerasCard';
 
@@ -64,15 +65,24 @@ const GARAGE_LABELS: Record<GarageStatus, string> = {
 	offline: 'Offline',
 };
 
-const LOCK_LOOKS: Record<LockStatus, { label: string; Icon: LucideIcon; variant: ButtonProps['variant'] }> = {
-	locked: { label: 'Locked', Icon: Lock, variant: 'secondary' },
-	unlocked: { label: 'Unlocked', Icon: Unlock, variant: 'destructive' },
+/**
+ * Each lock state: its word for the row's status line, and its button, which says what a tap does
+ * (docs/design/components.md: a state is never a button's label). The tone colors the status line
+ * and icon tile only when something's wrong.
+ */
+export const LOCK_LOOKS: Record<
+	LockStatus,
+	{ state: string; label: string; Icon: LucideIcon; variant: ButtonProps['variant']; tone?: 'warning' | 'alarm' }
+> = {
+	locked: { state: 'Locked', label: 'Unlock', Icon: Unlock, variant: 'secondary' },
+	// The one door needing a tap: Lock leads
+	unlocked: { state: 'Unlocked', label: 'Lock', Icon: Lock, variant: 'default', tone: 'warning' },
 	// No ellipsis: the spinner says it's under way, and the label has to fit its button with full padding
-	locking: { label: 'Locking', Icon: Loader2, variant: 'secondary' },
-	unlocking: { label: 'Unlocking', Icon: Loader2, variant: 'destructive' },
+	locking: { state: 'Locking…', label: 'Locking', Icon: Loader2, variant: 'secondary' },
+	unlocking: { state: 'Unlocking…', label: 'Unlocking', Icon: Loader2, variant: 'secondary' },
 	// A tap tries to lock it again
-	jammed: { label: 'Jammed', Icon: TriangleAlert, variant: 'warning' },
-	offline: { label: 'Offline', Icon: WifiOff, variant: 'outline' },
+	jammed: { state: 'Jammed', label: 'Lock again', Icon: TriangleAlert, variant: 'warning', tone: 'alarm' },
+	offline: { state: 'Offline', label: 'Lock', Icon: WifiOff, variant: 'secondary' },
 };
 
 /** Actions on their way, by entity, until Home Assistant reports them (or the confirm timeout). */
@@ -256,8 +266,8 @@ const SecuritySectionContent: React.FC<SecuritySectionProps> = ({ compact: compa
 				: status === 'offline'
 					? displayStatus
 					: status === 'open'
-						? 'Close door'
-						: 'Open door',
+						? 'Close'
+						: 'Open',
 			open: () => move(false),
 			close: () => move(true),
 			toggle: () => move(status === 'open'),
@@ -268,33 +278,32 @@ const SecuritySectionContent: React.FC<SecuritySectionProps> = ({ compact: compa
 		};
 	});
 
-	const lockButton = (door: (typeof doors)[number], size: 'xl' | 'lg', className?: string) => (
-		<Button variant={door.variant} size={size} onClick={door.toggle} disabled={door.disabled} className={className}>
+	const lockButton = (door: (typeof doors)[number]) => (
+		<Button variant={door.variant} size="md" onClick={door.toggle} disabled={door.disabled} className="min-w-28">
 			<door.Icon className={cn(door.isPending && 'animate-spin')} />
-			{/* The button's width comes from its layout (w-36, or its card), so the label needn't hold one */}
 			{door.label}
 		</Button>
 	);
 
 	/**
 	 * A bay's buttons: Stop while it moves (when the opener can stop), Open and Close when it stopped
-	 * partway, else the one move it can make. Two buttons never squeeze into one's room: a row's
-	 * narrow slot gets icon buttons, a card stacks them.
+	 * partway (as two labeled icon buttons), else the one move it can make.
 	 */
-	const garageActions = (garage: (typeof garages)[number], size: 'xl' | 'lg') => {
+	const garageActions = (garage: (typeof garages)[number]) => {
 		if (garage.isMoving && garage.canStop)
 			return (
-				<Button variant="destructive" size={size} onClick={garage.stop} loading={garage.stopping} className="w-full">
+				<Button variant="destructive" size="md" onClick={garage.stop} loading={garage.stopping} className="min-w-28">
 					<Square className="fill-current" />
 					Stop
 				</Button>
 			);
+		// Stopped partway: both moves, as labeled icon buttons side by side
 		if (garage.status === 'stopped')
-			return size === 'lg' ? (
-				<div className="flex w-full justify-end gap-2">
+			return (
+				<>
 					<Button
 						variant="secondary"
-						size="icon-lg"
+						size="icon-md"
 						onClick={garage.open}
 						loading={false}
 						aria-label={`Open ${garage.name}`}
@@ -303,8 +312,8 @@ const SecuritySectionContent: React.FC<SecuritySectionProps> = ({ compact: compa
 						<ArrowUpToLine />
 					</Button>
 					<Button
-						variant="default"
-						size="icon-lg"
+						variant="secondary"
+						size="icon-md"
 						onClick={garage.close}
 						loading={false}
 						aria-label={`Close ${garage.name}`}
@@ -312,27 +321,16 @@ const SecuritySectionContent: React.FC<SecuritySectionProps> = ({ compact: compa
 					>
 						<ArrowDownToLine />
 					</Button>
-				</div>
-			) : (
-				<div className="flex w-full flex-col gap-2">
-					<Button variant="secondary" size={size} onClick={garage.open} loading={false} className="w-full">
-						<ArrowUpToLine />
-						Open
-					</Button>
-					<Button variant="default" size={size} onClick={garage.close} loading={false} className="w-full">
-						<ArrowDownToLine />
-						Close
-					</Button>
-				</div>
+				</>
 			);
 		return (
 			<Button
 				variant={garage.isOpen ? 'default' : 'secondary'}
-				size={size}
+				size="md"
 				onClick={garage.toggle}
 				disabled={garage.disabled}
 				loading={false}
-				className="w-full"
+				className="min-w-28"
 			>
 				{/* The icon turns into a spinner in place */}
 				{garage.isMoving ? (
@@ -354,7 +352,7 @@ const SecuritySectionContent: React.FC<SecuritySectionProps> = ({ compact: compa
 			{/* Scrolls under the section title when the cards don't fit, to the screen's bottom edge like the other columns */}
 			<div className={cn('flex min-h-0 flex-1 flex-col', SECTION_SCROLLER, compact ? 'gap-3' : 'gap-4')}>
 				<ModuleGate id="alarm">
-					<AlarmCard compact={compact} />
+					<AlarmCard />
 				</ModuleGate>
 
 				{/* A new house: say what shows up here rather than leave the column blank */}
@@ -364,39 +362,41 @@ const SecuritySectionContent: React.FC<SecuritySectionProps> = ({ compact: compa
 					</EmptyState>
 				)}
 
-				{/* One card, a row per door and per garage bay, at every size: the same look on the 15" and
-				    10.5" panels, desktops and phones */}
-				<Card className="shrink-0 gap-0 py-0.5">
-					{doors.map((door, i) => (
-						<div key={door.id} className={cn('flex items-center gap-3 px-4 py-1.5 touch:py-0.5', i > 0 && 'border-t')}>
-							<Lock className="size-5 shrink-0 text-muted-foreground" />
-							{/* Status under the name: three columns leave little room for a badge beside it */}
-							<div className="flex min-w-0 flex-1 flex-col">
-								<span className="truncate font-semibold">{door.name}</span>
-								{door.hasContact && (
-									<span className={cn('text-xs', door.isOpen ? 'text-warning' : 'text-muted-foreground')}>
-										{door.isOpen ? 'Open' : 'Closed'}
-									</span>
-								)}
-							</div>
-							{lockButton(door, 'lg', 'w-36')}
-						</div>
-					))}
-					{garages.map((garage) => (
-						<div key={garage.id} className="flex items-center gap-3 border-t px-4 py-1.5 touch:py-0.5">
-							<Warehouse
-								className={cn('size-5 shrink-0', garage.isOpen ? 'text-foreground' : 'text-muted-foreground')}
+				{/* A DeviceRow per door and per garage bay (docs/design/components.md), in two groups: the state in
+				    words on the status line (amber or red with its word only when something's wrong), the button
+				    saying what a tap does */}
+				{doors.length > 0 && (
+					<SectionGroup label="Doors" surface>
+						{doors.map((door) => (
+							<DeviceRow
+								key={door.id}
+								icon={<Lock />}
+								tone={door.tone ?? 'off'}
+								name={door.name}
+								status={[door.state, door.hasContact ? (door.isOpen ? 'Open' : 'Closed') : undefined]
+									.filter(Boolean)
+									.join(' · ')}
+								statusTone={door.tone ?? (door.isOpen ? 'warning' : undefined)}
+								trailing={lockButton(door)}
 							/>
-							<div className="flex min-w-0 flex-1 flex-col">
-								<span className="truncate font-semibold">{garage.name}</span>
-								<span className={cn('truncate text-xs', garage.isOpen ? 'text-warning' : 'text-muted-foreground')}>
-									{garage.detail}
-								</span>
-							</div>
-							<div className="w-36 shrink-0">{garageActions(garage, 'lg')}</div>
-						</div>
-					))}
-				</Card>
+						))}
+					</SectionGroup>
+				)}
+				{garages.length > 0 && (
+					<SectionGroup label={garages.length === 1 ? 'Garage door' : 'Garage doors'} surface>
+						{garages.map((garage) => (
+							<DeviceRow
+								key={garage.id}
+								icon={<Warehouse />}
+								tone={garage.isOpen ? 'warning' : 'off'}
+								name={garage.name}
+								status={garage.detail}
+								statusTone={garage.isOpen ? 'warning' : undefined}
+								trailing={garageActions(garage)}
+							/>
+						))}
+					</SectionGroup>
+				)}
 
 				<ModuleGate id="cameras">
 					<CamerasCard compact={compact} onViewAll={onViewCameras} />
