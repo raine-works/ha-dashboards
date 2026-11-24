@@ -32,7 +32,7 @@ export const WallPanel: React.FC<{ config?: Record<string, unknown> }> = ({ conf
 	return (
 		<PanelLayout actions={timer ? <PanelTimerAction /> : undefined}>
 			<main className="grid min-h-0 flex-1 grid-cols-3 grid-rows-1 gap-4 *:min-w-0 max-lg:gap-3">
-				<LightingSection title="Lighting" subtitle="Every light in the house" floor={floor} />
+				<LightingSection title="Lighting" floor={floor} />
 				<SecuritySection />
 				<ClimateSection />
 			</main>

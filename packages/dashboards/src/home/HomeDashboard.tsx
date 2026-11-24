@@ -50,7 +50,6 @@ export const WIDE_QUERY = '(min-width: 1024px)';
 /** Every light and scene in the house, top floor first (like looking at the house). */
 const LIGHTING: LightingSectionProps = {
 	title: 'Lighting',
-	subtitle: 'Every light in the house',
 	allFloors: true,
 };
 

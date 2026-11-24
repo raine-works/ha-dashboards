@@ -22,6 +22,15 @@ export interface LightCapabilities {
 }
 
 /**
+ * Whether a light's row shows its dimmer and colors button: while it's on, or while its dimmer is
+ * held (a drag that started while it was on keeps its slider until it's let go). A light that's off
+ * shows only its toggle and name, so a room of lights that are off stays a short, quiet list.
+ */
+export function showsLightControls(isOn: boolean, dimmerHeld: boolean): boolean {
+	return isOn || dimmerHeld;
+}
+
+/**
  * What a light's controls can do, from `supported_color_modes` / `effect_list`. A light that
  * hasn't reported its modes (unavailable) keeps the dimmer, disabled, so its row doesn't jump.
  */

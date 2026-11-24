@@ -41,20 +41,9 @@ import {
 import { serviceErrorMessage } from '../../lib/service-calls';
 import { cn } from '../../lib/utils';
 import { withErrorBoundary } from '../layout/ErrorBoundary';
+import { SectionHeader } from '../layout/SectionHeader';
 import { SECTION_SCROLLER } from '../layout/scroll';
-import {
-	Badge,
-	Button,
-	type ButtonProps,
-	Card,
-	CardContent,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-	EmptyState,
-	StableLabel,
-	toast,
-} from '../ui';
+import { Button, type ButtonProps, Card, EmptyState, toast } from '../ui';
 import { AlarmCard } from './AlarmCard';
 import { CamerasCard } from './CamerasCard';
 
@@ -66,8 +55,6 @@ export interface SecuritySectionProps {
 	onViewCameras?: () => void;
 }
 
-// Every status the contact and garage badges can show, so they keep one width as the state changes
-const CONTACT_LABELS = ['Open', 'Closed'];
 const GARAGE_LABELS: Record<GarageStatus, string> = {
 	closed: 'Closed',
 	closing: 'Closing…',
@@ -76,7 +63,6 @@ const GARAGE_LABELS: Record<GarageStatus, string> = {
 	open: 'Open',
 	offline: 'Offline',
 };
-const GARAGE_STATUSES = Object.values(GARAGE_LABELS);
 
 const LOCK_LOOKS: Record<LockStatus, { label: string; Icon: LucideIcon; variant: ButtonProps['variant'] }> = {
 	locked: { label: 'Locked', Icon: Lock, variant: 'secondary' },
@@ -364,13 +350,7 @@ const SecuritySectionContent: React.FC<SecuritySectionProps> = ({ compact: compa
 	return (
 		<section className={cn('flex h-full min-h-0 flex-col', compact ? 'gap-3' : 'gap-4')}>
 			{/* Section Header */}
-			<div className="flex items-center gap-3 px-2">
-				<Shield className="size-6 shrink-0 text-emerald-600 dark:text-emerald-400" />
-				<div>
-					<h2 className="font-semibold text-lg leading-tight">Security & Access</h2>
-					<p className="text-muted-foreground text-sm max-lg:hidden">Alarms, locks, garage bays and cameras</p>
-				</div>
-			</div>
+			<SectionHeader icon={<Shield />} title="Security" />
 			{/* Scrolls under the section title when the cards don't fit, to the screen's bottom edge like the other columns */}
 			<div className={cn('flex min-h-0 flex-1 flex-col', SECTION_SCROLLER, compact ? 'gap-3' : 'gap-4')}>
 				<ModuleGate id="alarm">
@@ -384,99 +364,39 @@ const SecuritySectionContent: React.FC<SecuritySectionProps> = ({ compact: compa
 					</EmptyState>
 				)}
 
-				{compact ? (
-					// 10.5" panels: one card with a row per door and per garage bay
-					<Card className="shrink-0 gap-0 py-0.5">
-						{doors.map((door, i) => (
-							<div
-								key={door.id}
-								className={cn('flex items-center gap-3 px-4 py-1.5 touch:py-0.5', i > 0 && 'border-t')}
-							>
-								<Lock className="size-5 shrink-0 text-muted-foreground" />
-								{/* Status under the name: three columns leave little room for a badge beside it */}
-								<div className="flex min-w-0 flex-1 flex-col">
-									<span className="truncate font-semibold">{door.name}</span>
-									{door.hasContact && (
-										<span className={cn('text-xs', door.isOpen ? 'text-warning' : 'text-muted-foreground')}>
-											{door.isOpen ? 'Open' : 'Closed'}
-										</span>
-									)}
-								</div>
-								{lockButton(door, 'lg', 'w-36')}
-							</div>
-						))}
-						{garages.map((garage) => (
-							<div key={garage.id} className="flex items-center gap-3 border-t px-4 py-1.5 touch:py-0.5">
-								<Warehouse
-									className={cn('size-5 shrink-0', garage.isOpen ? 'text-foreground' : 'text-muted-foreground')}
-								/>
-								<div className="flex min-w-0 flex-1 flex-col">
-									<span className="truncate font-semibold">{garage.name}</span>
-									<span className={cn('truncate text-xs', garage.isOpen ? 'text-warning' : 'text-muted-foreground')}>
-										{garage.detail}
+				{/* One card, a row per door and per garage bay, at every size: the same look on the 15" and
+				    10.5" panels, desktops and phones */}
+				<Card className="shrink-0 gap-0 py-0.5">
+					{doors.map((door, i) => (
+						<div key={door.id} className={cn('flex items-center gap-3 px-4 py-1.5 touch:py-0.5', i > 0 && 'border-t')}>
+							<Lock className="size-5 shrink-0 text-muted-foreground" />
+							{/* Status under the name: three columns leave little room for a badge beside it */}
+							<div className="flex min-w-0 flex-1 flex-col">
+								<span className="truncate font-semibold">{door.name}</span>
+								{door.hasContact && (
+									<span className={cn('text-xs', door.isOpen ? 'text-warning' : 'text-muted-foreground')}>
+										{door.isOpen ? 'Open' : 'Closed'}
 									</span>
-								</div>
-								<div className="w-36 shrink-0">{garageActions(garage, 'lg')}</div>
+								)}
 							</div>
-						))}
-					</Card>
-				) : (
-					<>
-						{/* Door Locks Row */}
-						<div className="grid shrink-0 auto-cols-fr grid-flow-col gap-4">
-							{doors.map((door) => (
-								<Card key={door.id} className="justify-between gap-4 py-4">
-									{/* Badge below the name so narrow cards don't truncate it; px-3 leaves the name and
-								    lock button room in a third of a column */}
-									<CardHeader className="gap-2 px-3">
-										<CardTitle className="truncate">{door.name}</CardTitle>
-										{door.hasContact && (
-											<Badge variant={door.isOpen ? 'warning' : 'outline'}>
-												<StableLabel
-													options={CONTACT_LABELS}
-													value={door.isOpen ? 0 : 1}
-													className="justify-items-center"
-												/>
-											</Badge>
-										)}
-									</CardHeader>
-									{/* A narrow card: the icon over the label, a two-line label at most in a fixed height, full padding */}
-									<CardContent className="px-3">
-										{lockButton(
-											door,
-											'xl',
-											'h-16 w-full flex-col gap-1 whitespace-normal px-3 text-center text-sm leading-tight has-[>svg]:px-3',
-										)}
-									</CardContent>
-								</Card>
-							))}
+							{lockButton(door, 'lg', 'w-36')}
 						</div>
-
-						{/* Garage Doors Dual Bay */}
-						{/* The bays fill the column but stop at a sensible size in a tall window, and never squeeze
-					    below their content (a short column scrolls instead) */}
-						<div className="grid max-h-64 min-h-min flex-1 auto-cols-fr grid-flow-col gap-4">
-							{garages.map((garage) => (
-								<Card key={garage.id} className="min-h-0 justify-between">
-									<CardHeader className="gap-2">
-										<CardTitle className="truncate text-lg">{garage.name}</CardTitle>
-										<Badge variant={garage.isOpen ? 'warning' : 'outline'}>
-											<StableLabel
-												options={GARAGE_STATUSES}
-												value={GARAGE_STATUSES.indexOf(garage.displayStatus)}
-												className="justify-items-center"
-											/>
-										</Badge>
-									</CardHeader>
-									<CardContent className="flex min-h-0 flex-1 items-center justify-center">
-										<Warehouse className={cn('size-12', garage.isOpen ? 'text-foreground' : 'text-muted-foreground')} />
-									</CardContent>
-									<CardFooter>{garageActions(garage, 'xl')}</CardFooter>
-								</Card>
-							))}
+					))}
+					{garages.map((garage) => (
+						<div key={garage.id} className="flex items-center gap-3 border-t px-4 py-1.5 touch:py-0.5">
+							<Warehouse
+								className={cn('size-5 shrink-0', garage.isOpen ? 'text-foreground' : 'text-muted-foreground')}
+							/>
+							<div className="flex min-w-0 flex-1 flex-col">
+								<span className="truncate font-semibold">{garage.name}</span>
+								<span className={cn('truncate text-xs', garage.isOpen ? 'text-warning' : 'text-muted-foreground')}>
+									{garage.detail}
+								</span>
+							</div>
+							<div className="w-36 shrink-0">{garageActions(garage, 'lg')}</div>
 						</div>
-					</>
-				)}
+					))}
+				</Card>
 
 				<ModuleGate id="cameras">
 					<CamerasCard compact={compact} onViewAll={onViewCameras} />

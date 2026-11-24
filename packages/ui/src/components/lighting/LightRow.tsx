@@ -10,7 +10,7 @@ import type React from 'preact/compat';
 import { memo, useState } from 'preact/compat';
 import { useStableCallbacks } from '../../hooks/useStableCallbacks';
 import { deepEqual } from '../../lib/hass-store';
-import { lightFill } from '../../lib/lights';
+import { lightFill, showsLightControls } from '../../lib/lights';
 import { cn } from '../../lib/utils';
 import { Button, Card, Slider, Switch } from '../ui';
 import { ColorRing } from './ColorRing';
@@ -74,6 +74,7 @@ const LightRowViewContent: React.FC<LightRowViewProps> = ({
 		state.isOn && fill
 			? ({ '--primary': fill.color, '--primary-foreground': fill.foreground } as React.CSSProperties)
 			: undefined;
+	const showControls = showsLightControls(state.isOn, preview !== null);
 	const content = (
 		<>
 			{/* A ring only while an effect runs (turning); the light's color is the button's own */}
@@ -90,7 +91,12 @@ const LightRowViewContent: React.FC<LightRowViewProps> = ({
 					<Lightbulb className="size-5" />
 				</Button>
 			</ColorRing>
-			<div className={cn('flex min-w-0 flex-col', state.dimmable ? 'w-28 shrink-0 max-lg:flex-1' : 'flex-1')}>
+			<div
+				className={cn(
+					'flex min-w-0 flex-col',
+					state.dimmable && showControls ? 'w-28 shrink-0 max-lg:flex-1' : 'flex-1',
+				)}
+			>
 				<span className="truncate font-semibold">{fixture.name}</span>
 				<span className="truncate text-muted-foreground text-xs">
 					{state.isOn
@@ -99,7 +105,7 @@ const LightRowViewContent: React.FC<LightRowViewProps> = ({
 				</span>
 			</div>
 			{/* On/off-only lights (switches) get neither a dimmer nor the colors dialog */}
-			{state.dimmable && (
+			{state.dimmable && showControls && (
 				<div style={lightColor} className="min-w-0 flex-1 max-lg:order-last max-lg:basis-full max-lg:px-1">
 					<Slider
 						min={1}
@@ -115,7 +121,7 @@ const LightRowViewContent: React.FC<LightRowViewProps> = ({
 					/>
 				</div>
 			)}
-			{state.adjustable ? (
+			{!showControls ? null : state.adjustable ? (
 				<Button
 					variant="outline"
 					size="icon-xl"

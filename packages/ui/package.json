@@ -38,7 +38,7 @@
 		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
-		"@fontsource/poppins": "catalog:",
+		"@fontsource-variable/geist": "catalog:",
 		"class-variance-authority": "catalog:",
 		"clsx": "catalog:",
 		"leaflet": "catalog:",
