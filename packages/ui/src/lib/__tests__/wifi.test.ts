@@ -35,6 +35,14 @@ describe('parseWifiQr', () => {
 		});
 	});
 
+	it('keeps quotes that were escaped', () => {
+		expect(parseWifiQr(String.raw`WIFI:S:x;P:\"a\";;`)?.password).toBe('"a"');
+		expect(parseWifiQr(String.raw`WIFI:T:WPA;S:Lobby;P:\"sunny\";;`)?.password).toBe('"sunny"');
+		expect(parseWifiQr(String.raw`WIFI:S:x;P:"a\";;`)?.password).toBe('"a"');
+		expect(parseWifiQr(String.raw`WIFI:S:x;P:\""a";;`)?.password).toBe('""a"');
+		expect(parseWifiQr('WIFI:S:x;P:";;')?.password).toBe('"');
+	});
+
 	it('is null for anything else', () => {
 		expect(parseWifiQr('https://example.com')).toBeNull();
 		expect(parseWifiQr('WIFI:T:WPA;P:secret;;')).toBeNull();
