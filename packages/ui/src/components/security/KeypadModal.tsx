@@ -228,7 +228,7 @@ export const KeypadModal: React.FC<KeypadModalProps> = ({
 				size="compact"
 				className={cn('short:gap-2 short:p-4 max-sm:gap-6', warned && 'touch:max-lg:gap-3')}
 			>
-				<DialogHeader className="items-center text-center max-sm:mt-[6svh] sm:px-10 sm:text-center">
+				<DialogHeader className="items-center text-center max-sm:mt-[calc(var(--panel-height)*0.06)] sm:px-10 sm:text-center">
 					{/* A phone on its side: the keys get the height */}
 					<Shield className="short:hidden size-8 text-muted-foreground sm:max-lg:hidden" />
 					<DialogTitle>{MODE_TITLES[targetMode] ?? 'Security PIN'}</DialogTitle>
@@ -266,7 +266,7 @@ export const KeypadModal: React.FC<KeypadModalProps> = ({
 				</div>
 
 				{/* The keys: 1–9, then Cancel · 0 · delete */}
-				<div className="grid grid-cols-3 justify-items-center gap-x-6 gap-y-3 short:gap-y-2 max-sm:gap-x-8 max-sm:gap-y-[2.5svh]">
+				<div className="grid grid-cols-3 justify-items-center gap-x-6 gap-y-3 short:gap-y-2 max-sm:gap-x-8 max-sm:gap-y-[calc(var(--panel-height)*0.025)]">
 					{DIGITS.map(([digit, letters]) =>
 						key(
 							digit,
