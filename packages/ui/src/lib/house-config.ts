@@ -44,7 +44,10 @@ export interface HouseTts {
 	fallback?: string;
 }
 
-/** The house's settings, parsed (`parseHouseConfig`); every key optional but the lists and `tts`. */
+/**
+ * The house's settings, parsed (`parseHouseConfig`): `laundry`, `liveInputs`, `tts`, `bedtimeRoutines` and
+ * `modules` are always there (empty when unset), the rest optional.
+ */
 export interface HouseConfig {
 	/** The speaker that announces for the house (the kitchen timer, the Daily dialog's first pick). */
 	announceSpeaker?: string;
