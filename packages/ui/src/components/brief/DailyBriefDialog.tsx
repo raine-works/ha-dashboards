@@ -543,7 +543,7 @@ export const DailyBriefDialog: React.FC<DailyBriefDialogProps> = ({ isOpen, onCl
 							aria-pressed={isOn}
 							data-state={isOn ? 'on' : 'off'}
 							onClick={() => pickSpeaker(s.entityId)}
-							className={toggleVariants({ variant: 'outline', size: 'xl' })}
+							className={toggleVariants({ variant: 'chip', size: 'xl' })}
 						>
 							{s.name}
 						</button>
@@ -585,7 +585,7 @@ export const DailyBriefDialog: React.FC<DailyBriefDialogProps> = ({ isOpen, onCl
 											: 'Weather, calendar and news'}
 							</DialogDescription>
 						</div>
-						<TabsList className="h-11 shrink-0 max-sm:order-last max-sm:w-full sm:w-fit">
+						<TabsList className="max-sm:order-last">
 							<TabsTrigger value="brief" className="px-4">
 								<Newspaper />
 								Brief

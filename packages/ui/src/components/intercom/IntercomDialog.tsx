@@ -5,7 +5,7 @@
  * @module
  */
 
-import { Bell, Check, Printer, Smartphone, Speaker, Tv, Volume2 } from 'lucide-react';
+import { Bell, Printer, Smartphone, Speaker, Tv, Volume2 } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useState } from 'preact/compat';
 import { useHassApi, useHassReady, useHassSelector } from '../../context/HassContext';
@@ -21,10 +21,10 @@ import {
 } from '../../lib/intercom';
 import { readStoredJson, writeStored } from '../../lib/storage';
 import { discoverTvs, TVS_WATCH } from '../../lib/tv';
-import { cn } from '../../lib/utils';
 import { MessageComposer } from '../audio/MessageComposer';
 import { withHolidayChime } from '../holiday/holidaySounds';
 import { useHoliday } from '../holiday/useHoliday';
+import { SectionGroup } from '../layout/Section';
 import { usePrinter } from '../printer/usePrinter';
 import {
 	Button,
@@ -41,8 +41,8 @@ import {
 	TabsContent,
 	TabsList,
 	TabsTrigger,
-	toggleVariants,
 } from '../ui';
+import { CheckRow } from '../ui/check-row';
 import { PhoneMessages } from './PhoneMessages';
 import { PresetPicker } from './PresetPicker';
 import { PrintNotes } from './PrintNotes';
@@ -197,7 +197,7 @@ export const IntercomDialog: React.FC<IntercomDialogProps> = ({ isOpen, onClose 
 					onValueChange={(mode) => update({ mode: mode as IntercomSettings['mode'] })}
 					className="flex min-h-0 flex-1 flex-col gap-4 short:gap-2"
 				>
-					<TabsList className="h-11 w-full shrink-0 sm:w-fit">
+					<TabsList>
 						<TabsTrigger value="speakers" className="px-4">
 							<Speaker />
 							Speakers
@@ -228,98 +228,62 @@ export const IntercomDialog: React.FC<IntercomDialogProps> = ({ isOpen, onClose 
 						{/* Phones: speakers, then the quick announcements, then the spare height, then the volume and
 				    message box at the bottom edge (the whole tab scrolls when it doesn't fit, e.g. with the keyboard up) */}
 						<div className="flex min-h-0 flex-1 gap-6 short:gap-4 max-md:flex-col max-md:gap-4 max-md:overflow-y-auto">
-							{/* Speaker Selection */}
-							<div className="flex w-72 shrink-0 flex-col gap-3 max-md:w-full">
-								<div className="flex items-center justify-between">
-									<span className="font-medium text-sm">Speakers</span>
-									<div className="flex gap-1">
-										<Button variant="ghost" size="sm" onClick={() => update({ speakers: availableIds })}>
-											All
-										</Button>
-										<Button variant="ghost" size="sm" onClick={() => update({ speakers: [] })}>
-											None
-										</Button>
-									</div>
-								</div>
-
-								<div className="flex min-h-0 flex-col gap-2 overflow-y-auto p-0.5">
+							{/* Who hears it: the speakers, then the TVs, each a group of check rows on one surface */}
+							<div className="flex w-72 shrink-0 flex-col gap-gap overflow-y-auto p-0.5 max-md:w-full max-md:overflow-visible">
+								<SectionGroup
+									label="Speakers"
+									surface
+									actions={
+										speakers.length > 1 && (
+											<>
+												<Button variant="ghost" size="sm" onClick={() => update({ speakers: availableIds })}>
+													All
+												</Button>
+												<Button variant="ghost" size="sm" onClick={() => update({ speakers: [] })}>
+													None
+												</Button>
+											</>
+										)
+									}
+								>
 									{speakers.length === 0 && (
 										<EmptyState icon={<Speaker className="size-10" />}>No Music Assistant speakers found.</EmptyState>
 									)}
-									{speakers.map((speaker) => {
-										const isOn = selected.includes(speaker.entityId);
-										return (
-											<button
-												key={speaker.entityId}
-												type="button"
-												aria-pressed={isOn}
-												data-state={isOn ? 'on' : 'off'}
-												disabled={!speaker.available || speaker.tvAudio}
-												onClick={() => toggleSpeaker(speaker.entityId)}
-												className={cn(
-													toggleVariants({ variant: 'outline', size: 'xl' }),
-													'w-full shrink-0 justify-start',
-												)}
-											>
-												<span className="min-w-0 flex-1 truncate text-left">{speaker.name}</span>
-												{speaker.isPlaying && <span className="size-2 shrink-0 rounded-full bg-primary" />}
-												{!speaker.available ? (
-													<span className="text-muted-foreground text-xs">Offline</span>
-												) : (
-													speaker.tvAudio && <span className="text-muted-foreground text-xs">Playing the TV</span>
-												)}
-												{/* The check at the end, like the Phones tab's people */}
-												<span
-													className={cn(
-														'flex size-5 shrink-0 items-center justify-center rounded-full border',
-														isOn && 'border-primary bg-primary text-primary-foreground',
-													)}
-												>
-													{isOn && <Check className="size-3" />}
-												</span>
-											</button>
-										);
-									})}
-									{tvs.length > 0 && (
-										<>
-											<span className="mt-2 font-medium text-sm">TVs</span>
-											{tvs.map((tv) => {
-												const isOn = selectedTvs.includes(tv.entityId);
-												const awake = tv.state === 'on';
-												return (
-													<button
-														key={tv.entityId}
-														type="button"
-														aria-pressed={isOn}
-														data-state={isOn ? 'on' : 'off'}
-														disabled={!awake}
-														onClick={() => toggleTv(tv.entityId)}
-														className={cn(
-															toggleVariants({ variant: 'outline', size: 'xl' }),
-															'w-full shrink-0 justify-start',
-														)}
-													>
-														<Tv className="shrink-0" />
-														<span className="min-w-0 flex-1 truncate text-left">{tv.name}</span>
-														{!awake && (
-															<span className="text-muted-foreground text-xs">
-																{tv.state === 'unavailable' ? 'Offline' : 'Off'}
-															</span>
-														)}
-														<span
-															className={cn(
-																'flex size-5 shrink-0 items-center justify-center rounded-full border',
-																isOn && 'border-primary bg-primary text-primary-foreground',
-															)}
-														>
-															{isOn && <Check className="size-3" />}
-														</span>
-													</button>
-												);
-											})}
-										</>
-									)}
-								</div>
+									{speakers.map((speaker) => (
+										<CheckRow
+											key={speaker.entityId}
+											label={speaker.name}
+											checked={selected.includes(speaker.entityId)}
+											onCheckedChange={() => toggleSpeaker(speaker.entityId)}
+											disabled={!speaker.available || speaker.tvAudio}
+											detail={
+												!speaker.available
+													? 'Offline'
+													: speaker.tvAudio
+														? 'Playing the TV'
+														: speaker.isPlaying
+															? 'Playing'
+															: undefined
+											}
+										/>
+									))}
+								</SectionGroup>
+								{tvs.length > 0 && (
+									<SectionGroup label="TVs" surface>
+										{tvs.map((tv) => (
+											<CheckRow
+												key={tv.entityId}
+												label={tv.name}
+												icon={<Tv />}
+												checked={selectedTvs.includes(tv.entityId)}
+												onCheckedChange={() => toggleTv(tv.entityId)}
+												// Only a TV that's on: one asleep would wake to say it
+												disabled={tv.state !== 'on'}
+												detail={tv.state === 'on' ? undefined : tv.state === 'unavailable' ? 'Offline' : 'Off'}
+											/>
+										))}
+									</SectionGroup>
+								)}
 							</div>
 
 							<Separator orientation="vertical" className="max-md:hidden" />

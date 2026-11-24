@@ -66,6 +66,7 @@ import {
 	DialogTitle,
 	EmptyState,
 	StableLabel,
+	SURFACE,
 	Tabs,
 	TabsContent,
 	TabsList,
@@ -256,10 +257,14 @@ const TvList: React.FC<{ tvs: Tv[]; selected?: string; onSelect: (id: string) =>
 	selected,
 	onSelect,
 }) => (
-	// Phones: a strip; wider screens: a column
+	// Rows on one surface, the picked one filled (docs/design/dialogs.md): a column on wider screens, a
+	// strip on phones
 	<nav
 		aria-label="TVs"
-		className="flex shrink-0 gap-2 overflow-x-auto p-0.5 max-md:-mx-1 max-md:px-1 md:w-56 md:flex-col md:overflow-x-visible"
+		className={cn(
+			SURFACE,
+			'flex shrink-0 gap-1 self-start overflow-x-auto p-1 max-md:w-full md:w-60 md:flex-col md:overflow-x-visible',
+		)}
 	>
 		{tvs.map((tv) => (
 			<button
@@ -267,7 +272,7 @@ const TvList: React.FC<{ tvs: Tv[]; selected?: string; onSelect: (id: string) =>
 				type="button"
 				aria-pressed={tv.entityId === selected}
 				onClick={() => onSelect(tv.entityId)}
-				className="flex min-w-0 shrink-0 items-center gap-3 rounded-lg border p-2 text-left transition-colors hover:bg-accent aria-pressed:border-primary aria-pressed:bg-accent max-md:w-44"
+				className="flex min-h-14 min-w-0 shrink-0 items-center gap-3 rounded-control p-2 text-left outline-none transition-colors hover:bg-accent/50 focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-pressed:bg-accent max-md:w-48"
 			>
 				<AppIcon app={tv.app} input={tv.input} on={tv.state === 'on'} className="size-10" />
 				<span className="flex min-w-0 flex-col">
@@ -492,10 +497,10 @@ const OnScreenArt: React.FC<{ tv: Tv }> = ({ tv }) => {
 				alt=""
 				draggable={false}
 				onError={() => setFailed(artwork)}
-				className="h-20 w-auto max-w-36 shrink-0 rounded-md bg-muted object-contain max-sm:h-16"
+				className="h-24 w-auto max-w-40 shrink-0 rounded-icon bg-muted object-contain max-sm:h-16"
 			/>
 		);
-	return <AppIcon app={tv.app} input={tv.input} on={tv.state === 'on'} className="size-14" />;
+	return <AppIcon app={tv.app} input={tv.input} on={tv.state === 'on'} className="size-16 max-sm:size-14" />;
 };
 
 /** One TV: what's on with power, playback and volume, then the apps and inputs (or the remote). */
@@ -512,7 +517,7 @@ const TvPanel: React.FC<{ tv: Tv; controls: TvControls; remote: boolean }> = ({ 
 			{/* What's plugged in: tap to switch to it */}
 			{tv.inputs.length > 0 && (
 				<div className="flex flex-col gap-2">
-					<span className="font-semibold text-muted-foreground text-xs uppercase tracking-wide">Inputs</span>
+					<h3 className="px-1 text-muted-foreground text-overline uppercase">Inputs</h3>
 					<ChipRow role="group" aria-label="Inputs">
 						{tv.inputs.map((input) => (
 							<Button
@@ -535,17 +540,21 @@ const TvPanel: React.FC<{ tv: Tv; controls: TvControls; remote: boolean }> = ({ 
 				</div>
 			)}
 			{tv.apps.length > 0 && (
-				<div className="grid grid-cols-4 gap-x-2 gap-y-3 sm:grid-cols-5 xl:grid-cols-6">
-					{tv.apps.map((app) => (
-						<AppTile
-							key={app.packageName}
-							app={app}
-							current={on && !tv.input && tv.appId === app.packageName}
-							loading={controls.isBusy(tv, `app:${app.packageName}`)}
-							disabled={!canLaunch}
-							onLaunch={() => controls.launch(tv, app)}
-						/>
-					))}
+				<div className="flex flex-col gap-2">
+					<h3 className="px-1 text-muted-foreground text-overline uppercase">Apps</h3>
+					{/* As many across as fit, filling the row */}
+					<div className="grid grid-cols-[repeat(auto-fill,minmax(6rem,1fr))] gap-x-2 gap-y-3 max-sm:grid-cols-4">
+						{tv.apps.map((app) => (
+							<AppTile
+								key={app.packageName}
+								app={app}
+								current={on && !tv.input && tv.appId === app.packageName}
+								loading={controls.isBusy(tv, `app:${app.packageName}`)}
+								disabled={!canLaunch}
+								onLaunch={() => controls.launch(tv, app)}
+							/>
+						))}
+					</div>
 				</div>
 			)}
 		</div>
@@ -553,93 +562,96 @@ const TvPanel: React.FC<{ tv: Tv; controls: TvControls; remote: boolean }> = ({ 
 
 	return (
 		<div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto p-0.5">
-			{/* What's on (with its poster while something plays), and power */}
-			<div className="flex shrink-0 items-center gap-4 rounded-lg border bg-card p-3">
-				<OnScreenArt tv={tv} />
-				{playing ? (
-					<span className="flex min-w-0 flex-1 flex-col">
-						<span className="truncate text-muted-foreground text-xs">
-							{tv.name}
-							{tv.appName ? ` · ${tv.appName}` : ''}
-							{playing.state === 'paused' ? ' · Paused' : ''}
+			{/* The TV as one card: what's on and power, then playback and volume under it */}
+			<div className={cn(SURFACE, 'flex shrink-0 flex-col gap-4 p-pad max-sm:gap-3 max-sm:p-3')}>
+				<div className="flex items-center gap-4">
+					<OnScreenArt tv={tv} />
+					{playing ? (
+						<span className="flex min-w-0 flex-1 flex-col">
+							<span className="truncate text-muted-foreground text-xs">
+								{tv.name}
+								{tv.appName ? ` · ${tv.appName}` : ''}
+								{playing.state === 'paused' ? ' · Paused' : ''}
+							</span>
+							<span className="truncate text-title">{playing.title}</span>
+							{playing.subtitle && <span className="truncate text-muted-foreground text-sm">{playing.subtitle}</span>}
 						</span>
-						<span className="truncate font-semibold">{playing.title}</span>
-						{playing.subtitle && <span className="truncate text-muted-foreground text-sm">{playing.subtitle}</span>}
-					</span>
-				) : (
-					<span className="flex min-w-0 flex-1 flex-col">
-						<span className="truncate font-semibold">{tv.name}</span>
-						<span className="truncate text-muted-foreground text-sm">
-							{on ? (tv.appName ? `On · ${tv.appName}` : 'On') : tvStatus(tv)}
+					) : (
+						<span className="flex min-w-0 flex-1 flex-col">
+							<span className="truncate text-title">{tv.name}</span>
+							<span className="truncate text-muted-foreground text-sm">
+								{on ? (tv.appName ? `On · ${tv.appName}` : 'On') : tvStatus(tv)}
+							</span>
 						</span>
-					</span>
-				)}
-				<Button
-					variant={on ? 'outline' : 'default'}
-					size="xl"
-					onClick={() => controls.power(tv)}
-					loading={controls.isBusy(tv, 'power')}
-					disabled={!canPower}
-					className="w-36 shrink-0 max-sm:w-auto"
-				>
-					<Power />
-					<span className="max-sm:sr-only">{on ? 'Turn off' : 'Turn on'}</span>
-				</Button>
-			</div>
+					)}
+					{/* Turning a TV on is what you came for (filled); turning it off is quieter */}
+					<Button
+						variant={on ? 'secondary' : 'default'}
+						size="action"
+						onClick={() => controls.power(tv)}
+						loading={controls.isBusy(tv, 'power')}
+						disabled={!canPower}
+						className="w-36 shrink-0 max-sm:w-auto"
+					>
+						<Power />
+						<span className="max-sm:sr-only">{on ? 'Turn off' : 'Turn on'}</span>
+					</Button>
+				</div>
 
-			{/* Playback and volume; always laid out, so a TV turning on never moves the apps */}
-			<div className="flex shrink-0 flex-wrap items-center gap-2">
-				<Button
-					variant="outline"
-					size="icon-xl"
-					onClick={() => controls.previous(tv)}
-					disabled={!playing || !tvSupports(tv, TV_FEATURE.PREVIOUS_TRACK)}
-					aria-label="Previous"
-				>
-					<SkipBack />
-				</Button>
-				<Button
-					variant="outline"
-					size="xl"
-					onClick={() => controls.playPause(tv)}
-					disabled={!playing || !tvSupports(tv, TV_FEATURE.PAUSE)}
-				>
-					{playing?.state === 'paused' ? <Play /> : <Pause />}
-					<StableLabel options={['Pause', 'Play']} value={playing?.state === 'paused' ? 1 : 0} />
-				</Button>
-				<Button
-					variant="outline"
-					size="icon-xl"
-					onClick={() => controls.next(tv)}
-					disabled={!playing || !tvSupports(tv, TV_FEATURE.NEXT_TRACK)}
-					aria-label="Next"
-				>
-					<SkipForward />
-				</Button>
-				<span className="flex min-w-48 flex-1 items-center gap-2">
+				{/* Playback and volume; always laid out, so a TV turning on never moves the apps */}
+				<div className="flex flex-wrap items-center gap-2">
 					<Button
 						variant="outline"
 						size="icon-xl"
-						onClick={() => controls.mute(tv)}
-						disabled={!on || !tvSupports(tv, TV_FEATURE.VOLUME_MUTE)}
-						aria-label={tv.muted ? 'Unmute' : 'Mute'}
+						onClick={() => controls.previous(tv)}
+						disabled={!playing || !tvSupports(tv, TV_FEATURE.PREVIOUS_TRACK)}
+						aria-label="Previous"
 					>
-						{tv.muted ? <VolumeX /> : <Volume2 />}
+						<SkipBack />
 					</Button>
-					<VolumeSlider
-						value={tv.volume ?? 0}
-						onCommit={(value) => controls.setVolume(tv, value)}
-						label={`${tv.name} volume`}
-						disabled={!canSetVolume}
-						className="flex-1"
-					/>
-				</span>
+					<Button
+						variant="outline"
+						size="xl"
+						onClick={() => controls.playPause(tv)}
+						disabled={!playing || !tvSupports(tv, TV_FEATURE.PAUSE)}
+					>
+						{playing?.state === 'paused' ? <Play /> : <Pause />}
+						<StableLabel options={['Pause', 'Play']} value={playing?.state === 'paused' ? 1 : 0} />
+					</Button>
+					<Button
+						variant="outline"
+						size="icon-xl"
+						onClick={() => controls.next(tv)}
+						disabled={!playing || !tvSupports(tv, TV_FEATURE.NEXT_TRACK)}
+						aria-label="Next"
+					>
+						<SkipForward />
+					</Button>
+					<span className="flex min-w-48 flex-1 items-center gap-2">
+						<Button
+							variant="outline"
+							size="icon-xl"
+							onClick={() => controls.mute(tv)}
+							disabled={!on || !tvSupports(tv, TV_FEATURE.VOLUME_MUTE)}
+							aria-label={tv.muted ? 'Unmute' : 'Mute'}
+						>
+							{tv.muted ? <VolumeX /> : <Volume2 />}
+						</Button>
+						<VolumeSlider
+							value={tv.volume ?? 0}
+							onCommit={(value) => controls.setVolume(tv, value)}
+							label={`${tv.name} volume`}
+							disabled={!canSetVolume}
+							className="flex-1"
+						/>
+					</span>
+				</div>
 			</div>
 
 			{/* Apps or the remote, in the same room (so the panel never grows taller); apps alone without the remote */}
 			{remote ? (
 				<Tabs value={tab} onValueChange={(value) => setTab(value as 'apps' | 'remote')} className="shrink-0">
-					<TabsList className="h-11">
+					<TabsList>
 						<TabsTrigger value="apps">Apps</TabsTrigger>
 						<TabsTrigger value="remote">Remote</TabsTrigger>
 					</TabsList>

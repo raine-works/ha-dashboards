@@ -64,7 +64,9 @@ const TabsList = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
 			role="tablist"
 			data-slot="tabs-list"
 			className={cn(
-				'inline-flex h-9 touch:h-13 w-fit items-center justify-center rounded-lg bg-muted p-[3px] text-muted-foreground',
+				// The one segmented control (docs/design/components.md): a muted track, the picked tab raised on it;
+				// the screen's width on a phone, its tabs' own from sm
+				'inline-flex h-11 touch:h-13 w-full shrink-0 items-center justify-center gap-1 rounded-control bg-muted p-1 text-muted-foreground sm:w-fit',
 				className,
 			)}
 			{...props}
@@ -94,7 +96,7 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(({ cla
 			data-state={isActive ? 'active' : 'inactive'}
 			onClick={() => context.onValueChange(value)}
 			className={cn(
-				"inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-md border border-transparent px-2 touch:px-3 py-1 font-medium text-foreground text-sm touch:text-base transition-[color,box-shadow] focus-visible:border-ring focus-visible:outline-1 focus-visible:outline-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:shadow-sm dark:text-muted-foreground dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 dark:data-[state=active]:text-foreground [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+				"inline-flex h-full flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-chip px-3 touch:px-4 font-medium text-muted-foreground text-sm touch:text-base outline-none transition-[color,background-color,box-shadow] hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
 				className,
 			)}
 			{...props}
