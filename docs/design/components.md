@@ -11,7 +11,8 @@ and dialog sizes don't exist before it), and what's marked retired goes as each 
 
 A screen's group (Lighting, Security, Climate): the one `SectionHeader` (a neutral icon, the title,
 its actions), then its content on one surface. **No second header inside a section**: a group in it
-gets a plain overline ("Doors", "Garage", "Main floor"). Replaces today's cards-with-headers inside
+gets a plain overline ("Doors", "Garage", "Main floor"), with the group's own actions at its end
+(Open all / Close all). Replaces today's cards-with-headers inside
 sections (Thermostats, Scent, Curtains, Fan, Cameras).
 
 ### Tile
@@ -32,8 +33,12 @@ A square-ish squircle for something spatial or frequent: a room, a favorite, a s
 
 The house's state at a glance: the alarm, the doors, the climate. An icon, a state word, one line
 of detail, and at most one action, **secondary** when the state is good ("Armed · Disarm" is a quiet
-button) and **primary** only when the state needs action ("Disarmed · Arm"). Replaces today's alarm
-card, whose full-width red Disarm is the loudest thing on screen while the house is safe.
+button) and **primary** only when the state needs action ("Disarmed · Arm"). A choice of actions that
+won't fit beside the state (the alarm's Arm Home and Arm Away), a countdown or an error goes on its
+own full-width row under it. The detail is cut to one line, except where it must be read whole (a
+refusal to arm, naming what Arm anyway would bypass), and turns amber, keeping its words, when it
+warns (open doors). The alarm card is one now; its full-width red Disarm was the loudest thing on
+screen while the house was safe.
 
 ### DeviceRow
 
@@ -48,6 +53,8 @@ control from a fixed set:
 | Chevron | Opens its dialog (everything else) |
 
 - Tapping the row's name opens its dialog (dimmer, color, mode, position, speed…).
+- The icon tile is left out only where the trailing control needs the row's room (a thermostat's
+  stepper in a narrow column).
 - 56px tall on wall panels, 48px elsewhere.
 - **A state is never shown as a button label**: "Locked" is the status line; the button says what
   it does ("Unlock"), the way today's "Open door" does.
