@@ -295,7 +295,7 @@ export const CameraModal: React.FC<CameraModalProps> = ({ isOpen, onClose, initi
 						onValueChange={(value) => setTab(value as 'live' | 'clips')}
 						className="min-h-0 min-w-0 flex-1 gap-4 p-1 max-md:gap-3 max-md:overflow-y-auto"
 					>
-						<TabsList className="h-11 w-full shrink-0 sm:w-fit">
+						<TabsList>
 							<TabsTrigger value="live" className="px-4">
 								<Radio />
 								Live

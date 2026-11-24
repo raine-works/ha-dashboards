@@ -197,7 +197,7 @@ export const IntercomDialog: React.FC<IntercomDialogProps> = ({ isOpen, onClose 
 					onValueChange={(mode) => update({ mode: mode as IntercomSettings['mode'] })}
 					className="flex min-h-0 flex-1 flex-col gap-4 short:gap-2"
 				>
-					<TabsList className="h-11 w-full shrink-0 sm:w-fit">
+					<TabsList>
 						<TabsTrigger value="speakers" className="px-4">
 							<Speaker />
 							Speakers
@@ -257,7 +257,7 @@ export const IntercomDialog: React.FC<IntercomDialogProps> = ({ isOpen, onClose 
 												disabled={!speaker.available || speaker.tvAudio}
 												onClick={() => toggleSpeaker(speaker.entityId)}
 												className={cn(
-													toggleVariants({ variant: 'outline', size: 'xl' }),
+													toggleVariants({ variant: 'chip', size: 'xl' }),
 													'w-full shrink-0 justify-start',
 												)}
 											>
@@ -295,7 +295,7 @@ export const IntercomDialog: React.FC<IntercomDialogProps> = ({ isOpen, onClose 
 														disabled={!awake}
 														onClick={() => toggleTv(tv.entityId)}
 														className={cn(
-															toggleVariants({ variant: 'outline', size: 'xl' }),
+															toggleVariants({ variant: 'chip', size: 'xl' }),
 															'w-full shrink-0 justify-start',
 														)}
 													>

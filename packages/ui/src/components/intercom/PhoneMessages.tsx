@@ -126,7 +126,7 @@ export const PhoneMessages: React.FC<{
 								aria-pressed={isOn}
 								data-state={isOn ? 'on' : 'off'}
 								onClick={() => toggle(person.entityId)}
-								className={cn(toggleVariants({ variant: 'outline', size: 'xl' }), 'w-full shrink-0 justify-start')}
+								className={cn(toggleVariants({ variant: 'chip', size: 'xl' }), 'w-full shrink-0 justify-start')}
 							>
 								<Avatar className="size-7">
 									{person.picture && <AvatarImage src={person.picture} alt="" />}

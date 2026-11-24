@@ -211,7 +211,7 @@ const LightingSectionContent: React.FC<LightingSectionProps> = ({
 	if (houseWide) tabs.unshift({ value: 'floor', label: 'Lights' });
 	if (hasScenes) tabs.push({ value: 'scenes', label: 'Scenes' });
 	const tabList = (
-		<TabsList className="h-11 w-full">
+		<TabsList className="sm:w-full">
 			{tabs.map((tab) => (
 				<TabsTrigger key={tab.value} value={tab.value}>
 					{tab.label}

@@ -366,7 +366,7 @@ export const PartyMode: React.FC = () => {
 						/>
 						<div className="flex min-h-0 flex-col gap-4 max-lg:gap-3">
 							<Tabs value={tab} onValueChange={(value) => setTab(value as PartyTab)} className="min-h-0 flex-1 gap-3">
-								<TabsList className="h-11 w-full shrink-0">
+								<TabsList className="sm:w-full">
 									<TabsTrigger value="queue" className="px-4">
 										<ListMusic />
 										Queue

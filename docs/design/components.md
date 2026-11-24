@@ -81,7 +81,20 @@ Three sizes and four roles, instead of today's ten sizes and `outline` on two-th
 | Danger | `destructive` | Filled `destructive` | Destroying something, and only then |
 
 Every button has a label (icon-only: Close). `loading` stays. Header buttons are secondary tiles
-(icon over label).
+(icon over label). `outline` remains as a name only: it draws as the tonal secondary, so the
+buttons and chips written with it took the design at once; new code says `secondary`. `warning`
+is tonal too, tinted amber.
+
+### Chips and segmented choices
+
+- **A chip** (a quick message, Play on's speaker, a filter, a person): tonal, filled with `primary`
+  while picked: a Button `outline` / `default` pair, or a ToggleGroup item with `variant: 'chip'`
+  for one on its own. No borders, so a row of them reads as one quiet line with the pick standing
+  out.
+- **One segmented control** for choosing a view or a mode (tabs, Home / Away / Sleep, Today /
+  Week / Month): `Tabs`, or a `ToggleGroup` with `variant="outline"`, drawn the same way: a muted
+  track with the picked one raised on the card color (and the brand edge). The screen's width on
+  a phone, its items' own from `sm`; full width only where it heads its own column.
 
 ### Dialog
 

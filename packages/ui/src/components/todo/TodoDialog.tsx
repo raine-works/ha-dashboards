@@ -1185,7 +1185,7 @@ export const TodoDialog: React.FC<TodoDialogProps> = ({ isOpen, onClose, list: l
 
 				{tabs > 1 && (list || showCompleted) && (
 					<Tabs value={showCompleted ? COMPLETED_TAB : list?.entityId} onValueChange={pick} className="shrink-0">
-						<TabsList className="h-11 w-full">
+						<TabsList>
 							{lists.map((l) => (
 								<TabsTrigger key={l.entityId} value={l.entityId}>
 									{openOn(l) > 0 ? `${l.name} · ${openOn(l)}` : l.name}

@@ -11,12 +11,17 @@ import { cn } from '../../lib/utils';
 
 /** shadcn's Toggle classes by `variant` and `size`, which the group's items use. */
 const toggleVariants = cva(
-	"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium text-sm outline-none transition-[color,box-shadow] hover:bg-muted hover:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+	"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium text-sm outline-none transition-[color,box-shadow] hover:bg-muted hover:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
 	{
 		variants: {
 			variant: {
-				default: 'bg-transparent',
-				outline: 'border border-input bg-transparent shadow-xs hover:bg-accent hover:text-accent-foreground',
+				default: 'bg-transparent data-[state=on]:bg-accent data-[state=on]:text-accent-foreground',
+				// The segmented control (docs/design/components.md), as Tabs draw it: in a group, a muted track
+				// (the group's) with the picked item raised on it
+				outline:
+					'bg-transparent text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=on]:bg-card data-[state=on]:text-foreground data-[state=on]:shadow-sm',
+				// Panel extension: a toggle on its own (Play on's speakers, a message's people): tonal, filled while on
+				chip: 'rounded-control bg-secondary text-secondary-foreground hover:bg-secondary/80 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:hover:bg-primary/90',
 			},
 			size: {
 				default: 'h-9 touch:h-11 min-w-9 touch:min-w-11 px-2 touch:text-base',
@@ -70,7 +75,10 @@ const ToggleGroup: React.FC<ToggleGroupProps> = ({
 		data-slot="toggle-group"
 		data-variant={variant}
 		data-size={size}
-		className={cn('group/toggle-group flex w-fit items-center rounded-md data-[variant=outline]:shadow-xs', className)}
+		className={cn(
+			'group/toggle-group flex w-fit items-center rounded-md data-[variant=outline]:gap-1 data-[variant=outline]:rounded-control data-[variant=outline]:bg-muted data-[variant=outline]:p-1',
+			className,
+		)}
 		{...props}
 	>
 		<ToggleGroupContext.Provider value={{ value, onValueChange, variant, size }}>
@@ -105,7 +113,7 @@ const ToggleGroupItem = React.forwardRef<HTMLButtonElement, ToggleGroupItemProps
 				onClick={() => context.onValueChange(value)}
 				className={cn(
 					toggleVariants({ variant: resolvedVariant, size: resolvedSize }),
-					'min-w-0 flex-1 shrink-0 rounded-none shadow-none first:rounded-l-md last:rounded-r-md focus:z-10 focus-visible:z-10 data-[variant=outline]:border-l-0 data-[variant=outline]:first:border-l',
+					'min-w-0 flex-1 shrink-0 rounded-none shadow-none first:rounded-l-md last:rounded-r-md focus:z-10 focus-visible:z-10 data-[variant=outline]:rounded-chip',
 					className,
 				)}
 				{...props}
