@@ -1,3 +1,9 @@
+/**
+ * The guest Wi-Fi's QR code and the dialog that shows it.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import { useEntity, useHassSelector } from '../../context/HassContext';
 import { useHouseConfig } from '../../context/HouseConfig';

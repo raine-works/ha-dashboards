@@ -1,3 +1,9 @@
+/**
+ * The button that prints a list on the receipt printer.
+ *
+ * @module
+ */
+
 import { CheckCheck, Printer, Users } from 'lucide-react';
 import type React from 'preact/compat';
 import { useState } from 'preact/compat';

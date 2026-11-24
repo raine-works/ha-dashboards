@@ -1,3 +1,9 @@
+/**
+ * The people dialog: where everyone is, their phone battery, and a map.
+ *
+ * @module
+ */
+
 import {
 	BatteryChargingIcon,
 	BatteryFullIcon,
@@ -147,6 +153,7 @@ const PersonTile: React.FC<{
 	);
 };
 
+/** The people dialog's props: whether it's open and what closes it. */
 export interface PeopleDialogProps {
 	isOpen: boolean;
 	onClose: () => void;

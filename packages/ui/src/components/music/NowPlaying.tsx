@@ -1,3 +1,9 @@
+/**
+ * The music player's Now Playing tab: the cover, transport, volume, up next and moving the music.
+ *
+ * @module
+ */
+
 import {
 	Album,
 	ChevronRight,

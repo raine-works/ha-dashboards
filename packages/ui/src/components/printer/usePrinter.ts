@@ -1,3 +1,9 @@
+/**
+ * The receipt printer and what's wrong with it, live.
+ *
+ * @module
+ */
+
 import { useHassSelector } from '../../context/HassContext';
 import { discoverPrinters, type Printer, type PrinterStatus, printerStatus, printerWatch } from '../../lib/printer';
 
@@ -9,6 +15,7 @@ const PROBLEMS: Record<string, string> = {
 	'Paper low': 'is low on paper: replace the roll soon',
 };
 
+/** The receipt printer, its status, and its trouble in words. */
 export interface PrinterView {
 	printer: Printer;
 	status: PrinterStatus;

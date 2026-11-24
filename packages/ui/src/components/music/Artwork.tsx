@@ -1,3 +1,9 @@
+/**
+ * Cover art for music: the cover or a placeholder by kind, the playing bars and the blurred backdrop.
+ *
+ * @module
+ */
+
 import { Disc3, type LucideIcon, MicVocal, Music, Newspaper, RadioReceiver, Tv } from 'lucide-react';
 import type React from 'preact/compat';
 import { useState } from 'preact/compat';

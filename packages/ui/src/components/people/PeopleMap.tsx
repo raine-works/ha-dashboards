@@ -1,3 +1,9 @@
+/**
+ * The people dialog's map (Leaflet, loaded on demand): everyone's last position and the zones.
+ *
+ * @module
+ */
+
 import L from 'leaflet';
 import type React from 'preact/compat';
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/compat';
@@ -6,6 +12,7 @@ import { dragZoom, isSecondTap, isTap, TAP_SLOP_PX, type TapPoint } from '../../
 import { groupNearby, type PersonView } from '../../lib/people';
 import { cn } from '../../lib/utils';
 
+/** A Home Assistant zone drawn on the map: its center and radius. */
 export interface MapZone {
 	entityId: string;
 	latitude: number;
@@ -14,6 +21,7 @@ export interface MapZone {
 	radius: number;
 }
 
+/** The map's props: the people with a position, the zones, and who to center on. */
 export interface PeopleMapProps {
 	people: (PersonView & { latitude: number; longitude: number })[];
 	zones: MapZone[];

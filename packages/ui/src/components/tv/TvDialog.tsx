@@ -1,3 +1,9 @@
+/**
+ * The TV dialog and its header button, and the hooks that find the house's TVs.
+ *
+ * @module
+ */
+
 import {
 	Apple,
 	ArrowLeft,
@@ -649,6 +655,7 @@ const TvPanel: React.FC<{ tv: Tv; controls: TvControls; remote: boolean }> = ({ 
 	);
 };
 
+/** The TV dialog's props: whether it's open, what closes it, the Remote tab and the TV shown first. */
 export interface TvDialogProps {
 	isOpen: boolean;
 	onClose: () => void;

@@ -1,3 +1,9 @@
+/**
+ * The to-do dialog: every list as a tab, its items to add, check off, reorder, date and delete.
+ *
+ * @module
+ */
+
 import { Check, CheckCheck, GripVertical, ListTodo, Loader2, Plus, Trash2, Undo2, Users, X } from 'lucide-react';
 import type React from 'preact/compat';
 import { memo, useEffect, useRef, useState } from 'preact/compat';
@@ -66,6 +72,7 @@ const ROW_GAP_PX = 8;
 // A deleted item waits this long (its toast's Undo) before Home Assistant deletes it
 const UNDO_MS = 5000;
 
+/** The to-do dialog's props: whether it's open, what closes it, and what it opens on. */
 export interface TodoDialogProps {
 	isOpen: boolean;
 	onClose: () => void;

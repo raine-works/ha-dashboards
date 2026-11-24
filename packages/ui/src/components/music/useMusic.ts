@@ -1,3 +1,10 @@
+/**
+ * Music Assistant hooks: the speakers, the shown playback state, the remembered speaker, the config
+ * entry, the controls (play, group, volume, queue) and the recent library.
+ *
+ * @module
+ */
+
 import { useEffect, useMemo, useRef, useState } from 'preact/compat';
 import { CONFIRM_TIMEOUT_MS, useHassApi, useHassReady, useHassSelector } from '../../context/HassContext';
 import { useBusy } from '../../hooks/useBusy';
@@ -617,6 +624,7 @@ export function useMusicControls(players: MusicPlayer[]) {
 	};
 }
 
+/** What `useMusicControls` returns: every command the player's controls send, with their busy state. */
 export type MusicControls = ReturnType<typeof useMusicControls>;
 
 /** Busy keys are per target (a follower's commands go to its leader, so both show it). */

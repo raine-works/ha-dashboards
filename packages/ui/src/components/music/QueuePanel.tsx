@@ -1,3 +1,9 @@
+/**
+ * The music player's Queue tab: the whole queue, to play from, move or remove.
+ *
+ * @module
+ */
+
 import {
 	ArrowDown,
 	ArrowUp,

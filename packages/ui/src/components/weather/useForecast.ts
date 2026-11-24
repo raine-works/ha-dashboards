@@ -1,3 +1,9 @@
+/**
+ * A weather entity's forecast, subscribed to.
+ *
+ * @module
+ */
+
 import { useEffect, useState } from 'preact/compat';
 import { useHassConnection } from '../../context/HassContext';
 import type { WeatherForecast } from '../../lib/weather';

@@ -1,3 +1,9 @@
+/**
+ * Weather conditions' icons and their colors.
+ *
+ * @module
+ */
+
 import {
 	AlertTriangle,
 	CloudFog,
@@ -60,6 +66,7 @@ export function weatherIcon(condition: string | undefined, night = false): { ico
 	}
 }
 
+/** A weather condition's icon in its color (`weatherIcon`), hidden from screen readers. */
 export const WeatherIcon: React.FC<{ condition?: string; night?: boolean; className?: string }> = ({
 	condition,
 	night,

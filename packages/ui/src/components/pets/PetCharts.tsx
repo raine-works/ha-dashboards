@@ -1,11 +1,15 @@
+/**
+ * The pets dialog's Recharts charts (shadcn's chart), loaded with import() when the dialog first
+ * opens, like the energy dialog's: Recharts stays out of the bundle every page loads.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import { Bar, BarChart, CartesianGrid, Line, LineChart, type TooltipContentProps, XAxis, YAxis } from 'recharts';
 import type { DailyRow } from '../../lib/pets';
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '../ui/chart';
 import { ChartTooltipRow } from '../ui/chart-tooltip-row';
-
-// The pets dialog's Recharts charts (shadcn's chart), loaded with import() when the dialog first
-// opens, like the energy dialog's: Recharts stays out of the bundle every page loads.
 
 /** A chart series: its key in the rows, its name and its color (`var(--chart-<n>)`). */
 export interface ChartSeries {

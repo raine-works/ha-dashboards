@@ -1,3 +1,9 @@
+/**
+ * The alarm card (Alarmo): its status, the exit and entry countdowns, and arming and disarming.
+ *
+ * @module
+ */
+
 import { Loader2, Shield, ShieldAlert, ShieldCheck, TriangleAlert } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useRef, useState } from 'preact/compat';
@@ -39,14 +45,19 @@ export function armBlockers(entity: HassEntity | undefined, states: Record<strin
 	return Object.keys(open).map((id) => sensorName(states[id], id));
 }
 
+/** The alarm's states as the card shows them (`arming` is the exit delay, `pending` the entry delay). */
 export type AlarmStatus = 'disarmed' | 'arming' | 'armed' | 'pending' | 'triggered';
 
+/** What the alarm card shows for Alarmo's state (`getAlarmView`). */
 export interface AlarmView {
 	status: AlarmStatus;
+	/** The card's heading, e.g. the armed mode. */
 	title: string;
+	/** The line under it. */
 	description: string;
 	/** Epoch ms when the exit/entry delay ends, if one is running. */
 	countdownEndsAt?: number;
+	/** The whole delay in seconds, for the countdown's progress. */
 	countdownTotalSec?: number;
 }
 
@@ -142,11 +153,17 @@ function useCountdownBeeps(enabled: boolean, state: string | undefined, endsAt: 
 	}, [enabled, state, endsAt]);
 }
 
+/** The alarm card's props. */
 export interface AlarmCardProps {
 	/** Less padding, for 10.5" panels. */
 	compact?: boolean;
 }
 
+/**
+ * The house alarm (Alarmo): its status and any exit or entry countdown (beeping on a wall panel), and
+ * arming and disarming with the keypad's PIN. A refused arm lists the open sensors that stopped it,
+ * with Arm anyway for a couple of minutes.
+ */
 export const AlarmCard: React.FC<AlarmCardProps> = ({ compact = false }) => {
 	const { getHass, callService } = useHassApi();
 	const connection = useHassConnection();

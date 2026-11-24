@@ -1,3 +1,10 @@
+/**
+ * The music dialog, the header's music button and the mini player, and the music exports the
+ * dashboards use.
+ *
+ * @module
+ */
+
 import { Music, PartyPopper, Pause, Play, SkipForward, Square } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useState } from 'preact/compat';
@@ -33,13 +40,20 @@ export { MusicPlayer } from './MusicPlayer';
 export { PartyModeHost, showPartyMode } from './PartyModeHost';
 export { rememberMusicPlayer } from './useMusic';
 
+/** The music dialog's props: whether it's open, what closes it, and where the player starts. */
 export interface MusicDialogProps {
 	isOpen: boolean;
 	onClose: () => void;
+	/** The speaker to show first (an entity id); the playing one, else the last picked, without it. */
 	initialPlayer?: string;
+	/** The player's tab to open on. */
 	initialTab?: MusicTab;
 }
 
+/**
+ * The music dialog: the Music Assistant player for every speaker, with a Party mode button on the
+ * wall panels. The player remounts each time it opens, so it starts on the playing speaker.
+ */
 export const MusicDialog: React.FC<MusicDialogProps> = ({ isOpen, onClose, initialPlayer, initialTab }) => {
 	const wallPanel = useWallPanel();
 	return (
