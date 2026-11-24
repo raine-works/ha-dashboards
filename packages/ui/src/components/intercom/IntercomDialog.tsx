@@ -256,10 +256,7 @@ export const IntercomDialog: React.FC<IntercomDialogProps> = ({ isOpen, onClose 
 												data-state={isOn ? 'on' : 'off'}
 												disabled={!speaker.available || speaker.tvAudio}
 												onClick={() => toggleSpeaker(speaker.entityId)}
-												className={cn(
-													toggleVariants({ variant: 'chip', size: 'xl' }),
-													'w-full shrink-0 justify-start',
-												)}
+												className={cn(toggleVariants({ variant: 'chip', size: 'xl' }), 'w-full shrink-0 justify-start')}
 											>
 												<span className="min-w-0 flex-1 truncate text-left">{speaker.name}</span>
 												{speaker.isPlaying && <span className="size-2 shrink-0 rounded-full bg-primary" />}
