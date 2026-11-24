@@ -17,7 +17,7 @@ import { playBeeps, unlockAudio } from '../../lib/tones';
 import { cn } from '../../lib/utils';
 import { formatDuration } from '../../lib/wav';
 import type { HassEntity } from '../../types/homeassistant';
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Progress } from '../ui';
+import { Button, Progress, StatusTile, type StatusTone } from '../ui';
 import { KeypadModal } from './KeypadModal';
 
 // How long to show "Arming..." while waiting for Alarmo to acknowledge the request
@@ -125,12 +125,12 @@ const AlarmCountdown: React.FC<{ endsAt: number; totalSec: number; pending: bool
 }) => {
 	const secondsLeft = useSecondsRemaining(endsAt) ?? 0;
 	return (
-		<CardContent className="flex items-center gap-4">
-			<span className={cn('font-mono font-semibold text-3xl tabular-nums', pending && 'text-destructive')}>
+		<div className="flex items-center gap-4">
+			<span className={cn('font-semibold text-figure tabular-nums', pending && 'text-destructive')}>
 				{formatDuration(secondsLeft)}
 			</span>
 			<Progress value={(secondsLeft / totalSec) * 100} variant={pending ? 'destructive' : 'default'} />
-		</CardContent>
+		</div>
 	);
 };
 
@@ -153,18 +153,12 @@ function useCountdownBeeps(enabled: boolean, state: string | undefined, endsAt: 
 	}, [enabled, state, endsAt]);
 }
 
-/** The alarm card's props. */
-export interface AlarmCardProps {
-	/** Less padding, for 10.5" panels. */
-	compact?: boolean;
-}
-
 /**
- * The house alarm (Alarmo): its status and any exit or entry countdown (beeping on a wall panel), and
+ * The house alarm (Alarmo), as a StatusTile: its state and any exit or entry countdown (beeping on a wall panel), and
  * arming and disarming with the keypad's PIN. A refused arm lists the open sensors that stopped it,
  * with Arm anyway for a couple of minutes.
  */
-export const AlarmCard: React.FC<AlarmCardProps> = ({ compact = false }) => {
+export const AlarmCard: React.FC = () => {
 	const { getHass, callService } = useHassApi();
 	const connection = useHassConnection();
 	// Alarmo's failed-to-arm event is for admins only: anyone else's subscription is refused (and logged)
@@ -350,69 +344,58 @@ export const AlarmCard: React.FC<AlarmCardProps> = ({ compact = false }) => {
 	}
 	const warn = isBlocked || (view.status === 'disarmed' && openNow.length > 0 && !isWaiting);
 
-	return (
-		<Card
-			className={cn(
-				compact ? 'gap-3 py-4' : 'gap-4',
-				isAlerting && 'border-destructive',
-				isBlocked && 'border-warning',
-			)}
-		>
-			<CardHeader>
-				<CardTitle className="flex items-center gap-2 text-lg">
-					<Icon
-						className={cn(
-							'size-5',
-							isAlerting && 'text-destructive',
-							isBlocked && 'text-warning',
-							view.status === 'armed' && 'text-success',
-							view.status === 'disarmed' && !isBlocked && 'text-muted-foreground',
-						)}
-					/>
-					{title}
-				</CardTitle>
-				{/* One line, so a door opening never grows the card (the header's Open button lists them all);
-				    a refusal to arm, which needs reading, may wrap */}
-				<CardDescription className={cn(warn && 'text-warning', !isBlocked && 'truncate')} title={description}>
-					{description}
-				</CardDescription>
-			</CardHeader>
+	// How the state reads (docs/design/components.md): calm when armed, attention while something needs
+	// a look (an exit delay, an open door, a refusal to arm), danger while it's going off
+	const tone: StatusTone = isAlerting
+		? 'danger'
+		: isBlocked || warn || view.status === 'arming'
+			? 'attention'
+			: view.status === 'armed'
+				? 'ok'
+				: 'neutral';
 
-			{/* Actions get their own full-width row so they never squeeze the title */}
-			<CardContent className="flex gap-2 *:flex-1">
+	return (
+		<StatusTile icon={<Icon />} tone={tone} state={title} detail={description}>
+			{/* Actions get their own full-width row so they never squeeze the state. Disarm is quiet while the
+			    house is safe, and red only while the alarm is going off (or about to): it still asks for the PIN */}
+			<div className="flex gap-2 *:flex-1">
 				{isBlocked ? (
 					<>
-						<Button variant="outline" size="xl" onClick={dismissBlocked}>
+						<Button variant="secondary" size="action" onClick={dismissBlocked}>
 							Dismiss
 						</Button>
-						<Button variant="warning" size="xl" onClick={() => arm(blocked.mode, codeRef.current, true)}>
+						<Button variant="warning" size="action" onClick={() => arm(blocked.mode, codeRef.current, true)}>
 							Arm anyway
 						</Button>
 					</>
 				) : isWaiting ? (
-					<Button variant="outline" size="xl" disabled>
+					<Button variant="secondary" size="action" disabled>
 						<Loader2 className="animate-spin" />
 						Arming
 					</Button>
 				) : view.status === 'disarmed' ? (
 					<>
-						<Button variant="outline" size="xl" onClick={() => setKeypadMode('armed_home')}>
+						<Button variant="secondary" size="action" onClick={() => setKeypadMode('armed_home')}>
 							Arm Home
 						</Button>
-						<Button size="xl" onClick={() => setKeypadMode('armed_away')}>
+						<Button variant="secondary" size="action" onClick={() => setKeypadMode('armed_away')}>
 							Arm Away
 						</Button>
 					</>
 				) : view.status === 'arming' ? (
-					<Button variant="outline" size="xl" onClick={() => setKeypadMode('disarmed')}>
+					<Button variant="secondary" size="action" onClick={() => setKeypadMode('disarmed')}>
 						Cancel
 					</Button>
 				) : (
-					<Button variant="destructive" size="xl" onClick={() => setKeypadMode('disarmed')}>
+					<Button
+						variant={isAlerting ? 'destructive' : 'secondary'}
+						size="action"
+						onClick={() => setKeypadMode('disarmed')}
+					>
 						Disarm
 					</Button>
 				)}
-			</CardContent>
+			</div>
 
 			{!!view.countdownEndsAt && !!view.countdownTotalSec && (
 				<AlarmCountdown
@@ -422,11 +405,7 @@ export const AlarmCard: React.FC<AlarmCardProps> = ({ compact = false }) => {
 				/>
 			)}
 
-			{error && (
-				<CardContent>
-					<p className="text-destructive text-sm">{error}</p>
-				</CardContent>
-			)}
+			{error && <p className="text-caption text-destructive touch:text-sm">{error}</p>}
 
 			<KeypadModal
 				isOpen={keypadMode !== null}
@@ -435,6 +414,6 @@ export const AlarmCard: React.FC<AlarmCardProps> = ({ compact = false }) => {
 				targetMode={keypadMode ?? 'disarmed'}
 				openSensors={keypadMode && keypadMode !== 'disarmed' ? openNow : []}
 			/>
-		</Card>
+		</StatusTile>
 	);
 };

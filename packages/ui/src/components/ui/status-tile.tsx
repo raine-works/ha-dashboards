@@ -44,6 +44,11 @@ export interface StatusTileProps {
 	 * needs action (`actionLeads()`).
 	 */
 	action?: ComponentChildren;
+	/**
+	 * What goes under the state, the tile's full width: a choice of actions that don't fit beside it
+	 * (the alarm's Arm Home and Arm Away), a countdown, an error.
+	 */
+	children?: ComponentChildren;
 	/** Layout only. */
 	className?: string;
 }
@@ -53,17 +58,20 @@ export interface StatusTileProps {
  * action at the end. Calm when all is well, so an exception stands out on its own; the color always
  * comes with the icon and the word.
  */
-export const StatusTile: React.FC<StatusTileProps> = ({ icon, tone, state, detail, action, className }) => (
+export const StatusTile: React.FC<StatusTileProps> = ({ icon, tone, state, detail, action, children, className }) => (
 	<div
 		data-slot="status-tile"
 		data-tone={tone}
-		className={cn(SURFACE, 'flex items-center gap-3 p-4', tone === 'danger' && 'bg-alarm/10', className)}
+		className={cn(SURFACE, 'flex flex-col gap-3 p-4', tone === 'danger' && 'bg-alarm/10', className)}
 	>
-		<IconTile tone={STATUS_ICON_TONES[tone]}>{icon}</IconTile>
-		<div className="flex min-w-0 flex-1 flex-col gap-0.5">
-			<span className="truncate text-title">{state}</span>
-			{detail && <span className="truncate text-caption text-muted-foreground touch:text-sm">{detail}</span>}
+		<div className="flex items-center gap-3">
+			<IconTile tone={STATUS_ICON_TONES[tone]}>{icon}</IconTile>
+			<div className="flex min-w-0 flex-1 flex-col gap-0.5">
+				<span className="truncate text-title">{state}</span>
+				{detail && <span className="truncate text-caption text-muted-foreground touch:text-sm">{detail}</span>}
+			</div>
+			{action && <div className="shrink-0">{action}</div>}
 		</div>
-		{action && <div className="shrink-0">{action}</div>}
+		{children}
 	</div>
 );

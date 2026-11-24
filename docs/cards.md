@@ -14,6 +14,10 @@ For desktops, laptops and phones (the Companion app included).
 - **Lighting is rooms first**: a tile per room, by floor (what's on, its scene, a power button for
   its lights). A tap on a room opens its lights, scenes, colors and bedtime; a light that's off
   shows only its name until it's on.
+- **Security is the alarm, then doors and garage doors**: the alarm's state at a glance (its Disarm
+  quiet while the house is safe, red only while it's going off), then a row per door and garage door
+  with its state in words (amber only when something's open or unlocked) and a button saying what a
+  tap does (Unlock, Lock, Open, Close).
 - **Climate is a line per thing**: each thermostat zone (its mode, the temperature inside, the
   setpoint between − and +; a tap opens its mode), curtain (open and close as icons; a tap opens its
   position) and fan (a tap opens its speed, Oscillate and presets).
