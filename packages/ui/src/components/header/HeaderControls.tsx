@@ -287,7 +287,7 @@ export const HEADER_TILE =
  */
 export const SidebarButton: React.FC<HeaderButtonProps> = ({ size = 'icon-xl', className }) => (
 	<Button
-		variant="outline"
+		variant="secondary"
 		size={size}
 		onClick={(e) => openSidebar(e.currentTarget as Element)}
 		aria-label="Open the sidebar"
@@ -355,7 +355,7 @@ export const NotificationsButton: React.FC<HeaderButtonProps & { label?: boolean
 		<>
 			{count > 0 && (
 				<Button
-					variant="outline"
+					variant="secondary"
 					size={size}
 					onClick={() => setOpen(true)}
 					aria-label={title}
@@ -373,30 +373,53 @@ export const NotificationsButton: React.FC<HeaderButtonProps & { label?: boolean
 };
 
 /**
- * Opens the to-do lists, with a count of what's left across them (shopping lists aside; with a
- * household member signed in, only what's theirs or anyone's). `label` adds "To-do" (hidden on
- * the narrowest phones). Nothing without a `todo.*` list.
+ * The to-do lists' launcher, for whatever button opens them (the phone header's To-do, the panel
+ * header's More): how many are left (shopping lists aside; with a household member signed in, only
+ * what's theirs or anyone's), `open()`, and the dialog to render, which a to-do notification's link
+ * (`?todo=<list>&item=<uid>`) opens on that list with the item in view. `available` is false
+ * without a `todo.*` list, or with `enabled` false (the house turned the To-do module off): then
+ * nothing opens, not even from a link. One per page: the link is read once.
  */
-export const TodoButton: React.FC<HeaderButtonProps & TileProps> = ({ size = 'icon-xl', label, tile, className }) => {
-	const [open, setOpen] = useState(false);
-	// A to-do notification's link (`?todo=<list>&item=<uid>`) opens the list with the item in view
+export function useTodoLauncher(enabled = true) {
+	const [isOpen, setOpen] = useState(false);
 	const [link, clearLink] = useLinkedParams(['todo', 'item']);
 	useEffect(() => {
-		if (link) setOpen(true);
-	}, [link]);
+		if (link && enabled) setOpen(true);
+	}, [link, enabled]);
 	const lists = useTodoLists();
 	// A household member's own and anyone's; everyone's on the wall panels
 	const mine = useMyTodoCounts(lists);
 	const count = todoBadgeCount(lists, mine);
-	if (lists.length === 0) return null;
-	const title = count === 0 ? 'To-do' : `To-do: ${count} left`;
+	const dialog = enabled && (
+		<TodoDialog
+			isOpen={isOpen}
+			onClose={() => {
+				setOpen(false);
+				clearLink();
+			}}
+			list={link?.todo}
+			focusItem={link?.item || undefined}
+			counts={mine}
+		/>
+	);
+	return { available: enabled && lists.length > 0, count, open: () => setOpen(true), dialog };
+}
+
+/**
+ * Opens the to-do lists, with a count of what's left (`useTodoLauncher`). `label` adds "To-do"
+ * (hidden on the narrowest phones). Nothing without a `todo.*` list.
+ */
+export const TodoButton: React.FC<HeaderButtonProps & TileProps> = ({ size = 'icon-xl', label, tile, className }) => {
+	const todo = useTodoLauncher();
+	if (!todo.available) return null;
+	const title = todo.count === 0 ? 'To-do' : `To-do: ${todo.count} left`;
 
 	return (
 		<>
 			<Button
-				variant="outline"
+				variant="secondary"
 				size={size}
-				onClick={() => setOpen(true)}
+				onClick={todo.open}
 				aria-label={title}
 				title={title}
 				className={cn('relative', className)}
@@ -405,18 +428,9 @@ export const TodoButton: React.FC<HeaderButtonProps & TileProps> = ({ size = 'ic
 				{(label || tile || size === 'tile') && (
 					<span className={cn(!tile && size !== 'tile' && 'max-[520px]:sr-only')}>To-do</span>
 				)}
-				{count > 0 && <CountBadge>{count}</CountBadge>}
+				{todo.count > 0 && <CountBadge>{todo.count}</CountBadge>}
 			</Button>
-			<TodoDialog
-				isOpen={open}
-				onClose={() => {
-					setOpen(false);
-					clearLink();
-				}}
-				list={link?.todo}
-				focusItem={link?.item || undefined}
-				counts={mine}
-			/>
+			{todo.dialog}
 		</>
 	);
 };
@@ -449,7 +463,7 @@ export const DailyBriefButton: React.FC<HeaderButtonProps & TileProps> = ({
 	return (
 		<>
 			<Button
-				variant="outline"
+				variant="secondary"
 				size={size}
 				onClick={() => setOpen(true)}
 				aria-label={name}
@@ -483,7 +497,7 @@ export const CamerasButton: React.FC<HeaderButtonProps> = ({ size = 'icon-xl', c
 	return (
 		<>
 			<Button
-				variant={activity.length > 0 ? 'warning' : 'outline'}
+				variant={activity.length > 0 ? 'warning' : 'secondary'}
 				size={size}
 				onClick={() => setOpen(true)}
 				// What was detected and where, for screen readers too (a title never shows on touch)
@@ -500,6 +514,26 @@ export const CamerasButton: React.FC<HeaderButtonProps> = ({ size = 'icon-xl', c
 };
 
 type MoreDialog = 'brief' | 'intercom' | 'tv' | 'energy' | 'wifi' | 'appearance' | 'push';
+
+/** What the More menu can open (besides Appearance and Phone alerts), by its label. */
+export const MORE_ITEMS = {
+	brief: 'Daily',
+	energy: 'Energy',
+	wifi: 'Guest Wi-Fi',
+	intercom: 'Messages',
+	todo: 'To-do',
+	tv: 'TVs',
+} as const;
+export type MoreItem = keyof typeof MORE_ITEMS;
+
+/**
+ * The More menu's tiles: what this house has, alphabetical by label (so nothing moves as one comes
+ * and goes). To-do is one of them: the panel header's quick actions are Assist, Cameras and Music.
+ */
+export const moreItems = (has: Partial<Record<MoreItem, boolean>>): MoreItem[] =>
+	(Object.keys(MORE_ITEMS) as MoreItem[])
+		.filter((item) => has[item])
+		.sort((a, b) => MORE_ITEMS[a].localeCompare(MORE_ITEMS[b]));
 
 /** A tile in the More menu: the icon over its label and a line of detail, two across. */
 const MORE_TILE =
@@ -538,18 +572,23 @@ export const MoreButton: React.FC<{ tvRemote?: boolean; colorSchemePicker?: bool
 	const guestWifi = !!useGuestWifi() && wallPanel && guestWifiModule;
 	// The signed-in member's phone alerts, beside Appearance (the Home dashboard's personal settings)
 	const push = usePushPreferences();
+	// The to-do lists live here on the panel header (its quick actions are Assist, Cameras and Music)
+	const todo = useTodoLauncher(useModule('todo'));
+	const todoTile = todo.available;
 	const close = () => {
 		setDialog(null);
 		clearLink();
 	};
 	// A labeled tile each, like the phone header's: what's behind the button is named, never a bare list
-	const tile = (key: MoreDialog, Icon: typeof Newspaper, label: string, hint?: React.ReactNode) => (
+	const tile = (key: MoreDialog | 'todo', Icon: typeof Newspaper, label: string, hint?: React.ReactNode) => (
 		<Button
-			variant="outline"
+			key={key}
+			variant="secondary"
 			size="xl"
 			onClick={() => {
 				setMenuOpen(false);
-				setDialog(key);
+				if (key === 'todo') todo.open();
+				else setDialog(key);
 			}}
 			className={MORE_TILE}
 		>
@@ -560,7 +599,10 @@ export const MoreButton: React.FC<{ tvRemote?: boolean; colorSchemePicker?: bool
 	);
 	// Nothing in it for this house (none of its modules, no appearance picker): no button at all
 	const tvTile = tvModule && tvs.length > 0;
-	if (!daily && !energy && !guestWifi && !messages && !tvTile && !colorSchemePicker && !dialog) return null;
+	if (!daily && !energy && !guestWifi && !messages && !tvTile && !todoTile && !colorSchemePicker && !dialog)
+		return null;
+	// What's waiting on the to-do lists shows on More itself, as To-do's count did
+	const waiting = todoTile ? todo.count : 0;
 
 	return (
 		<>
@@ -568,24 +610,40 @@ export const MoreButton: React.FC<{ tvRemote?: boolean; colorSchemePicker?: bool
 				<PopoverTrigger asChild>
 					{/* A tile like the header's other buttons: its grid over "More" */}
 					<Button
-						variant="outline"
+						variant="secondary"
 						size="tile"
-						aria-label="More"
-						title="More: Daily, Messages, TVs, Energy"
-						className={className}
+						aria-label={waiting > 0 ? `More: ${waiting} to do` : 'More'}
+						title="More: To-do, Daily, Messages, TVs, Energy"
+						className={cn('relative', className)}
 					>
 						<LayoutGrid />
 						<span>More</span>
+						{waiting > 0 && <CountBadge>{waiting}</CountBadge>}
 					</Button>
 				</PopoverTrigger>
 				<PopoverContent align="end" className="flex w-80 flex-col gap-2 p-2">
 					{/* Alphabetical, two across; a lone last one takes the row */}
 					<div className="flex flex-wrap gap-2">
-						{daily && tile('brief', Newspaper, 'Daily')}
-						{energy && tile('energy', Zap, 'Energy', <HouseWatts />)}
-						{guestWifi && tile('wifi', Wifi, 'Guest Wi-Fi')}
-						{messages && tile('intercom', MessagesSquare, 'Messages')}
-						{tvTile && tile('tv', TvIcon, 'TVs', tvsOn > 0 ? `${tvsOn} on` : undefined)}
+						{moreItems({
+							brief: daily,
+							energy,
+							wifi: guestWifi,
+							intercom: messages,
+							todo: todoTile,
+							tv: tvTile,
+						}).map((item) =>
+							item === 'brief'
+								? tile(item, Newspaper, MORE_ITEMS[item])
+								: item === 'energy'
+									? tile(item, Zap, MORE_ITEMS[item], <HouseWatts />)
+									: item === 'wifi'
+										? tile(item, Wifi, MORE_ITEMS[item])
+										: item === 'intercom'
+											? tile(item, MessagesSquare, MORE_ITEMS[item])
+											: item === 'todo'
+												? tile(item, ListTodo, MORE_ITEMS[item], todo.count > 0 ? `${todo.count} left` : undefined)
+												: tile(item, TvIcon, MORE_ITEMS[item], tvsOn > 0 ? `${tvsOn} on` : undefined),
+						)}
 					</div>
 					{/* The theme and Light / Dark / Auto (the Home dashboard; the wall panels follow the house) */}
 					{colorSchemePicker && (
@@ -596,6 +654,7 @@ export const MoreButton: React.FC<{ tvRemote?: boolean; colorSchemePicker?: bool
 					)}
 				</PopoverContent>
 			</Popover>
+			{todo.dialog}
 			<DailyBriefDialog isOpen={dialog === 'brief'} onClose={close} tab={linkedBriefTab(link)} />
 			<IntercomDialog isOpen={dialog === 'intercom'} onClose={close} />
 			<TvDialog isOpen={dialog === 'tv'} onClose={close} remote={tvRemote} />

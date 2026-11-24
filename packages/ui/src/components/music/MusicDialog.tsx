@@ -140,7 +140,7 @@ export const MusicButton: React.FC<{ size?: ButtonProps['size']; onOpen?: () => 
 			{active && tile ? (
 				// A tile: the cover over "Music" below xl; from xl the cover beside the title and artist
 				<Button
-					variant="outline"
+					variant="secondary"
 					size="tile"
 					onClick={show}
 					aria-label={`Music: ${active.title} on ${active.name}${actives.length > 1 ? `, ${actives.length} playing` : ''}`}
@@ -166,7 +166,7 @@ export const MusicButton: React.FC<{ size?: ButtonProps['size']; onOpen?: () => 
 				</Button>
 			) : active ? (
 				<Button
-					variant="outline"
+					variant="secondary"
 					size={size}
 					onClick={show}
 					aria-label={`Music: ${active.title} on ${active.name}${actives.length > 1 ? `, ${actives.length} playing` : ''}`}
@@ -197,7 +197,7 @@ export const MusicButton: React.FC<{ size?: ButtonProps['size']; onOpen?: () => 
 				</Button>
 			) : (
 				<Button
-					variant="outline"
+					variant="secondary"
 					size={tile ? 'tile' : xl ? 'icon-xl' : 'icon-lg'}
 					onClick={show}
 					aria-label="Music"

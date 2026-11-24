@@ -720,7 +720,7 @@ export const TvButton: React.FC<{
 	return (
 		<>
 			<Button
-				variant="outline"
+				variant="secondary"
 				size={size}
 				onClick={() => setOpen(true)}
 				aria-label={title}

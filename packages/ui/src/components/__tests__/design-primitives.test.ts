@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+import { moreItems } from '../header/HeaderControls';
 import { actionLeads, detailClasses, STATUS_ICON_TONES, type StatusTone } from '../ui/status-tile';
 import { ICON_TONES } from '../ui/tile';
 
@@ -38,5 +39,18 @@ describe("a status tile's detail", () => {
 	it('warns in amber, keeping its words', () => {
 		expect(detailClasses(false, 'warning')).toContain('text-warning');
 		expect(detailClasses()).toContain('text-muted-foreground');
+	});
+});
+
+describe('the More menu', () => {
+	it('lists what the house has, alphabetical by label, To-do among them', () => {
+		expect(moreItems({ tv: true, todo: true, brief: true, intercom: true })).toEqual([
+			'brief',
+			'intercom',
+			'todo',
+			'tv',
+		]);
+		expect(moreItems({ energy: true, wifi: false })).toEqual(['energy']);
+		expect(moreItems({})).toEqual([]);
 	});
 });

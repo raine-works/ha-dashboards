@@ -384,7 +384,7 @@ export const EnergyButton: React.FC<{ size?: ButtonProps['size']; className?: st
 	return (
 		<>
 			<Button
-				variant="outline"
+				variant="secondary"
 				size={size}
 				onClick={() => setOpen(true)}
 				aria-label={label}

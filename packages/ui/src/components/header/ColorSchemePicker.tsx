@@ -56,7 +56,7 @@ export const ColorSchemeButton: React.FC<{
 	return (
 		<>
 			<Button
-				variant="outline"
+				variant="secondary"
 				size={size}
 				aria-label="Appearance"
 				title="Appearance"

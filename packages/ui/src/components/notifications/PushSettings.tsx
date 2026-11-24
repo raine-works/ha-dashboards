@@ -130,7 +130,7 @@ export const PushSettingsButton: React.FC<{
 	return (
 		<>
 			<Button
-				variant="outline"
+				variant="secondary"
 				size={size}
 				aria-label={title}
 				title={title}
