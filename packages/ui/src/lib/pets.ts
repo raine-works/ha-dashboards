@@ -1,3 +1,9 @@
+/**
+ * Pet care from the Litter-Robot integration: the pets (a `person.*` each, with per-pet sensors),
+ * Litter-Robots and Feeder-Robots, their statuses and tones, and the daily charts' rows.
+ *
+ * @module
+ */
 import type { HassEntity } from '../types/homeassistant';
 import type { EntityWatch } from './hass-store';
 import { initialsFor } from './people';
@@ -7,36 +13,51 @@ import { isUnavailable } from './values';
 /** Matches the Badge/Progress status variants. */
 export type Tone = 'success' | 'info' | 'warning' | 'destructive' | 'muted';
 
+/** A sensor's number with its unit. */
 export interface Measurement {
+	/** The number. */
 	value: number;
+	/** Its unit of measurement ("lb"), empty when it has none. */
 	unit: string;
 }
 
+/** A pet as the pets dialog shows it. */
 export interface PetView {
 	/** The pet's `person.*` entity (no device trackers). */
 	entityId: string;
 	/** The id shared by its sensors: `sensor.<id>_visits_today`, `sensor.<id>_weight`. */
 	id: string;
+	/** Its friendly name. */
 	name: string;
+	/** One or two letters for an avatar without a picture. */
 	initials: string;
+	/** Its picture's URL. */
 	picture?: string;
 	/** Litter box visits since midnight. */
 	visitsToday: number | null;
+	/** Its weight, as the Litter-Robot last measured it. */
 	weight: Measurement | null;
 }
 
+/** A Litter-Robot as the pets dialog shows it. */
 export interface LitterBoxView {
+	/** Its `vacuum.<device>_litter_box` entity id. */
 	entityId: string;
+	/** Its device's name. */
 	name: string;
 	/** Litter-Robot status code (`rdy`, `ccp`, `dfs`, ...). */
 	status: string;
+	/** The status in words ("Drawer full"). */
 	statusLabel: string;
+	/** The status's tone. */
 	tone: Tone;
 	/** Percent full. */
 	wasteDrawer: number | null;
+	/** The waste drawer's tone (`wasteTone`). */
 	wasteTone: Tone;
 	/** Percent of litter left. */
 	litterLevel: number | null;
+	/** The litter level's tone (`supplyTone`). */
 	litterTone: Tone;
 	/** Running a clean cycle, or about to (the vacuum's `cleaning`, or a cleaning status code). */
 	cycling: boolean;
@@ -48,18 +69,25 @@ export interface LitterBoxView {
 	lastReset: string | null;
 }
 
+/** A Feeder-Robot as the pets dialog shows it. */
 export interface FeederView {
 	/** The food level sensor; its prefix names the device. */
 	entityId: string;
+	/** Its device's name. */
 	name: string;
 	/** Percent of food left in the hopper. */
 	foodLevel: number | null;
+	/** The food level's tone (`supplyTone`). */
 	foodTone: Tone;
+	/** When it last fed (ISO). */
 	lastFeeding: string | null;
+	/** When it feeds next (ISO). */
 	nextFeeding: string | null;
+	/** Food dispensed since midnight. */
 	dispensedToday: Measurement | null;
 	/** `sensor.<device>_food_dispensed_today`, for its daily statistics (null without one). */
 	dispensedId: string | null;
+	/** `button.<device>_give_snack`, if it has one. */
 	snackButton: string | null;
 	/** When the snack button was last pressed (a button's state is its last press). */
 	lastSnack: string | null;
@@ -85,15 +113,15 @@ const timestamp = (entity: HassEntity | undefined): string | null =>
 const deviceName = (entity: HassEntity | undefined, suffix: RegExp, fallback: string) =>
 	(entity?.attributes.friendly_name ?? fallback).replace(suffix, '').replace(/\s+/g, ' ').trim() || fallback;
 
-/**
- * Pets: `person.*` entities without device trackers that have Litter-Robot per-pet sensors
- * (`sensor.<id>_visits_today` or `sensor.<id>_weight`), sorted by name.
- */
 const PET_CARE_SENSOR =
 	/^sensor\..+_(visits_today|weight|status_code|waste_drawer|litter_level|food_level|last_feeding|next_feeding|food_dispensed_today)$/;
 /** What the pet discovery functions read (pets, Litter-Robots, Feeder-Robots). */
 export const PET_CARE_WATCH: EntityWatch = (id) => /^(person|vacuum|button)\./.test(id) || PET_CARE_SENSOR.test(id);
 
+/**
+ * Pets: `person.*` entities without device trackers that have Litter-Robot per-pet sensors
+ * (`sensor.<id>_visits_today` or `sensor.<id>_weight`), sorted by name.
+ */
 export function discoverPets(states: Record<string, HassEntity>): PetView[] {
 	return Object.values(states)
 		.filter((s) => {
@@ -152,6 +180,7 @@ const LITTER_STATUS: Record<string, { label: string; tone: Tone }> = {
 	offline: { label: 'Offline', tone: 'destructive' },
 };
 
+/** A Litter-Robot status code in words, with its tone; an unknown code shows uppercased, muted. */
 export function litterStatus(code: string | undefined): { label: string; tone: Tone } {
 	if (!code || UNAVAILABLE.has(code)) return { label: 'Unknown', tone: 'muted' };
 	return LITTER_STATUS[code] ?? { label: code.toUpperCase(), tone: 'muted' };
@@ -276,11 +305,15 @@ export type DailyStatRows = Record<
 
 /** A chart series: its key in the rows, the statistic it reads, and which number (a day's `change` or `mean`). */
 export interface DailySeries {
+	/** Its key in each `DailyRow`. */
 	key: string;
+	/** The statistic it reads. */
 	statId: string;
+	/** Which of a day's numbers it takes. */
 	type: 'change' | 'mean';
 }
 
+/** A day's row in a daily chart: its local midnight, and each series' value (null without one). */
 export type DailyRow = { start: number } & Record<string, number | null>;
 
 /** The local midnights of the last `days` days, oldest first, today last. */

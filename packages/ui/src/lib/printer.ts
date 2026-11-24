@@ -1,3 +1,9 @@
+/**
+ * Receipt printers (the ESC/POS integration): discovery, their status from their sensors, and the
+ * quick notes the intercom prints.
+ *
+ * @module
+ */
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
 import type { PresetCategory } from './intercom';
 
@@ -7,13 +13,17 @@ export const PRINTER_PLATFORM = 'escpos_printer';
 /** The longest note the intercom prints: a slip, not a letter. */
 export const NOTE_MAX = 280;
 
+/** A receipt printer with its status sensors. */
 export interface Printer {
 	/** `notify.kitchen_printer`: the entity the print services target. */
 	entityId: string;
 	/** "Kitchen printer" (its area), else the device's name. */
 	name: string;
+	/** Its `binary_sensor.*_online`, if it has one. */
 	online?: string;
+	/** Its `sensor.*_paper_status` (`ok`, `low`, `out`), if it has one. */
 	paper?: string;
+	/** Its `binary_sensor.*_cover_open`, if it has one. */
 	cover?: string;
 }
 
@@ -52,9 +62,11 @@ export function discoverPrinters(hass: Pick<HomeAssistant, 'entities' | 'devices
 
 /** What the printer can do now: `ready` is false while it can't print at all. */
 export interface PrinterStatus {
+	/** It can print. */
 	ready: boolean;
 	/** "Ready", "Paper low", "Out of paper", "Cover open", "Offline". */
 	label: string;
+	/** How the status shows: fine, a warning (it still prints), or an error (it can't). */
 	tone: 'ok' | 'warning' | 'error';
 }
 

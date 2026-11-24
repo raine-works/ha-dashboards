@@ -1,3 +1,11 @@
+/**
+ * The panels' own sounds and haptics: chimes synthesized with Web Audio (the keypad, the alarm's
+ * countdown), recorded clips (the holiday sounds), and a vibration on every tap. All on one shared
+ * AudioContext, and none ever throws: a missing or blocked sound is silence.
+ *
+ * @module
+ */
+
 // One shared context: browsers cap how many can exist, and a keypress needs to start instantly
 let context: AudioContext | null = null;
 
@@ -22,18 +30,23 @@ export function unlockAudio(): void {
 	if (ctx?.state === 'suspended') void ctx.resume().catch(() => {});
 }
 
+/** One note of a chime. */
 export interface ChimeNote {
+	/** Its pitch, Hz. */
 	frequency: number;
 	/** When the note strikes, from the chime's start. */
 	atMs?: number;
+	/** Its loudness relative to the others (1 when absent; the chime is normalized after). */
 	gain?: number;
 }
 
 /** A short chime: one or more soft notes, each struck and left to ring out. */
 export interface Chime {
+	/** Its notes. */
 	notes: ChimeNote[];
 	/** How fast each note fades: the time to fall to about a third. */
 	decayMs: number;
+	/** The whole chime's length, its tail faded to silence. */
 	lengthMs: number;
 }
 
@@ -167,7 +180,9 @@ export function keepAudioAwake(...warm: Chime[]): () => void {
 	};
 }
 
+/** One beep of a rhythm (`playBeeps`). */
 export interface Beep {
+	/** What it sounds like. */
 	chime: Chime;
 	/** From this one's start to the next one's. */
 	nextInMs: number;

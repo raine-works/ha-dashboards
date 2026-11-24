@@ -1,4 +1,8 @@
-// Attribute coercers: Home Assistant's attributes (and script responses) are untyped JSON.
+/**
+ * Attribute coercers: Home Assistant's attributes (and script responses) are untyped JSON.
+ *
+ * @module
+ */
 
 /** A finite number, else undefined (null, NaN, a numeric string). */
 export const finiteNumber = (value: unknown) =>

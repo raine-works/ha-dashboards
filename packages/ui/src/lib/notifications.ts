@@ -1,16 +1,28 @@
-// Home Assistant's persistent notifications (the bell in HA's sidebar), streamed over
-// `persistent_notification/subscribe`: a `current` event with every notification, then `added`,
-// `updated` and `removed` events with the ones that changed.
+/**
+ * Home Assistant's persistent notifications (the bell in HA's sidebar), streamed over
+ * `persistent_notification/subscribe`: a `current` event with every notification, then `added`,
+ * `updated` and `removed` events with the ones that changed.
+ *
+ * @module
+ */
 
+/** A persistent notification, as Home Assistant sends it. */
 export interface PersistentNotification {
+	/** Its id (dismissing it takes this). */
 	notification_id: string;
+	/** Its title, if it has one. */
 	title?: string | null;
+	/** Its Markdown body. */
 	message: string;
+	/** When it was created (ISO). */
 	created_at: string;
 }
 
+/** An event of `persistent_notification/subscribe`. */
 export interface NotificationsEvent {
+	/** `current`: every notification; the others: the ones added, updated or removed. */
 	type: 'current' | 'added' | 'updated' | 'removed';
+	/** The notifications it's about, by id. */
 	notifications: Record<string, PersistentNotification>;
 }
 

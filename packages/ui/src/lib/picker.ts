@@ -1,5 +1,9 @@
-// The date-time picker's arithmetic: quick picks, days as `YYYY-MM-DD`, months, and the time wheels'
-// 12-hour values. Pure, so the picker's choices are tested.
+/**
+ * The date-time picker's arithmetic: quick picks, days as `YYYY-MM-DD`, months, and the time wheels'
+ * 12-hour values. Pure, so the picker's choices are tested.
+ *
+ * @module
+ */
 
 import { addDays, dayKey, pad2 } from './time';
 
@@ -15,10 +19,14 @@ export function parseDay(day: string): Date {
 /** The first of the month `months` from `month`'s. */
 export const addMonths = (month: Date, months: number) => new Date(month.getFullYear(), month.getMonth() + months, 1);
 
+/** Whether two dates fall in the same month of the same year. */
 export const sameMonth = (a: Date, b: Date) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth();
 
+/** A quick pick: its chip's label and its day. */
 export interface QuickPick {
+	/** "Today", "This weekend"… */
 	label: string;
+	/** The day, `YYYY-MM-DD`. */
 	day: string;
 }
 
@@ -41,13 +49,20 @@ export function quickPicks(now = new Date()): QuickPick[] {
 
 /** The time wheels: hour 1–12, minute in MINUTE_STEP steps, AM or PM. */
 export const MINUTE_STEP = 5;
+/** The hour wheel's values, 1–12. */
 export const HOURS = Array.from({ length: 12 }, (_, i) => i + 1);
+/** The minute wheel's values, 0–55 in `MINUTE_STEP`s. */
 export const MINUTES = Array.from({ length: 60 / MINUTE_STEP }, (_, i) => i * MINUTE_STEP);
+/** The AM/PM wheel's values. */
 export type Meridiem = 'AM' | 'PM';
 
+/** A time as the wheels hold it. */
 export interface WheelTime {
+	/** 1–12. */
 	hour: number;
+	/** A multiple of `MINUTE_STEP`. */
 	minute: number;
+	/** Morning or afternoon. */
 	meridiem: Meridiem;
 }
 

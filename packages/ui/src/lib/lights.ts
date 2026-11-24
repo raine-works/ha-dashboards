@@ -1,3 +1,9 @@
+/**
+ * Lighting discovery and shaping: which lights and Stateful Scenes each floor and room has, what
+ * a light's controls can do, and how a light that's on looks.
+ *
+ * @module
+ */
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
 import { kelvinToRgb } from './color';
 import { isUnavailable } from './values';
@@ -7,6 +13,7 @@ export const HOUSEHOLD_LIGHT_LABEL = 'household_light';
 
 const COLOR_MODES = new Set(['hs', 'xy', 'rgb', 'rgbw', 'rgbww', 'color_temp']);
 
+/** Which controls a light's row offers. */
 export interface LightCapabilities {
 	/** Has a brightness level (any color mode other than plain on/off). */
 	dimmable: boolean;
@@ -80,6 +87,7 @@ const isRunning = (effect: unknown): effect is string =>
 
 /** One effect in the adjust dialog: its name as the first light lists it, and each light's own spelling of it. */
 export interface AdjustEffect {
+	/** The effect's name, as the first light that has it spells it. */
 	name: string;
 	/** Light id → the effect's name in that light's `effect_list`. */
 	lights: Record<string, string>;
@@ -97,6 +105,7 @@ export interface AdjustCapabilities {
 	kelvin?: number;
 	/** A color a light that's on shows. */
 	rgb?: [number, number, number];
+	/** That color's hue in degrees, when the light reports `hs_color`. */
 	hue?: number;
 	/** The effect a light that's on runs. */
 	effect?: string;
@@ -187,9 +196,13 @@ export function labeledLights(hass: Pick<HomeAssistant, 'entities'>, label = HOU
 		.sort();
 }
 
+/** A room on a floor with its labeled lights. */
 export interface FloorRoom {
+	/** The room's Home Assistant area id. */
 	areaId: string;
+	/** The area's name. */
 	name: string;
+	/** Its lights, by name, each named without the room's name in front ("Floor Lamp"). */
 	lights: { id: string; name: string }[];
 }
 
@@ -235,9 +248,13 @@ export function floorsInOrder(floors: HomeAssistant['floors'], order: string[]) 
 	);
 }
 
+/** A floor with the rooms that have labeled lights. */
 export interface HouseFloor {
+	/** The Home Assistant floor id. */
 	floorId: string;
+	/** The floor's name. */
 	name: string;
+	/** Its rooms with lights, by name. */
 	rooms: FloorRoom[];
 }
 
@@ -280,9 +297,11 @@ export function discoverHouseFloors(
 		.filter((floor) => floor.rooms.length > 0);
 }
 
+/** A room's Stateful Scene. */
 export interface RoomScene {
 	/** Stateful Scenes switch (`switch.<room>_<scene>_stateful_scene`). */
 	id: string;
+	/** The scene's name without the room's name or "Stateful Scene" ("Wind Down"). */
 	name: string;
 }
 
@@ -385,9 +404,13 @@ export function lightFill(colors: string[]): { background: string; color: string
 	};
 }
 
+/** A floor with the rooms that have Stateful Scenes. */
 export interface HouseSceneFloor {
+	/** The Home Assistant floor id. */
 	floorId: string;
+	/** The floor's name. */
 	name: string;
+	/** Its rooms with scenes, by name: each its area id, name and scenes. */
 	rooms: { areaId: string; name: string; scenes: RoomScene[] }[];
 }
 

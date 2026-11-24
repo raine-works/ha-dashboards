@@ -1,20 +1,32 @@
-// Pinch-zoom for a camera view: a scale and a pan (the content's offset from centered, in px),
-// applied as `translate(x, y) scale(s)` around the view's center. Pure, so the gestures are tested.
+/**
+ * Pinch-zoom for a camera view: a scale and a pan (the content's offset from centered, in px),
+ * applied as `translate(x, y) scale(s)` around the view's center. Pure, so the gestures are tested.
+ *
+ * @module
+ */
 
+/** A zoom: `translate(x, y) scale(scale)` around the view's center. */
 export interface Zoom {
+	/** 1 (not zoomed) to `MAX_ZOOM`. */
 	scale: number;
+	/** The content's offset from centered, px. */
 	x: number;
+	/** The content's offset from centered, px. */
 	y: number;
 }
 
+/** Not zoomed. */
 export const NO_ZOOM: Zoom = { scale: 1, x: 0, y: 0 };
+/** The furthest a view zooms in. */
 export const MAX_ZOOM = 5;
 /** What a double tap zooms to. */
 export const TAP_ZOOM = 2.5;
 
-/** A view size and a point in it, relative to its center. */
+/** A view's size. */
 export interface Size {
+	/** px. */
 	width: number;
+	/** px. */
 	height: number;
 }
 
@@ -73,7 +85,9 @@ const DOUBLE_TAP_PX = 30;
 /** A finger that moves less than this is still a tap. */
 const TAP_SLOP_PX = 8;
 
+/** Where a pinch-zoom gesture is, and the zoom it has made. */
 export interface PinchState {
+	/** The zoom now. */
 	zoom: Zoom;
 	/** Animate this change (a double tap, a reset), else follow the fingers exactly. */
 	smooth: boolean;
@@ -83,9 +97,11 @@ export interface PinchState {
 	gesture: { start: Zoom; points: Point[] } | null;
 	/** The fingers moved since they went down (so lifting them isn't a tap). */
 	moved: boolean;
+	/** The last lone tap (when, in ms, and where), for a double tap. */
 	lastTap: { at: number; point: Point } | null;
 }
 
+/** A view not zoomed, with no fingers down. */
 export const INITIAL_PINCH: PinchState = {
 	zoom: NO_ZOOM,
 	smooth: false,
@@ -95,6 +111,7 @@ export const INITIAL_PINCH: PinchState = {
 	lastTap: null,
 };
 
+/** The pointer and wheel events the reducer takes; points are relative to the view's center. */
 export type PinchAction =
 	| { type: 'down'; id: number; point: Point }
 	| { type: 'move'; id: number; point: Point; view: Size }
@@ -112,6 +129,10 @@ function restart(state: PinchState, pointers: Record<number, Point>): PinchState
 	return { ...state, pointers, gesture: points.length > 0 ? { start: state.zoom, points } : null };
 }
 
+/**
+ * The gesture's next state: two fingers pinch, one pans (when zoomed), a double tap toggles the
+ * zoom, a wheel (or a trackpad's pinch) zooms at the pointer.
+ */
 export function pinchReducer(state: PinchState, action: PinchAction): PinchState {
 	switch (action.type) {
 		case 'down': {

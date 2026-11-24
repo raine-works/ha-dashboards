@@ -1,16 +1,24 @@
-// One-handed zoom for a map, the way Google Maps does it: tap, then touch again and hold, and drag
-// down to zoom in or up to zoom out. The arithmetic; `PeopleMap` runs it on Leaflet.
+/**
+ * One-handed zoom for a map, the way Google Maps does it: tap, then touch again and hold, and drag
+ * down to zoom in or up to zoom out. The arithmetic; `PeopleMap` runs it on Leaflet.
+ *
+ * @module
+ */
 
-/** The second touch counts when it lands this soon after the first tap, this close to it. */
+/** The second touch counts when it lands this soon (ms) after the first tap, and `DOUBLE_TAP_PX` close to it. */
 export const DOUBLE_TAP_MS = 300;
+/** How close (px) the second touch lands to the first tap to count. */
 export const DOUBLE_TAP_PX = 40;
 /** A touch that moves less than this is still a tap (and a held second touch hasn't started zooming). */
 export const TAP_SLOP_PX = 8;
 /** Dragging this far changes the zoom by one level (a thumb's easy travel covers about three). */
 export const DRAG_PX_PER_ZOOM = 110;
 
+/** Where and when a touch began or ended. */
 export interface TapPoint {
+	/** Client x, px. */
 	x: number;
+	/** Client y, px. */
 	y: number;
 	/** ms, any clock (both taps on the same one). */
 	time: number;

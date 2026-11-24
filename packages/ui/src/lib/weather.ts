@@ -1,3 +1,9 @@
+/**
+ * Weather: conditions in words, forecasts as the header, the 10-day list and the hourly charts
+ * show them.
+ *
+ * @module
+ */
 import { capitalize } from './text';
 
 // Home Assistant weather conditions (weather entity states) as display text
@@ -28,19 +34,31 @@ export function formatWeatherCondition(condition: string): string {
 
 /** One entry of a `weather/subscribe_forecast` (or `weather.get_forecasts`) forecast. */
 export interface WeatherForecast {
+	/** When it's for (ISO): the hour, or the day. */
 	datetime: string;
+	/** A weather condition (`partlycloudy`). */
 	condition?: string;
+	/** The temperature (a daily forecast's high). */
 	temperature?: number;
 	/** Daily forecasts' low. */
 	templow?: number;
+	/** What it feels like. */
 	apparent_temperature?: number;
+	/** Rain expected, in the entity's precipitation unit. */
 	precipitation?: number;
+	/** Chance of rain, %. */
 	precipitation_probability?: number;
+	/** Relative humidity, %. */
 	humidity?: number;
+	/** Wind speed, in the entity's unit. */
 	wind_speed?: number;
+	/** Gust speed, in the entity's unit. */
 	wind_gust_speed?: number;
+	/** Where the wind blows from, degrees. */
 	wind_bearing?: number;
+	/** UV index. */
 	uv_index?: number;
+	/** Cloud cover, %. */
 	cloud_coverage?: number;
 	/** Hourly forecasts: day or night, for the icon. */
 	is_daytime?: boolean;
@@ -115,14 +133,23 @@ export function formatReading(value: unknown, unit?: string, digits = 0): string
 
 /** An hour on the weather charts: when (ms), its readings (null when the forecast lacks one), and its icon. */
 export interface HourlyRow {
+	/** The hour (epoch ms). */
 	at: number;
+	/** The temperature. */
 	temperature: number | null;
+	/** What it feels like. */
 	feelsLike: number | null;
+	/** Chance of rain, %. */
 	rainChance: number | null;
+	/** Rain expected. */
 	rainAmount: number | null;
+	/** Wind speed. */
 	wind: number | null;
+	/** Gust speed. */
 	gusts: number | null;
+	/** The weather condition, for its icon. */
 	condition?: string;
+	/** Night (the night icon). */
 	night: boolean;
 }
 

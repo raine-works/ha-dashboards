@@ -1,9 +1,15 @@
-// The Markdown that conversation agents answer with (paragraphs, lists, emphasis, inline code,
-// headings, the odd code block), parsed into blocks and spans for rendering as elements. Never
-// HTML: an answer can't inject markup. Links keep only their text (the panels never navigate away).
+/**
+ * The Markdown that conversation agents answer with (paragraphs, lists, emphasis, inline code,
+ * headings, the odd code block), parsed into blocks and spans for rendering as elements. Never
+ * HTML: an answer can't inject markup. Links keep only their text (the panels never navigate away).
+ *
+ * @module
+ */
 
+/** A run of inline text with one mark (or none). */
 export type MarkdownSpan = { type: 'text' | 'strong' | 'em' | 'code'; text: string };
 
+/** A block of an answer: a paragraph, heading, list (its items' spans) or code block. */
 export type MarkdownBlock =
 	| { type: 'paragraph'; spans: MarkdownSpan[] }
 	| { type: 'heading'; spans: MarkdownSpan[] }

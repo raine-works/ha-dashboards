@@ -1,11 +1,16 @@
-// The dashboards' modules: each feature the dashboards can show, what it needs from Home Assistant,
-// and how to tell whether this house has it. One list for three jobs:
-// - the dashboards show a feature only while it's detected and not turned off (`ModuleGate`,
-//   `useModule()` in context/Modules.tsx);
-// - the house settings turn one off (`modules: { holidays: false }` in house.yaml);
-// - the capability report (`moduleReport()`), for the docs and the setup tools, says which are on,
-//   which are off and what each missing one needs.
-// Detection is cheap and synchronous: a scan of the states and registries the frontend already has.
+/**
+ * The dashboards' modules: each feature the dashboards can show, what it needs from Home Assistant,
+ * and how to tell whether this house has it. One list for three jobs:
+ * - the dashboards show a feature only while it's detected and not turned off (`ModuleGate`,
+ *   `useModule()` in context/Modules.tsx);
+ * - the house settings turn one off (`modules: { holidays: false }` in house.yaml);
+ * - the capability report (`moduleReport()`), for the docs and the setup tools, says which are on,
+ *   which are off and what each missing one needs.
+ *
+ * Detection is cheap and synchronous: a scan of the states and registries the frontend already has.
+ *
+ * @module
+ */
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
 import { discoverBedtimeToggles } from './bedtime';
 import { discoverWindowCovers } from './covers';
@@ -20,6 +25,7 @@ import { discoverPrinters } from './printer';
 import { findAlarmPanel } from './security';
 import { discoverTvs } from './tv';
 
+/** A module's id: the key a house setting turns it off with (`modules: { holidays: false }`). */
 export type ModuleId =
 	| 'lighting'
 	| 'bedtime'
@@ -48,15 +54,22 @@ export type ModuleId =
 	| 'holidays'
 	| 'guest_wifi';
 
+/** The parts of `hass` detection reads. */
 export type ModuleHass = Pick<HomeAssistant, 'states' | 'entities' | 'devices' | 'areas' | 'services' | 'config'>;
 
+/** What a module's detection sees: Home Assistant and the house settings. */
 export interface ModuleContext {
+	/** The states, registries, services and config. */
 	hass: ModuleHass;
+	/** The house settings (they name some modules' entities, and turn modules off). */
 	house: HouseConfig;
 }
 
+/** A feature the dashboards can show. */
 export interface DashboardModule {
+	/** Its id. */
 	id: ModuleId;
+	/** Its name in the capability report ("Curtains & blinds"). */
 	name: string;
 	/** What it shows. */
 	description: string;
@@ -299,12 +312,17 @@ export const MODULES: readonly DashboardModule[] = [
 
 const BY_ID = new Map(MODULES.map((m) => [m.id, m]));
 
+/**
+ * The module with this id.
+ * @throws When no module has it (a typed id always has one).
+ */
 export const moduleById = (id: ModuleId): DashboardModule => {
 	const found = BY_ID.get(id);
 	if (!found) throw new Error(`Unknown dashboard module: ${id}`);
 	return found;
 };
 
+/** A module's state in a house (see `moduleState`). */
 export type ModuleState = 'on' | 'missing' | 'off';
 
 /**
@@ -317,13 +335,20 @@ export function moduleState(id: ModuleId, ctx: ModuleContext): ModuleState {
 	return !module.detect || module.detect(ctx) ? 'on' : 'missing';
 }
 
+/** Whether the dashboards show a module: detected and not turned off. */
 export const isModuleOn = (id: ModuleId, ctx: ModuleContext) => moduleState(id, ctx) === 'on';
 
+/** A module's row in the capability report: its `DashboardModule` words and its state in this house. */
 export interface ModuleReportRow {
+	/** The module's id. */
 	id: ModuleId;
+	/** Its name. */
 	name: string;
+	/** Its state in this house. */
 	state: ModuleState;
+	/** What it shows. */
 	description: string;
+	/** What it needs from Home Assistant. */
 	needs: string;
 }
 

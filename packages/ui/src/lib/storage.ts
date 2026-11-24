@@ -1,6 +1,10 @@
-// The device's own storage: remembered picks (a speaker, a tab), a running timer. It can be
-// unavailable or throw (a private window, blocked site data), and everything kept in it has a
-// default, so these never throw.
+/**
+ * The device's own storage: remembered picks (a speaker, a tab), a running timer. It can be
+ * unavailable or throw (a private window, blocked site data), and everything kept in it has a
+ * default, so these never throw.
+ *
+ * @module
+ */
 
 /** A stored value; null when there's none or storage can't be read. */
 export function readStored(key: string): string | null {

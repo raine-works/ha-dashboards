@@ -1,3 +1,8 @@
+/**
+ * Service calls: one that answers with data, and a failed one in words for its toast.
+ *
+ * @module
+ */
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
 
 // What a failed call was trying to do, as "Couldn't <verb> <target>"

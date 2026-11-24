@@ -1,3 +1,8 @@
+/**
+ * QR codes as SVG paths (the Party join link).
+ *
+ * @module
+ */
 import { encode } from 'uqr';
 
 /**

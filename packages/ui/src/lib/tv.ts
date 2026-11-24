@@ -1,3 +1,9 @@
+/**
+ * TVs from Raineworks TV: discovery, each TV's state (its apps, inputs, what's playing, volume), its
+ * remote's keys, and the status line.
+ *
+ * @module
+ */
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
 import { labelInUse } from './labels';
 import { entityArea } from './lights';
@@ -16,6 +22,7 @@ export const TV_PLATFORM = 'googletv';
 export interface TvApp {
 	/** Its package (the TV's `app_id` while it's open), what `play_media` with `app` opens. */
 	packageName: string;
+	/** Its name ("Netflix"). */
 	name: string;
 	/** Its Google Play icon (a URL), when the integration found one. */
 	icon?: string;
@@ -45,7 +52,9 @@ export interface TvInput {
 	id: string;
 	/** Its name on the TV ("Xbox"), else "HDMI <port>". */
 	label: string;
+	/** Its HDMI port (0 when unknown). */
 	port: number;
+	/** What's plugged in, for its icon. */
 	kind: TvInputKind;
 	/** The name its device gives itself over HDMI-CEC ("Arc Ultra"). */
 	device?: string;
@@ -61,6 +70,7 @@ const CONSOLE_KINDS: ReadonlySet<TvInputKind> = new Set([
 	'console',
 ]);
 
+/** Whether an input is a game console. */
 export const isConsoleInput = (input: Pick<TvInput, 'kind'>) => CONSOLE_KINDS.has(input.kind);
 
 /**
@@ -104,11 +114,14 @@ export type TvActivity = 'off' | 'screensaver' | 'home' | 'app' | 'playing' | 'p
 
 const ACTIVITIES: ReadonlySet<string> = new Set(['off', 'screensaver', 'home', 'app', 'playing', 'paused', 'input']);
 
+/** A TV's power state (anything but off or unavailable counts as on). */
 export type TvState = 'on' | 'off' | 'unavailable';
 
 /** What an app on the TV is playing (title, show or artist, its poster or cover), as the TV reports it. */
 export interface TvNowPlaying {
+	/** Playing or paused. */
 	state: 'playing' | 'paused';
+	/** The title. */
 	title: string;
 	/** The show, channel or artist ("FX"). */
 	subtitle?: string;
@@ -116,10 +129,15 @@ export interface TvNowPlaying {
 	artwork?: string;
 }
 
+/** A TV as the TVs dialog shows it (`toTv`). */
 export interface Tv {
+	/** Its `media_player` entity id. */
 	entityId: string;
+	/** Its friendly name. */
 	name: string;
+	/** Its power state. */
 	state: TvState;
+	/** What it's doing, from its Activity sensor. */
 	activity?: TvActivity;
 	/** The app in front (its package), while on. */
 	appId?: string;
@@ -129,13 +147,17 @@ export interface Tv {
 	app?: TvApp;
 	/** The launcher: the TV's apps, the featured ones first. */
 	apps: TvApp[];
+	/** Its HDMI inputs, by port. */
 	inputs: TvInput[];
 	/** The input on screen, while one is. */
 	input?: TvInput;
+	/** What an app is playing, while on and not on an input. */
 	nowPlaying?: TvNowPlaying;
 	/** 0–100. */
 	volume?: number;
+	/** Muted (false while off). */
 	muted: boolean;
+	/** Its `TV_FEATURE` bits (test with `tvSupports`). */
 	features: number;
 	/** The TV's `remote` entity, which sends key presses (`REMOTE_KEYS`; needs ADB). */
 	remoteEntityId?: string;
@@ -152,6 +174,7 @@ export const REMOTE_KEYS = {
 	home: 'HOME',
 } as const;
 
+/** A key on the on-screen remote. */
 export type RemoteKey = keyof typeof REMOTE_KEYS;
 
 /** The TV's entity in another domain: the one on the same device, else `<domain>.<object id><suffix>`. */
@@ -201,6 +224,7 @@ export const TV_FEATURE = {
 	SELECT_SOURCE: 2048,
 } as const;
 
+/** Whether a TV supports a `TV_FEATURE`. */
 export const tvSupports = (tv: Tv, feature: number) => (tv.features & feature) !== 0;
 
 /** TVs are `media_player`s; their activity a sensor of theirs. */
@@ -256,6 +280,10 @@ export function toNowPlaying(entity: HassEntity): TvNowPlaying | undefined {
 	};
 }
 
+/**
+ * A Raineworks TV `media_player` as a `Tv` (without its remote, which `discoverTvs` adds).
+ * @param activityState Its Activity sensor's state, when it has one.
+ */
 export function toTv(entity: HassEntity, activityState?: string): Tv {
 	const a = entity.attributes;
 	const state: TvState = entity.state === 'unavailable' ? 'unavailable' : entity.state === 'off' ? 'off' : 'on';
