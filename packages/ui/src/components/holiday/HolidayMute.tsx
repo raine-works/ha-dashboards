@@ -1,3 +1,9 @@
+/**
+ * Muting the holiday sounds for a while: when the mute ends, and the button that turns it on and off.
+ *
+ * @module
+ */
+
 import { Volume2, VolumeX } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useReducer } from 'preact/compat';

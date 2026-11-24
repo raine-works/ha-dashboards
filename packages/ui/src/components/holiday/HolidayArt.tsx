@@ -1,11 +1,15 @@
+/**
+ * The holidays' characters (loaded on demand: `HolidayCharacter` in HolidayEgg.tsx): hand-drawn on a
+ * 32px grid in one style (a mid-tone fill with a 1.5px outline a shade darker, so they read on the
+ * light and the dark theme alike; the same dark ink eyes and smile, rosy cheeks), readable from 16px
+ * up. The idle motion (`holiday-bob` and friends in theme.css) stands still for reduced motion.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import type { CharacterId } from '../../lib/holidays';
 import { cn } from '../../lib/utils';
-
-// The holidays' characters (loaded on demand: `HolidayCharacter` in HolidayEgg.tsx): hand-drawn on a 32px grid in one style (a mid-tone fill with a 1.5px
-// outline a shade darker, so they read on the light and the dark theme alike; the same dark ink
-// eyes and smile, rosy cheeks), readable from 16px up. The idle motion (`holiday-bob` and friends in
-// theme.css) stands still for reduced motion.
 
 const INK = '#292524';
 const BLUSH = '#fb7185';
@@ -334,4 +338,5 @@ export const HolidayArt: React.FC<{ id: CharacterId; animated?: boolean; classNa
 	);
 };
 
+/** {@link HolidayArt}, as the default export `lazy()` loads. */
 export default HolidayArt;

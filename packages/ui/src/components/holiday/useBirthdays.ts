@@ -1,9 +1,13 @@
-// Today's birthdays from the Birthdays calendar (`lib/birthdays.ts`): one `calendar.get_events` call
-// for today, again just after local midnight, when the page comes back into view on a new day, and
-// when the calendar entity updates (its current or next event changed). `?birthday=<name>` previews
-// one until the page reloads (`none` hides them), read on load and on Home Assistant's in-app
-// navigation, then taken off the URL. The preview and the request are the page's, shared by every
-// component that asks (the header's cupcake, the Daily dialog's affirmation).
+/**
+ * Today's birthdays from the Birthdays calendar (`lib/birthdays.ts`): one `calendar.get_events` call
+ * for today, again just after local midnight, when the page comes back into view on a new day, and
+ * when the calendar entity updates (its current or next event changed). `?birthday=<name>` previews
+ * one until the page reloads (`none` hides them), read on load and on Home Assistant's in-app
+ * navigation, then taken off the URL. The preview and the request are the page's, shared by every
+ * component that asks (the header's cupcake, the Daily dialog's affirmation).
+ *
+ * @module
+ */
 
 import { useEffect, useState, useSyncExternalStore } from 'preact/compat';
 import { useHassApi, useHassReady, useHassSelector } from '../../context/HassContext';

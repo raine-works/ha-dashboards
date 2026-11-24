@@ -1,3 +1,10 @@
+/**
+ * The Energy dialog's charts (Recharts, loaded on demand): the period's stacked columns and the last
+ * 24 hours' draw.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import { useId } from 'preact/compat';
 import {

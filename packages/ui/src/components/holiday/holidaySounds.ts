@@ -1,3 +1,10 @@
+/**
+ * The holidays' and birthdays' sounds: a tap's clip, the wall panels' alert sound near a holiday, and
+ * the holiday's sound in front of an intercom recording.
+ *
+ * @module
+ */
+
 import type { CharacterId } from '../../lib/holidays';
 import { playClip } from '../../lib/tones';
 import { activeHolidayNow } from './useHoliday';

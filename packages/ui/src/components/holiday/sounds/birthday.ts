@@ -1,4 +1,10 @@
+/**
+ * A birthday's sound, a chunk of its own loaded the first time a birthday plays it.
+ *
+ * @module
+ */
+
 import newYearHorn from './new-year-horn.mp3';
 
-// A birthday's sound: New Year's party horn
+/** The clip's URL: New Year's party horn. */
 export default [newYearHorn];

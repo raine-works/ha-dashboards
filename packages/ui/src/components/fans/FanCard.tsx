@@ -1,3 +1,9 @@
+/**
+ * Fans: a row each (on or off, the speed, Oscillate and presets) in one card.
+ *
+ * @module
+ */
+
 import { ArrowLeftRight, Fan as FanIcon } from 'lucide-react';
 import type React from 'preact/compat';
 import { Fragment } from 'preact/compat';

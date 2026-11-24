@@ -1,3 +1,9 @@
+/**
+ * Light, Dark or Auto: a toggle for the More menu and a header button that opens Appearance.
+ *
+ * @module
+ */
+
 import { Moon, Sun, SunMoon } from 'lucide-react';
 import type React from 'preact/compat';
 import { useState } from 'preact/compat';

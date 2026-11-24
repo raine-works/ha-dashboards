@@ -1,3 +1,10 @@
+/**
+ * The header every dashboard shares (clock, weather, alerts, the dialogs' buttons, people and pets),
+ * and the building blocks it's made of, re-exported for the cards that lay out their own.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import { ModuleGate } from '../../context/Modules';
 import { cn } from '../../lib/utils';
@@ -30,6 +37,7 @@ export { LaundryButton } from '../laundry/LaundryButton';
 export { ColorSchemeButton, ColorSchemeToggle } from './ColorSchemePicker';
 export * from './HeaderControls';
 
+/** {@link PanelHeader}'s props. */
 export interface PanelHeaderProps {
 	/** Panel-specific buttons (and their dialogs), placed before Cameras. */
 	actions?: React.ReactNode;
