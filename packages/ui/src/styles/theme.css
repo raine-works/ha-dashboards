@@ -359,17 +359,19 @@
 	   draws corner-shape (Chromium 139+: the wall panels' WebView, Android, Chrome), plain rounded
 	   elsewhere; the radii are the design, the curve a bonus. Circles (avatars, round keys) stay round */
 	@supports (corner-shape: squircle) {
-		*,
-		::before,
-		::after {
+		* {
 			corner-shape: squircle;
 		}
-		/* Every circle and pill: rounded-full, and the ones drawn here (the Assist orb with its turning
-		   ring and ripple, the round Assist button, the voice meter's bars) */
+		/* A pseudo-element (a gradient edge, the orb's ring and ripple) takes its element's curve, so a
+		   ring around a circle stays a circle */
+		::before,
+		::after {
+			corner-shape: inherit;
+		}
+		/* Every circle and pill: rounded-full, and the ones drawn here (the Assist orb, the round Assist
+		   button, the voice meter's bars) */
 		.rounded-full,
 		.assist-orb,
-		.assist-orb::before,
-		.assist-orb::after,
 		.assist-button[data-shape="round"],
 		.assist-meter > span {
 			corner-shape: round;
