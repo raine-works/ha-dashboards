@@ -1,3 +1,9 @@
+/**
+ * To-do hooks: the lists, a list's items live, and a household member's own counts.
+ *
+ * @module
+ */
+
 import { useEffect, useState } from 'preact/compat';
 import { useHassConnection, useHassSelector } from '../../context/HassContext';
 import { householdPerson } from '../../lib/people';

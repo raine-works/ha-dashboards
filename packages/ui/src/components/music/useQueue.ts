@@ -1,3 +1,9 @@
+/**
+ * A speaker's queue, read a page at a time and kept fresh, and what it was started from.
+ *
+ * @module
+ */
+
 import { useEffect, useState } from 'preact/compat';
 import { useHassApi, useHassReady } from '../../context/HassContext';
 import { getQueuePage, type MediaItem, type MusicPlayer, type QueuePage } from '../../lib/music';

@@ -1,3 +1,10 @@
+/**
+ * The weather dialog's hourly Recharts charts (temperature, rain, wind), loaded with import() when the
+ * dialog first opens, so Recharts stays out of the bundle every page loads.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import { useId } from 'preact/compat';
 import {

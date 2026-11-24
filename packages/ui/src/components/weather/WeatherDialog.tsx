@@ -1,3 +1,9 @@
+/**
+ * The weather dialog: today's conditions, the next hours as charts, and the days ahead.
+ *
+ * @module
+ */
+
 import { Cloud, CloudOff, Droplets, Eye, Gauge, Loader2, type LucideIcon, Sun, Sunrise, Sunset } from 'lucide-react';
 import type React from 'preact/compat';
 import { lazy, Suspense, useEffect, useState } from 'preact/compat';
@@ -47,9 +53,11 @@ const WIND_LEGEND = [
 	{ key: 'gusts', name: 'Gusts', color: 'color-mix(in oklab, var(--chart-3) 60%, transparent)' },
 ];
 
+/** The weather dialog's props: whether it's open, what closes it, and the weather entity it shows. */
 export interface WeatherDialogProps {
 	isOpen: boolean;
 	onClose: () => void;
+	/** The `weather.*` entity whose conditions and forecasts it shows. */
 	entityId: string;
 }
 

@@ -1,3 +1,9 @@
+/**
+ * The alarm keypad: the PIN to arm or disarm with.
+ *
+ * @module
+ */
+
 import { Delete, DoorClosed, Lock, type LucideIcon, Shield, Siren, TriangleAlert } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useState } from 'preact/compat';

@@ -1,3 +1,9 @@
+/**
+ * The Music Assistant player: the speaker list and the picked speaker's tabs.
+ *
+ * @module
+ */
+
 import { Speaker } from 'lucide-react';
 import type React from 'preact/compat';
 import { useState } from 'preact/compat';
@@ -12,11 +18,13 @@ import { useMusicControls, useMusicPlayers, useStoredPlayer } from './useMusic';
 
 export { Artwork, PlayingBars } from './Artwork';
 
+/** The player's tabs: Now Playing, Queue, Browse and Speakers. */
 export type MusicTab = 'now' | 'queue' | 'browse' | 'speakers';
 
 // A region that scrolls inside the contained player (-m-1 p-1 keeps borders and focus rings unclipped)
 const scrolls = '-m-1 min-h-0 overflow-y-auto p-1';
 
+/** The player's props: where it starts, and whether it scrolls inside a fixed-height container. */
 export interface MusicPlayerProps {
 	/** Speaker to show first (e.g. the one the now-playing button was showing). */
 	initialPlayer?: string;

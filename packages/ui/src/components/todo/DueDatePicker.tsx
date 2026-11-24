@@ -1,3 +1,9 @@
+/**
+ * A to-do item's due date (and time) picker: a popover, or a bottom sheet on phones.
+ *
+ * @module
+ */
+
 import { CalendarIcon, Clock, X } from 'lucide-react';
 import type React from 'preact/compat';
 import { useState } from 'preact/compat';
@@ -49,8 +55,11 @@ const firstOfMonth = (day: string | undefined) => {
 	return new Date(date.getFullYear(), date.getMonth(), 1);
 };
 
+/** The due date picker's props: the due date, what changes it, and whether it takes a time. */
 export interface DueDatePickerProps {
+	/** The item's due date, or null for none. */
 	value: Due | null;
+	/** Called on every change; null clears the due date. */
 	onChange: (due: Due | null) => void;
 	/** The list takes a time of day too (SET_DUE_DATETIME). */
 	withTime?: boolean;

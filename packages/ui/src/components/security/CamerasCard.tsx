@@ -1,3 +1,9 @@
+/**
+ * The cameras card: a snapshot of every camera, each opening its live view.
+ *
+ * @module
+ */
+
 import { Cctv } from 'lucide-react';
 import type React from 'preact/compat';
 import { useState } from 'preact/compat';

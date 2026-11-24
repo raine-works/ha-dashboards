@@ -1,3 +1,9 @@
+/**
+ * The pets dialog: litter box visits, weight and food as charts, and the litter box and feeder.
+ *
+ * @module
+ */
+
 import { CookieIcon, RefreshCwIcon, RotateCcwIcon, ToiletIcon, UtensilsIcon } from 'lucide-react';
 import type React from 'preact/compat';
 import { lazy, Suspense, useEffect, useState } from 'preact/compat';
@@ -251,6 +257,7 @@ const FeederPanel: React.FC<{ feeder: FeederView; now: number }> = ({ feeder, no
 	);
 };
 
+/** The pets dialog's props: whether it's open and what closes it. */
 export interface PetsDialogProps {
 	isOpen: boolean;
 	onClose: () => void;

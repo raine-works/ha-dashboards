@@ -1,3 +1,9 @@
+/**
+ * Party mode's open state for the page, remembered on the device, and the host that shows it.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import { lazy, Suspense, useEffect, useSyncExternalStore } from 'preact/compat';
 import { useHassApi } from '../../context/HassContext';

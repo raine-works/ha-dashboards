@@ -1,6 +1,10 @@
-// The playlist this device last started on each queue. Home Assistant doesn't say which playlist a
-// speaker plays (only the track), so Now Playing's Playlist button relies on this: a small store
-// outside the component tree, kept in localStorage so it survives a reload.
+/**
+ * The playlist this device last started on each queue. Home Assistant doesn't say which playlist a
+ * speaker plays (only the track), so Now Playing's Playlist button relies on this: a small store
+ * outside the component tree, kept in localStorage so it survives a reload.
+ *
+ * @module
+ */
 
 import { useEffect, useState, useSyncExternalStore } from 'preact/compat';
 import { useHassApi } from '../../context/HassContext';

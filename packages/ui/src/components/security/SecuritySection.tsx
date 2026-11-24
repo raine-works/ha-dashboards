@@ -1,3 +1,9 @@
+/**
+ * The security section: the alarm, the cameras, door locks and contacts, and garage bays.
+ *
+ * @module
+ */
+
 import {
 	ArrowDownToLine,
 	ArrowUpToLine,
@@ -52,6 +58,7 @@ import {
 import { AlarmCard } from './AlarmCard';
 import { CamerasCard } from './CamerasCard';
 
+/** The security section's props. */
 export interface SecuritySectionProps {
 	/** One row per door and garage bay instead of cards; defaults to on for 10.5" panels. */
 	compact?: boolean;

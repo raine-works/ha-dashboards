@@ -1,3 +1,9 @@
+/**
+ * The party button: the guests' link to the music, as a QR code to scan, to share, or cast to a TV.
+ *
+ * @module
+ */
+
 import { Cast, Check, Copy, Loader2, PartyPopper, RefreshCw, Share2, TriangleAlert, Tv } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useState } from 'preact/compat';

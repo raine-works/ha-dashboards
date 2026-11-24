@@ -1,3 +1,10 @@
+/**
+ * The speakers: the list to pick from, a volume slider, and the Speakers tab (grouping and each
+ * speaker's volume).
+ *
+ * @module
+ */
+
 import { Link, Speaker, Unlink, Volume2 } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useRef, useState } from 'preact/compat';

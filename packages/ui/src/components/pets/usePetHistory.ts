@@ -1,3 +1,9 @@
+/**
+ * The pets' daily statistics for the pets dialog's charts.
+ *
+ * @module
+ */
+
 import { useEffect, useState } from 'preact/compat';
 import { useHassApi, useHassReady } from '../../context/HassContext';
 import type { DailyStatRows } from '../../lib/pets';

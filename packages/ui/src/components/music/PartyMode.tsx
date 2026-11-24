@@ -1,3 +1,9 @@
+/**
+ * Party mode: the wall panels' full-screen music view, loaded on demand.
+ *
+ * @module
+ */
+
 import { ListMusic, PartyPopper, Pause, Play, Search, SkipBack, SkipForward, Speaker, Volume2 } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useState } from 'preact/compat';

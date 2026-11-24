@@ -1,3 +1,9 @@
+/**
+ * The question before music takes over a speaker playing its TV's sound.
+ *
+ * @module
+ */
+
 import { Music, Tv } from 'lucide-react';
 import type React from 'preact/compat';
 import { useSyncExternalStore } from 'preact/compat';

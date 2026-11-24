@@ -1,3 +1,10 @@
+/**
+ * The music player's Browse tab: search, the library and recent plays, artists and albums, as tiles to
+ * play, play next or add to the queue.
+ *
+ * @module
+ */
+
 import {
 	Check,
 	ChevronLeft,
@@ -177,6 +184,7 @@ export const MediaTile: React.FC<{ item: MediaItem; onPick: OnPick }> = ({ item,
 	);
 };
 
+/** Media tiles in a grid: three columns on phones, up to five on wide screens. */
 export const TileGrid: React.FC<{ items: MediaItem[]; onPick: OnPick }> = ({ items, onPick }) => (
 	<div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-5">
 		{items.map((item) => (
@@ -589,6 +597,7 @@ export interface BrowsePage {
 	album: MediaItem | null;
 }
 
+/** No artist or album open: Browse shows the search (or the library). */
 export const SEARCH_PAGE: BrowsePage = { artist: null, album: null };
 
 /**

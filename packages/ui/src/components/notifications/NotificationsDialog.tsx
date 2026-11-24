@@ -1,3 +1,9 @@
+/**
+ * Home Assistant's persistent notifications: the live list and the dialog to dismiss them.
+ *
+ * @module
+ */
+
 import { BellOff, Trash2, X } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useState } from 'preact/compat';
@@ -32,12 +38,15 @@ const PENDING_MS = 10_000;
 // With none left, "You're all caught up" shows this long before the dialog closes itself
 const EMPTY_CLOSE_MS = 500;
 
+/** What `useNotifications` returns: the notifications shown, and the ways to dismiss them. */
 export interface Notifications {
 	/** Newest first, without the ones just dismissed. */
 	notifications: PersistentNotification[];
 	/** Home Assistant has reported none left (not just the ones dismissed hidden while it catches up). */
 	cleared: boolean;
+	/** Hide one at once and dismiss it; a failure shows it again with a toast. */
 	dismiss: (id: string) => void;
+	/** Hide them all at once and dismiss them; a failure shows them again with a toast. */
 	dismissAll: () => void;
 }
 
@@ -112,6 +121,7 @@ export function useNotifications(): Notifications {
 	};
 }
 
+/** The notifications dialog's props: `useNotifications`' result, whether it's open and what closes it. */
 export interface NotificationsDialogProps extends Notifications {
 	isOpen: boolean;
 	onClose: () => void;
