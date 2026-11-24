@@ -1,3 +1,10 @@
+/**
+ * A camera's recorded clips, from UniFi Protect through Home Assistant's media source, and the
+ * signed URLs that play them and show their thumbnails.
+ *
+ * @module
+ */
+
 import { useEffect, useState } from 'preact/compat';
 import { useHassApi, useHassReady } from '../../context/HassContext';
 import {
@@ -43,6 +50,10 @@ function protectCamera(hass: Hass, cameraId: string) {
 	return cached;
 }
 
+/**
+ * A camera's clip list as it loads: the clips and the event types it records, `unsupported` for a
+ * camera that isn't UniFi Protect's, or `error` when the list couldn't be fetched.
+ */
 export type ClipsState =
 	| { status: 'loading'; filters: ClipFilter[] }
 	| { status: 'ready'; clips: Clip[]; filters: ClipFilter[] }

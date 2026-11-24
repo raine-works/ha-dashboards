@@ -1,3 +1,9 @@
+/**
+ * Stills across a clip, for the clip player's scrubber.
+ *
+ * @module
+ */
+
 import { useEffect, useState } from 'preact/compat';
 import { frameTimes } from '../../lib/clips';
 

@@ -1,3 +1,10 @@
+/**
+ * The panel's alerts: toasts for doors and windows opening, doorbell rings and the alarm's
+ * changes, the doorbell's live view, and the page's one Open Doors & Windows dialog.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import { useEffect, useRef, useState } from 'preact/compat';
 import type { ToasterProps } from 'sonner';
@@ -32,6 +39,7 @@ const OPENED_TOAST_MS = 10_000;
 const DOORBELL_TOAST_MS = 30_000;
 const ALARM_TOAST_MS = 6_000;
 
+/** {@link PanelAlerts}'s props. */
 export interface PanelAlertsProps {
 	/** Show a live view when a doorbell rings (default true). */
 	doorbellPopup?: boolean;

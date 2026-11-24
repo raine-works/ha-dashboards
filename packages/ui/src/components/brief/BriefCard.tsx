@@ -1,3 +1,9 @@
+/**
+ * The Daily dialog's card: a shared header over each tab's content.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import { cn } from '../../lib/utils';
 import { Card, CardAction, CardHeader, CardTitle } from '../ui';

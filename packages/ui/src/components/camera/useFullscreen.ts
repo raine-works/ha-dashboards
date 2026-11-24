@@ -1,3 +1,9 @@
+/**
+ * Full screen for a camera viewer, the browser's own or filling the window.
+ *
+ * @module
+ */
+
 import { useEffect, useState } from 'preact/compat';
 import { markDialogActivity } from '../ui';
 

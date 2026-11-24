@@ -1,3 +1,10 @@
+/**
+ * The cameras' smart detections (a person, an animal, a vehicle, a package), live: one camera's, or
+ * every camera with something on it.
+ *
+ * @module
+ */
+
 import { useEffect, useState } from 'preact/compat';
 import { useHassSelector } from '../../context/HassContext';
 import { CAMERA_ACTIVITY_WATCH, type CameraDetection, cameraDetections, discoverCameras } from '../../lib/cameras';
@@ -27,8 +34,11 @@ export function useCameraDetections(prefix: string): CameraDetection[] {
 	return detections;
 }
 
+/** A camera with something on it now. */
 export interface CameraActivity {
+	/** The camera's name. */
 	cameraLabel: string;
+	/** Its active smart detections (never empty). */
 	detections: CameraDetection[];
 }
 

@@ -1,3 +1,10 @@
+/**
+ * The clip player: a recorded clip with a scrubber of its frames, the clips before and after it,
+ * zoom, full screen and download.
+ *
+ * @module
+ */
+
 import {
 	ChevronLeft,
 	ChevronRight,

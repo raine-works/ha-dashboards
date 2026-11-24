@@ -1,3 +1,9 @@
+/**
+ * A camera's near-live snapshot, for its tiles.
+ *
+ * @module
+ */
+
 import { useEffect, useState } from 'preact/compat';
 import { useHassApi } from '../../context/HassContext';
 import { snapshotUrl } from '../../lib/cameras';
@@ -11,6 +17,7 @@ export const SNAPSHOT_REFRESH_MS = 5000;
 /** A snapshot older than this is out of date: shown dimmed and blurred until a new one arrives. */
 export const SNAPSHOT_STALE_MS = 15_000;
 
+/** {@link useCameraSnapshot}'s result. */
 export interface CameraSnapshot {
 	/** The latest frame (an object URL), once one has arrived. */
 	src?: string;

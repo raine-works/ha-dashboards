@@ -1,3 +1,9 @@
+/**
+ * The Cameras dialog and the camera thumbnails the dashboards share.
+ *
+ * @module
+ */
+
 import { History, Loader2, MessageSquareText, Radio, VideoOff } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useState } from 'preact/compat';
@@ -52,8 +58,11 @@ function queueTalkback(speaker: string, speak: () => Promise<void>): Promise<voi
 	return turn;
 }
 
+/** {@link CameraModal}'s props. */
 export interface CameraModalProps {
+	/** Whether the dialog is open. */
 	isOpen: boolean;
+	/** Called when it's dismissed (or closes itself after `idleTimeoutMs`). */
 	onClose: () => void;
 	/**
 	 * Camera entity to select when opening: any of a device's streams, or its package lens (which
@@ -158,6 +167,10 @@ export const CameraThumbnail: React.FC<{
 	);
 };
 
+/**
+ * The Cameras dialog: a camera's live view (with its smart detections, fullscreen, and talkback on
+ * one with a speaker), its recorded clips, and every camera's thumbnail to switch to.
+ */
 export const CameraModal: React.FC<CameraModalProps> = ({ isOpen, onClose, initialCamera, idleTimeoutMs }) => {
 	const { callService, getHass, waitFor } = useHassApi();
 	const [activeCamId, setActiveCamId] = useState<string | undefined>();

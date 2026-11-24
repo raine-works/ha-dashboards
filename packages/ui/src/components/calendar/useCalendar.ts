@@ -1,3 +1,9 @@
+/**
+ * The calendars' hooks: every calendar, the event now or next, and a range's events.
+ *
+ * @module
+ */
+
 import { useEffect, useState } from 'preact/compat';
 import { useHassApi, useHassReady, useHassSelector } from '../../context/HassContext';
 import {

@@ -1,3 +1,10 @@
+/**
+ * The Cameras dialog's Clips tab: a camera's recorded events by day, filtered by type and range,
+ * each opening in the clip player.
+ *
+ * @module
+ */
+
 import { Film, RefreshCw, VideoOff } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useRef, useState } from 'preact/compat';

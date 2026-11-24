@@ -1,3 +1,9 @@
+/**
+ * A theme's small preview tile, for the Appearance dialog's picker.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import { cn } from '../../lib/utils';
 import { themeStyle } from '../../themes/css';

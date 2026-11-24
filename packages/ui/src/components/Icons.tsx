@@ -1,3 +1,10 @@
+/**
+ * The panel's own icons, for what Lucide lacks (curtains, brand marks), drawn to sit beside
+ * Lucide's.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 
 interface IconProps {
