@@ -4,6 +4,7 @@ from homeassistant.core import Context, HomeAssistant, SupportsResponse
 import pytest
 from pytest_homeassistant_custom_component.common import async_mock_service
 
+from custom_components.raineworks_dashboards.push import async_preferences
 from custom_components.raineworks_dashboards.todo import description, due_label
 
 from .test_notify import phones  # noqa: F401
@@ -100,6 +101,20 @@ async def test_for_anyone_tells_everyone_but_who_added_it(
         chores["alex"][0].data["message"]
         == "Sam added this for anyone · due Thu Nov 26. Tap to see it."
     )
+
+
+async def test_a_to_do_push_skips_who_turned_to_do_off(
+    hass: HomeAssistant, chores, setup
+) -> None:
+    await setup(OPTIONS)
+    (await async_preferences(hass)).set("person.sam", "todo", False)
+    await hass.services.async_call(
+        "raineworks_dashboards",
+        "notify_todo_assignee",
+        {"list": "todo.chores", "item": "Water the plants", "person": "person.sam"},
+        blocking=True,
+    )
+    assert chores["sam"] == []
 
 
 async def test_mark_done_from_a_phone(hass: HomeAssistant, chores, setup) -> None:
