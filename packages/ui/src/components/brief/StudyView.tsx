@@ -136,7 +136,7 @@ export const StudyView: React.FC<StudyViewProps> = ({ active, playOn, onPlay, pl
 				{scripture && (
 					<Card className="justify-center-safe shrink-0 items-center gap-0 px-6 py-8 short:py-4 text-center lg:min-h-0 lg:w-2/5 lg:overflow-y-auto">
 						<figure className="flex flex-col items-center gap-5 short:gap-3">
-							<span className="flex size-12 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+							<span className="flex size-12 items-center justify-center rounded-lg bg-chart-4/10 text-chart-4">
 								<BookOpen className="size-6" />
 							</span>
 							<blockquote className="wrap-break-word text-balance font-medium text-xl leading-snug sm:text-2xl">
@@ -153,7 +153,7 @@ export const StudyView: React.FC<StudyViewProps> = ({ active, playOn, onPlay, pl
 				{lesson && (
 					<BriefCard
 						icon={BookOpen}
-						tone="text-amber-600 dark:text-amber-400"
+						tone="text-chart-4"
 						title="Come, Follow Me"
 						detail={lesson.dates}
 						className="shrink-0 lg:min-h-0 lg:flex-1 lg:shrink"
