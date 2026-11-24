@@ -46,7 +46,13 @@ function fakeWindow(start = { state: null as unknown, url: 'https://ha.local/das
 	};
 }
 
-const settle = () => new Promise((resolve) => setTimeout(resolve, 5));
+// Lets the fake history's moves land: each history.go() lands on a timer of its own, and a landing can
+// start another move (a microtask, then another timer). A few zero-delay timers in a row run after
+// every such timer queued before them, whatever the machine's speed; a fixed wait (5ms) could end
+// before a late timer's follow-up on a slow CI runner.
+const settle = async () => {
+	for (let turn = 0; turn < 5; turn++) await new Promise((resolve) => setTimeout(resolve, 0));
+};
 
 function dialog(name: string) {
 	const shown = { open: true };
