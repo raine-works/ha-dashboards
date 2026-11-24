@@ -5,7 +5,7 @@
  * @module
  */
 
-import { Lightbulb, Palette, SquareStack } from 'lucide-react';
+import { Lightbulb } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useMemo, useState } from 'preact/compat';
 import { useHassSelector } from '../../context/HassContext';
@@ -26,11 +26,12 @@ import {
 	type RoomScene,
 } from '../../lib/lights';
 import { cn } from '../../lib/utils';
-import { Button, Card, EmptyState, SwitchRow, Tabs, TabsContent, TabsList, TabsTrigger } from '../ui';
+import { EmptyState, Tabs, TabsContent, TabsList, TabsTrigger } from '../ui';
 import { BedtimeButton } from './BedtimeButton';
 import { BedtimeLightDialog } from './BedtimeLightDialog';
 import { LightAdjustModal } from './LightAdjustModal';
-import { type AdjustTarget, AllOffButton, LightRow, SceneChips, SceneRow } from './LightRow';
+import { type AdjustTarget, AllOffButton, LightRow, SceneRow } from './LightRow';
+import { RoomDialog, RoomTile } from './RoomTiles';
 import { type LightFixture, useLightControls, useLightingHass } from './useLightControls';
 
 export { BedtimeButton } from './BedtimeButton';
@@ -39,6 +40,7 @@ export { BedtimeLightDialog } from './BedtimeLightDialog';
 export { ColorRing } from './ColorRing';
 export { LightAdjustModal } from './LightAdjustModal';
 export { type AdjustTarget, AllOffButton, LightRow, SceneChips, SceneRow } from './LightRow';
+export { type HouseRoom, RoomDialog, RoomTile } from './RoomTiles';
 export {
 	brightnessPercent,
 	groupMembers,
@@ -149,6 +151,8 @@ const LightingSectionContent: React.FC<LightingSectionProps> = ({
 
 	const [activeTab, setActiveTab] = useState(houseWide ? 'floor' : 'room-0');
 	const [selectedFixture, setSelectedFixture] = useState<AdjustTarget | null>(null);
+	// The room whose dialog is open (by area, so it follows the room's latest lights and scenes)
+	const [openRoom, setOpenRoom] = useState<string | null>(null);
 	// On a scrolling page the title, its buttons and the tabs stick together: their height, for the
 	// floor names sticking under them
 	const [stuck, setStuck] = useState<HTMLDivElement | null>(null);
@@ -233,17 +237,6 @@ const LightingSectionContent: React.FC<LightingSectionProps> = ({
 	const renderRow = (fixture: LightFixture) => (
 		<LightRow key={fixture.id} fixture={fixture} controls={controls} onAdjust={openAdjust} />
 	);
-	// A light inside its room's block, padded like a light card so it lines up with the room's header
-	const renderPlainRow = (fixture: LightFixture) => (
-		<LightRow
-			key={fixture.id}
-			fixture={fixture}
-			controls={controls}
-			onAdjust={openAdjust}
-			variant="plain"
-			className="px-3 py-2 max-lg:py-3"
-		/>
-	);
 
 	return (
 		<section
@@ -285,67 +278,18 @@ const LightingSectionContent: React.FC<LightingSectionProps> = ({
 						{houseRooms.map((houseFloor) => (
 							<div key={houseFloor.floorId} className="flex shrink-0 flex-col gap-3">
 								<h3 className={floorHeading}>{houseFloor.name}</h3>
-								{houseFloor.rooms.map((room) => {
-									const ids = room.lights.map((light) => light.id);
-									const onCount = controls.countOn(ids);
-									return (
-										// Each room is one block: a tinted header (the room's switch, colors and scenes) over its lights
-										<Card key={room.areaId} className="shrink-0 gap-0 overflow-hidden py-0">
-											<div className={cn('flex flex-col gap-2 bg-muted/50 px-3 py-2', ids.length > 0 && 'border-b')}>
-												<div className="flex items-center gap-3">
-													{ids.length > 0 ? (
-														<SwitchRow
-															checked={onCount > 0}
-															onCheckedChange={(on) => controls.setRoomLights(ids, on, `the ${room.name} lights`)}
-															aria-label={`${room.name} lights`}
-															className="-mx-2 min-w-0 flex-1 rounded-md px-2 py-1"
-														>
-															{/* A room, not a light: stacked squares (a group) on a soft tile, tinted the theme's warm warning color while any of its lights are on */}
-															<span
-																className={cn(
-																	'flex size-12 shrink-0 items-center justify-center rounded-lg transition-colors',
-																	onCount > 0 ? 'bg-warning/15' : 'bg-muted',
-																)}
-															>
-																<SquareStack
-																	className={cn('size-5', onCount > 0 ? 'text-warning' : 'text-muted-foreground')}
-																/>
-															</span>
-															<div className="min-w-0 flex-1">
-																<h4 className="truncate font-semibold text-base">{room.name}</h4>
-																<p className="text-muted-foreground text-xs">
-																	{onCount === 0 ? 'All off' : `${onCount} of ${ids.length} on`}
-																</p>
-															</div>
-														</SwitchRow>
-													) : (
-														<h4 className="min-w-0 flex-1 truncate py-1 font-semibold text-base">{room.name}</h4>
-													)}
-													{/* The room's colors and effects, in line with its lights' own colors buttons */}
-													{ids.length > 1 && controls.anyAdjustable(ids) && (
-														<Button
-															variant="outline"
-															size="icon-xl"
-															onClick={() => openAdjust({ id: room.areaId, name: room.name, lightIds: ids })}
-															aria-label={`Adjust ${room.name} colors & effects`}
-															title={`Adjust ${room.name} colors & effects`}
-														>
-															<Palette className="size-5" />
-														</Button>
-													)}
-													{bedtimeToggles[room.areaId] && (
-														<BedtimeButton entityId={bedtimeToggles[room.areaId]} name={room.name} />
-													)}
-												</div>
-												{/* Its scenes, one on at a time, right where its lights are */}
-												{room.scenes.length > 0 && (
-													<SceneChips scenes={room.scenes} controls={controls} room={room.name} />
-												)}
-											</div>
-											<div className="flex flex-col divide-y">{room.lights.map(renderPlainRow)}</div>
-										</Card>
-									);
-								})}
+								{/* Rooms first: a tile per room (what's on, a power button); its lights and scenes open in a dialog */}
+								<div className="grid grid-cols-2 gap-3">
+									{houseFloor.rooms.map((room) => (
+										<RoomTile
+											key={room.areaId}
+											room={room}
+											controls={controls}
+											bedtimeEntity={bedtimeToggles[room.areaId]}
+											onOpen={() => setOpenRoom(room.areaId)}
+										/>
+									))}
+								</div>
 							</div>
 						))}
 					</TabsContent>
@@ -367,6 +311,13 @@ const LightingSectionContent: React.FC<LightingSectionProps> = ({
 				)}
 			</Tabs>
 
+			<RoomDialog
+				room={houseRooms.flatMap((f) => f.rooms).find((room) => room.areaId === openRoom) ?? null}
+				controls={controls}
+				bedtimeEntity={openRoom ? bedtimeToggles[openRoom] : undefined}
+				onAdjust={openAdjust}
+				onClose={() => setOpenRoom(null)}
+			/>
 			<BedtimeLightDialog controls={controls} />
 			<LightAdjustModal isOpen={!!selectedFixture} onClose={() => setSelectedFixture(null)} target={selectedFixture} />
 		</section>

@@ -22,6 +22,35 @@ export interface LightCapabilities {
 }
 
 /**
+ * A room tile's status line: how many of its lights are on ("Off", "1 on", "All on"), then the
+ * scene that's on ("2 on · Dinner"); "Bedtime" first while the room is in bedtime. A room with no
+ * lights says only its scene, or "Scenes".
+ */
+export function roomSummary(room: {
+	/** Its lights that are on. */
+	onCount: number;
+	/** All its lights. */
+	lightCount: number;
+	/** The name of its scene that's on, if one is. */
+	activeScene?: string;
+	/** Whether the room is in bedtime. */
+	bedtime?: boolean;
+}): string {
+	const { onCount, lightCount, activeScene, bedtime } = room;
+	const lights =
+		lightCount === 0
+			? activeScene
+				? undefined
+				: 'Scenes'
+			: onCount === 0
+				? 'Off'
+				: onCount === lightCount && lightCount > 1
+					? 'All on'
+					: `${onCount} on`;
+	return [bedtime && 'Bedtime', bedtime && onCount === 0 ? undefined : lights, activeScene].filter(Boolean).join(' · ');
+}
+
+/**
  * Whether a light's row shows its dimmer and colors button: while it's on, or while its dimmer is
  * held (a drag that started while it was on keeps its slider until it's let go). A light that's off
  * shows only its toggle and name, so a room of lights that are off stays a short, quiet list.
