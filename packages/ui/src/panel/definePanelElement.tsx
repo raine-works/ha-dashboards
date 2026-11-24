@@ -1,3 +1,10 @@
+/**
+ * The custom element every card is: a ShadowRoot with the compiled CSS and the active theme, a
+ * mount point carrying the color scheme, and the providers (hass store, dialog portal, wall panel)
+ * the sections and dialogs read.
+ *
+ * @module
+ */
 import React from 'preact/compat';
 import { createRoot } from 'preact/compat/client';
 import { AssistOverlay } from '../components/assist/AssistOverlay';
@@ -27,13 +34,17 @@ import { ensurePanelFonts } from './fonts';
 
 type PreactRoot = ReturnType<typeof createRoot>;
 
+/** What a card's component is rendered with. */
 export interface PanelComponentProps {
+	/** The card's Lovelace YAML config, as `setConfig` received it (`{}` when there's none). */
 	config: Record<string, unknown>;
 }
 
+/** How {@link definePanelElement} builds a card: its tag, component, styles and behaviour. */
 export interface PanelElementOptions {
 	/** Custom element tag. Lovelace strips the `custom:` prefix of `type: custom:<tag>` itself. */
 	tag: string;
+	/** The card's content, rendered inside the providers and an ErrorBoundary. */
 	component: React.ComponentType<PanelComponentProps>;
 	/** Key under globalThis.__panelStyles where @app/dashboard-build injects this panel's CSS. */
 	stylesKey: string;
@@ -74,7 +85,9 @@ const panelStyles = (key: string) => globalThis.__panelStyles?.[key] ?? '';
 /**
  * Register a Lovelace custom element that renders `component` into a ShadowRoot with the
  * panel's compiled Tailwind CSS, the bundled Poppins font, a dark-mode mount point, the
- * dialog portal container, and live Home Assistant state.
+ * dialog portal container, and live Home Assistant state. The tag and each alias are defined
+ * only when not already (a second bundle on the page keeps the first's). Returns the element's
+ * class.
  */
 export function definePanelElement({
 	tag,

@@ -1,6 +1,10 @@
-// Which dashboards bundle this page runs, so it can tell when a newer one is installed. The bundle is
-// dashboards-<hash>.js wherever it's served (the integration's /raineworks_dashboards/, or
-// anywhere else), so the running module's own URL names it, and version.json sits beside it.
+/**
+ * Which dashboards bundle this page runs, so it can tell when a newer one is installed. The bundle is
+ * dashboards-<hash>.js wherever it's served (the integration's /raineworks_dashboards/, or
+ * anywhere else), so the running module's own URL names it, and version.json sits beside it.
+ *
+ * @module
+ */
 
 /** `dashboards-<hash>.js` from a bundle's URL; null when it isn't one (a dev or test build). */
 export function bundleFile(url: string | undefined): string | null {

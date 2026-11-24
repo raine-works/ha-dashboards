@@ -1,3 +1,9 @@
+/**
+ * Bedtime: each room's bedtime toggle and Home Bedtime, the rooms a member can put to bed, and
+ * what Home Bedtime's routine does, as its confirm dialog lists it.
+ *
+ * @module
+ */
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
 import { isHouseholdMember } from './household';
 import { entityArea } from './lights';
@@ -32,6 +38,7 @@ export const bedtimeService = (entityId: string, on: boolean): [string, string] 
 	on ? 'turn_on' : 'turn_off',
 ];
 
+/** A room (an area) with a bedtime toggle. */
 export interface BedtimeRoom {
 	areaId: string;
 	/** The area's name ("Sam's Room"). */
@@ -82,6 +89,7 @@ export function memberBedtimeRoom(
 	return areaId ? bedtimeRooms(hass).find((room) => room.areaId === areaId) : undefined;
 }
 
+/** A room besides the signed-in member's own, as their bedtime dialog shows it (`otherBedtimeRooms`). */
 export interface OtherBedtimeRoom extends BedtimeRoom {
 	/** Its bedtime is on already. */
 	on: boolean;
@@ -160,6 +168,7 @@ export type BedtimeStepKind = (typeof BEDTIME_STEP_KINDS)[number];
 /** One thing a bedtime routine does, as its confirm dialog says it. */
 export interface BedtimeStep {
 	kind: BedtimeStepKind;
+	/** The step in a sentence ("Closes every curtain, blind and garage door"). */
 	text: string;
 	/**
 	 * The Home Assistant actions that do it in the routine's automation (`light.turn_off`, ...); a
@@ -169,9 +178,11 @@ export interface BedtimeStep {
 	actions: string[];
 }
 
+/** What a bedtime toggle's routine does, as its confirm dialog lists it. */
 export interface BedtimeRoutine {
 	/** The zone it's for, as its dialog names it ("Master Suite and Ensuite"). */
 	zone: string;
+	/** Its steps, in the order they happen. */
 	steps: BedtimeStep[];
 }
 

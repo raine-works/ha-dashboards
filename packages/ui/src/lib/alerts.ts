@@ -1,14 +1,24 @@
+/**
+ * What the panels alert on: doors, windows and garage doors opening, doorbells ringing and alarm
+ * panels changing, found from the states and compared between snapshots.
+ *
+ * @module
+ */
 import type { HassEntity } from '../types/homeassistant';
 import type { CameraDevice } from './cameras';
 import type { EntityWatch } from './hass-store';
 import { isUnavailable } from './values';
 
+/** What an opening is, from its device class. */
 export type OpeningKind = 'door' | 'window' | 'garage' | 'opening';
 
+/** A door, window or garage door, from a binary sensor or a cover. */
 export interface Opening {
 	entityId: string;
+	/** Its friendly name, without a trailing "Contact"/"Sensor". */
 	name: string;
 	kind: OpeningKind;
+	/** Open (a cover opening counts as open). */
 	isOpen: boolean;
 	/** False while the sensor is unavailable/unknown. */
 	available: boolean;
@@ -159,10 +169,12 @@ export function newlyOpened(previous: Opening[] | undefined, current: Opening[],
 	});
 }
 
+/** A doorbell's event entity. */
 export interface Doorbell {
 	entityId: string;
 	/** Event entity state: ISO time of the last event, or unknown. */
 	lastEvent: string;
+	/** The last event's type (`ring`); undefined when the integration doesn't say. */
 	eventType?: string;
 }
 
@@ -201,9 +213,11 @@ export function cameraForDoorbell(doorbellEntityId: string, cameras: CameraDevic
 	return cameras.filter((c) => objectId.startsWith(c.id)).sort((a, b) => b.id.length - a.id.length)[0];
 }
 
+/** An alarm control panel. */
 export interface AlarmPanel {
 	entityId: string;
 	name: string;
+	/** Its state (`disarmed`, `armed_away`, `arming`, `pending`, `triggered`…). */
 	state: string;
 	/** Target mode while arming (Alarmo's arm_mode / next_state). */
 	targetMode?: string;
@@ -211,9 +225,12 @@ export interface AlarmPanel {
 	since?: string;
 }
 
+/** What an alarm panel's change was (`pending`: the entry delay). */
 export type AlarmEventKind = 'triggered' | 'pending' | 'arming' | 'armed' | 'disarmed';
 
+/** An alarm panel's change worth announcing (`alarmEvents`). */
 export interface AlarmEvent {
+	/** The panel as it is now. */
 	panel: AlarmPanel;
 	kind: AlarmEventKind;
 	/** Human label for armed/arming modes, e.g. "Away". */
@@ -229,6 +246,7 @@ export const ALARM_MODE_LABELS: Record<string, string> = {
 	armed_custom_bypass: 'Custom',
 };
 
+/** Every alarm control panel, with its arming target (Alarmo's `arm_mode` / `next_state`). */
 export function discoverAlarmPanels(states: Record<string, HassEntity>): AlarmPanel[] {
 	return Object.values(states)
 		.filter((e) => e.entity_id.startsWith('alarm_control_panel.'))

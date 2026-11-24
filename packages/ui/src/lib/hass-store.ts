@@ -1,3 +1,9 @@
+/**
+ * The hass store the cards keep their `hass` in, and what selectors need to read from it cheaply:
+ * which entities an update changed, whether that touches a selector, and structural equality.
+ *
+ * @module
+ */
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
 
 /**
@@ -6,13 +12,17 @@ import type { HassEntity, HomeAssistant } from '../types/homeassistant';
  * components subscribe to the parts they show (`useHassSelector`) instead of all re-rendering.
  */
 export interface HassStore {
+	/** The latest hass, or null before the first. */
 	get(): HomeAssistant | null;
+	/** Store a new hass and tell every subscriber (nothing when it's the same object). */
 	set(hass: HomeAssistant | null): void;
 	/** Entity ids whose state the last `set` changed, or null when anything may have (registries, first hass). */
 	changed(): ReadonlySet<string> | null;
+	/** Call `listener` after every `set`; returns the function that stops it. */
 	subscribe(listener: () => void): () => void;
 }
 
+/** A new store holding `initial`. A subscriber that throws is logged, and the rest still hear. */
 export function createHassStore(initial: HomeAssistant | null = null): HassStore {
 	let current = initial;
 	let changed: ReadonlySet<string> | null = null;

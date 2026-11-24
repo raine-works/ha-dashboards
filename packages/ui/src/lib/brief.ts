@@ -1,3 +1,9 @@
+/**
+ * The daily brief: read from its sensor (weather, events, news and the recording), the speakers
+ * playing a recording of it, and how its times are written.
+ *
+ * @module
+ */
 import type { HassEntity } from '../types/homeassistant';
 import { addDays, isSameDay, parseCalendarTime, startOfDay } from './calendar';
 import { formatTime as time } from './time';
@@ -12,22 +18,29 @@ export const DAILY_BRIEF_ENTITY = 'sensor.daily_brief';
 /** What `briefPlayback()` reads: the speakers. */
 export const BRIEF_PLAYBACK_WATCH = ['media_player'] as const;
 
+/** The day's weather, as the brief saw it. */
 export interface BriefWeather {
+	/** Home Assistant's condition (`sunny`, `rainy`…); empty when the brief has none. */
 	condition: string;
 	/** Outside, when the brief was built. */
 	temperature?: number;
+	/** The day's forecast high and low. */
 	high?: number;
 	low?: number;
+	/** Chance of rain or snow, 0–100. */
 	precipitationProbability?: number;
+	/** The temperatures' unit ("°F" when the brief doesn't say). */
 	unit: string;
 }
 
+/** One of the day's calendar events in the brief. */
 export interface BriefEvent {
 	summary: string;
 	start: Date;
 	/** Exclusive, like the calendar's. */
 	end: Date;
 	allDay: boolean;
+	/** The calendar's name (empty when the brief doesn't say). */
 	calendar: string;
 	location?: string;
 }
@@ -38,7 +51,9 @@ export interface BriefStory {
 	text: string;
 }
 
+/** The daily brief, read from its sensor (`toDailyBrief`). */
 export interface DailyBrief {
+	/** When it was built (the sensor's state). */
 	generatedAt: Date;
 	/** "Tuesday, October 20" */
 	date: string;
@@ -138,12 +153,15 @@ export function toDailyBrief(entity?: HassEntity): DailyBrief | undefined {
 
 /** The brief playing (or paused) on a speaker. */
 export interface BriefPlayback {
+	/** The speaker (a group's leader). */
 	entityId: string;
+	/** The speaker's name, or the group's ("Kitchen + Library"). */
 	name: string;
 	state: 'playing' | 'paused';
 	/** Seconds into the brief at `positionUpdatedAt` (epoch ms). */
 	position?: number;
 	positionUpdatedAt?: number;
+	/** The recording's length in seconds, when the speaker or the brief knows it. */
 	duration?: number;
 }
 

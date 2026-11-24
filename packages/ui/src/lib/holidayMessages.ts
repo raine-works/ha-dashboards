@@ -1,14 +1,19 @@
-// Quick messages for a holiday's days (lib/holidays.ts): the intercom's announcements and phone
-// messages and the printed notes get a category of their own, first and picked, and the cameras'
-// talkback leads with the holiday's lines. Spoken ones (announcements, talkback) carry no emoji: TTS
-// would read them out. Notes are plain characters: the receipt printer prints in its code page.
-
+/**
+ * Quick messages for a holiday's days (lib/holidays.ts): the intercom's announcements and phone
+ * messages and the printed notes get a category of their own, first and picked, and the cameras'
+ * talkback leads with the holiday's lines. Spoken ones (announcements, talkback) carry no emoji: TTS
+ * would read them out. Notes are plain characters: the receipt printer prints in its code page.
+ *
+ * @module
+ */
 import type { HolidayId } from './holidays';
 import type { AnnouncementPreset, PresetCategory } from './intercom';
 
+/** A holiday's quick messages, for each place that offers them. */
 export interface HolidayMessages {
 	/** The category chip: "🎃 Halloween". */
 	label: string;
+	/** Intercom announcements (spoken: no emoji). */
 	announcements: AnnouncementPreset[];
 	/** Pushes to phones (emoji welcome). */
 	phone: string[];
@@ -20,6 +25,7 @@ export interface HolidayMessages {
 	indoor: string[];
 }
 
+/** Every holiday's quick messages. */
 export const HOLIDAY_MESSAGES: Record<HolidayId, HolidayMessages> = {
 	'new-year': {
 		label: "🎉 New Year's",

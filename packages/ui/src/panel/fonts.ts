@@ -1,6 +1,10 @@
-// Poppins (Latin) bundled into each panel as data URLs (@app/dashboard-build loads .woff2 with the
-// dataurl loader). Without it, devices fall back to their own system font, whose vertical
-// metrics differ (e.g. icons sitting lower than text on the ROAMiQ wall panel).
+/**
+ * Poppins (Latin) bundled into each panel as data URLs (@app/dashboard-build loads .woff2 with the
+ * dataurl loader). Without it, devices fall back to their own system font, whose vertical
+ * metrics differ (e.g. icons sitting lower than text on the ROAMiQ wall panel).
+ *
+ * @module
+ */
 import poppins300 from '@fontsource/poppins/files/poppins-latin-300-normal.woff2';
 import poppins400 from '@fontsource/poppins/files/poppins-latin-400-normal.woff2';
 import poppins500 from '@fontsource/poppins/files/poppins-latin-500-normal.woff2';

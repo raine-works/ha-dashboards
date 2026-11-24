@@ -1,12 +1,17 @@
-// Holiday easter eggs: the holidays the dashboards celebrate, their dates in any year (local
-// calendar days, never UTC) and which one is "on" for a day: its own day(s), or the days leading up
-// to it.
-
+/**
+ * Holiday easter eggs: the holidays the dashboards celebrate, their dates in any year (local
+ * calendar days, never UTC) and which one is "on" for a day: its own day(s), or the days leading up
+ * to it.
+ *
+ * @module
+ */
 import { capitalize } from './text';
 import { daysBetween, startOfDay } from './time';
 
+// Re-exported for the holidays' callers, which count days with them
 export { daysBetween, startOfDay };
 
+/** A holiday the dashboards celebrate. */
 export type HolidayId =
 	| 'new-year'
 	| 'valentines'
@@ -24,14 +29,17 @@ export type CharacterId = HolidayId | 'birthday';
 
 /** One of a holiday's own days ("Christmas Eve", "Christmas"). */
 export interface HolidayDay {
+	/** Local midnight of the day. */
 	date: Date;
 	name: string;
 }
 
+/** A holiday: its days in any year, its lead-up and what a tap on its character says. */
 export interface Holiday {
 	id: HolidayId;
 	/** "Halloween": what a countdown names. */
 	name: string;
+	/** Its emoji, after a countdown ("🎃"). */
 	emoji: string;
 	/** How many days before its first day the lead-up starts. */
 	leadDays: number;
@@ -43,6 +51,7 @@ export interface Holiday {
 	extras: string[];
 }
 
+/** The holiday on or leading up to a day (`activeHoliday`). */
 export interface ActiveHoliday {
 	holiday: Holiday;
 	/** Today is one of its own days. */
@@ -83,6 +92,7 @@ export function easterSunday(year: number): Date {
 const one = (name: string, date: (year: number) => Date) => (year: number) => [{ name, date: date(year) }];
 const happy = (day: HolidayDay) => `Happy ${day.name}!`;
 
+/** Every holiday the dashboards celebrate, in calendar order. */
 export const HOLIDAYS: readonly Holiday[] = [
 	{
 		id: 'new-year',
@@ -182,8 +192,10 @@ export const HOLIDAYS: readonly Holiday[] = [
 	},
 ];
 
+/** Every holiday's id, in calendar order. */
 export const HOLIDAY_IDS = HOLIDAYS.map((h) => h.id);
 
+/** The holiday with this id (a `?holiday=` preview's), or undefined for none. */
 export function holidayById(id: string): Holiday | undefined {
 	return HOLIDAYS.find((h) => h.id === id);
 }

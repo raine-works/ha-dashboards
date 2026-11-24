@@ -1,17 +1,27 @@
+/**
+ * Cameras: UniFi Protect's entities grouped into physical cameras, their smart detections and
+ * snapshots, and the talkback messages for each.
+ *
+ * @module
+ */
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
 import type { EntityWatch } from './hass-store';
 import { HOLIDAY_MESSAGES } from './holidayMessages';
 import type { HolidayId } from './holidays';
 
+/** A physical camera, from the entities sharing its prefix. */
 export interface CameraDevice {
 	/** Stable id: the shared entity_id prefix (e.g. `front_porch_doorbell`). */
 	id: string;
+	/** Its name, without the channel's ("Front Porch Doorbell"). */
 	label: string;
 	/** Camera entity shown in the main view. */
 	entityId: string;
 	/** Secondary lens (e.g. doorbell package camera) shown picture-in-picture. */
 	pipEntityId?: string;
+	/** Its `media_player.<prefix>_speaker`, for talkback, when it has one. */
 	speakerEntity?: string;
+	/** False while the main stream is unavailable. */
 	available: boolean;
 }
 
@@ -34,10 +44,6 @@ export function cameraPrefix(entityId: string): string {
 		.replace(PACKAGE_SUFFIX, '');
 }
 
-/**
- * Group camera entities into physical cameras: one main stream per device, the package lens
- * as its picture-in-picture, and the matching `media_player.<prefix>_speaker` for talkback.
- */
 // What `cameraDetections` reads (with DETECTION_SENSORS' types)
 const DETECTION_ENTITY = /^(binary_sensor\..+_(person|animal|vehicle)_detected|event\..+_package)$/;
 /**
@@ -49,6 +55,10 @@ export const CAMERAS_WATCH: EntityWatch = (id) =>
 /** What `cameraDetections` reads for every camera (with `discoverCameras`; the speakers don't count). */
 export const CAMERA_ACTIVITY_WATCH: EntityWatch = (id) => id.startsWith('camera.') || DETECTION_ENTITY.test(id);
 
+/**
+ * Group camera entities into physical cameras: one main stream per device, the package lens
+ * as its picture-in-picture, and the matching `media_player.<prefix>_speaker` for talkback.
+ */
 export function discoverCameras(states: Record<string, HassEntity>): CameraDevice[] {
 	const groups = new Map<string, { channels: Map<string, string>; pip?: string; other?: string }>();
 	const group = (prefix: string) => {
@@ -99,10 +109,13 @@ export function discoverCameras(states: Record<string, HassEntity>): CameraDevic
 	return cameras.sort((a, b) => a.label.localeCompare(b.label));
 }
 
+/** What a camera's smart detection saw. */
 export type CameraDetectionType = 'person' | 'animal' | 'vehicle' | 'package';
 
+/** A smart detection happening now (`cameraDetections`). */
 export interface CameraDetection {
 	type: CameraDetectionType;
+	/** As it's shown: "Person", "Package". */
 	label: string;
 }
 
