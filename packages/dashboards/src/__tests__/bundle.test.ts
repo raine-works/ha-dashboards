@@ -57,6 +57,13 @@ describe('the dashboards bundle', () => {
 		expect(await Bun.file(bundlePath).text()).toContain('import("./chunk-');
 	});
 
+	it('draws squircles where the browser can, and keeps circles round', async () => {
+		const text = await Bun.file(bundlePath).text();
+		expect(text).toMatch(/@supports \(?corner-shape: ?squircle\)?/);
+		expect(text).toContain('corner-shape:squircle');
+		expect(text).toContain('corner-shape:round');
+	});
+
 	it("embeds Geist, raineworks.com's typeface, and no longer Poppins", async () => {
 		const text = await Bun.file(bundlePath).text();
 		expect(text).toContain("font-family:'Geist'");
