@@ -1,3 +1,11 @@
+/**
+ * The Open Doors & Windows dialog: every open door, window and garage door, and how long it's been
+ * open, with a Close button for those that can close. One per page, opened with
+ * `showOpenSensors()`.
+ *
+ * @module
+ */
+
 import {
 	AppWindowIcon,
 	ArrowDownToLineIcon,
@@ -69,8 +77,11 @@ export const SharedOpenSensorsDialog: React.FC = () => {
 	return <OpenSensorsDialog isOpen={isOpen} onClose={() => setShown(false)} />;
 };
 
+/** {@link OpenSensorsDialog}'s props. */
 export interface OpenSensorsDialogProps {
+	/** Whether the dialog is open. */
 	isOpen: boolean;
+	/** Called when it's dismissed. */
 	onClose: () => void;
 }
 

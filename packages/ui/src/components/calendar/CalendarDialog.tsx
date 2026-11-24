@@ -1,3 +1,9 @@
+/**
+ * The Calendar dialog: a month of every calendar's events, and what's coming up.
+ *
+ * @module
+ */
+
 import { ChevronLeft, ChevronRight, Loader2, MapPin, RefreshCw } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useMemo, useState } from 'preact/compat';
@@ -33,8 +39,11 @@ const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const CELL_EVENTS = 2;
 const COMING_UP = 6;
 
+/** {@link CalendarDialog}'s props. */
 export interface CalendarDialogProps {
+	/** Whether the dialog is open. */
 	isOpen: boolean;
+	/** Called when it's dismissed. */
 	onClose: () => void;
 }
 

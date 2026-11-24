@@ -1,3 +1,10 @@
+/**
+ * The Appearance dialog: Light, Dark or Auto, and picking a theme (saved to the person's Home
+ * Assistant profile), with the theme editor a tap away.
+ *
+ * @module
+ */
+
 import { Check, House, Pencil, Plus } from 'lucide-react';
 import type React from 'preact/compat';
 import { lazy, Suspense, useState } from 'preact/compat';

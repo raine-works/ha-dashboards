@@ -1,5 +1,9 @@
-// One Assist run at a time for the whole page: the header button starts it, the overlay shows it.
-// A small store outside the component tree, so both read the same run without a provider.
+/**
+ * One Assist run at a time for the whole page: the header button starts it, the overlay shows it.
+ * A small store outside the component tree, so both read the same run without a provider.
+ *
+ * @module
+ */
 
 import {
 	ASSIST_SAMPLE_RATE,
@@ -42,6 +46,7 @@ function setState(next: AssistState) {
 	for (const listener of listeners) listener();
 }
 
+/** The page's Assist run, for `useSyncExternalStore`: its state, and a subscription to its changes. */
 export const assistStore = {
 	get: () => state,
 	subscribe(listener: () => void) {

@@ -1,3 +1,9 @@
+/**
+ * Pinch to zoom and pan, for the camera views.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import { useState } from 'preact/compat';
 import { INITIAL_PINCH, type PinchAction, pinchReducer } from '../../lib/zoom';

@@ -1,3 +1,9 @@
+/**
+ * A camera's live view over WebRTC, with Home Assistant's stream player as the fallback.
+ *
+ * @module
+ */
+
 import { Car, Maximize, Minimize, Package, PawPrint, User, Volume2, VolumeX, ZoomOut } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useRef, useState } from 'preact/compat';
@@ -83,9 +89,13 @@ interface WebRtcErrorEvent {
 
 type WebRtcServerEvent = WebRtcSessionEvent | WebRtcAnswerEvent | WebRtcCandidateEvent | WebRtcErrorEvent;
 
+/** {@link WebRtcCamera}'s props. */
 export interface WebRtcCameraProps {
+	/** The camera entity to stream. */
 	cameraEntity: string;
+	/** The name on its badge (the entity's friendly name by default). */
 	name?: string;
+	/** The view's shape (16:9 by default); `auto` fills its container's height. */
 	aspectRatio?: '16/9' | '4/3' | 'auto';
 	/**
 	 * `cover` (default) fills the view, cropping what doesn't fit; `contain` shows the whole frame,
@@ -94,16 +104,23 @@ export interface WebRtcCameraProps {
 	fit?: CameraFit;
 	/** Pinch (or the wheel) to zoom, drag to pan, double-tap to zoom in or out (the viewer's main view). */
 	zoomable?: boolean;
+	/** Layout classes for the view. */
 	className?: string;
+	/** Start playing at once (default true). */
 	autoPlay?: boolean;
+	/** Start muted (default true). */
 	initiallyMuted?: boolean;
+	/** The controls in the corner: mute, the zoom reset, full screen (default true). */
 	showControls?: boolean;
+	/** The badges over the top (its name, live or recording, the smart detections) and the activity frame (default true). */
 	showBadges?: boolean;
 	/** A full screen button (the viewer's main view); `fullscreen` makes the controls 56px. */
 	onFullscreen?: () => void;
+	/** Whether the view is full screen now. */
 	fullscreen?: boolean;
 }
 
+/** Each smart detection's icon, for its badge. */
 export const DETECTION_ICONS: Record<CameraDetectionType, React.FC<{ className?: string }>> = {
 	person: User,
 	animal: PawPrint,
@@ -111,6 +128,10 @@ export const DETECTION_ICONS: Record<CameraDetectionType, React.FC<{ className?:
 	package: Package,
 };
 
+/**
+ * A camera's live view: WebRTC straight from Home Assistant (under 100ms), falling back to Home
+ * Assistant's own stream player, with its badges and controls over it.
+ */
 export const WebRtcCamera: React.FC<WebRtcCameraProps> = ({
 	cameraEntity,
 	name,

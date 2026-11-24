@@ -1,3 +1,10 @@
+/**
+ * Assist on the dashboards: the button that starts a run, and the overlay that shows it (listening,
+ * thinking, the answer, and a text box for a follow-up).
+ *
+ * @module
+ */
+
 import { AlertCircle, ArrowUp, Keyboard, Mic, Sparkles, X } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useState, useSyncExternalStore } from 'preact/compat';

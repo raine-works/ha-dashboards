@@ -1,3 +1,10 @@
+/**
+ * The Daily dialog's Study tab: today's scripture and this week's Come, Follow Me lesson, fetched
+ * once a day per device.
+ *
+ * @module
+ */
+
 import { BookOpen, ExternalLink, Loader2, Play } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useState } from 'preact/compat';
@@ -68,7 +75,9 @@ export function useDailyStudy(active: boolean) {
 	};
 }
 
+/** {@link StudyView}'s props. */
 export interface StudyViewProps {
+	/** Whether the tab is showing (the study is fetched only then). */
 	active: boolean;
 	/** The speaker chips the dialog's tabs share */
 	playOn: React.ReactNode;
@@ -77,7 +86,9 @@ export interface StudyViewProps {
 	 * (`script.daily_scripture_announce`)
 	 */
 	onPlay: () => void;
+	/** Whether a Play is under way (its button shows busy). */
 	playing: boolean;
+	/** Whether Play can be tapped (a speaker is picked). */
 	canPlay: boolean;
 	/** The scripture on the speakers it's playing on: where, how far along, Pause / Resume and Stop */
 	playback?: React.ReactNode;

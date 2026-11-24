@@ -1,3 +1,10 @@
+/**
+ * The Daily dialog: the daily brief (with Play on a speaker), a person's daily affirmation, and the
+ * Study tab.
+ *
+ * @module
+ */
+
 import {
 	BookOpen,
 	CalendarDays,
@@ -415,10 +422,14 @@ const AffirmationView: React.FC<{ affirmation?: DailyAffirmation; now: Date; bir
 		</EmptyState>
 	);
 
+/** The Daily dialog's tabs. */
 export type DailyBriefTab = 'brief' | 'affirmation' | 'study';
 
+/** {@link DailyBriefDialog}'s props. */
 export interface DailyBriefDialogProps {
+	/** Whether the dialog is open. */
 	isOpen: boolean;
+	/** Called when it's dismissed. */
 	onClose: () => void;
 	/** The tab it opens on (the affirmation notification's link opens `affirmation`); the brief by default. */
 	tab?: DailyBriefTab;

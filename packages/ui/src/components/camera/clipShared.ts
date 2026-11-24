@@ -1,3 +1,9 @@
+/**
+ * What the clip list and the clip player share: each kind's icon and the signed thumbnails.
+ *
+ * @module
+ */
+
 import {
 	Activity,
 	AudioLines,
@@ -13,6 +19,7 @@ import {
 import { type Clip, type ClipKind, clipThumbnailPath } from '../../lib/clips';
 import { signPath } from './useCameraClips';
 
+/** Each kind of clip's icon (a ring, a person, a vehicle…). */
 export const CLIP_ICONS: Record<ClipKind, LucideIcon> = {
 	ring: Bell,
 	person: User,

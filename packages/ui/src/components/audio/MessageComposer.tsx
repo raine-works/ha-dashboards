@@ -1,3 +1,10 @@
+/**
+ * The message composer: type or record a message for the speakers (the intercom, a camera's
+ * speaker), with the recording's waveform and playback before it's sent.
+ *
+ * @module
+ */
+
 import { Check, Loader2, Mic, Pause, Play, Send, Square, Trash2 } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useRef, useState } from 'preact/compat';
@@ -15,12 +22,17 @@ const WAVEFORM_BAR_COUNT = 44;
 
 type RecordState = 'idle' | 'recording' | 'review' | 'sending' | 'sent';
 
+/** A finished recording, handed to `onSendRecording`. */
 export interface Recording {
 	/** 16kHz mono PCM, ready to encode for the destination speaker. */
 	samples: Float32Array;
+	/** The samples' rate, in Hz. */
 	sampleRate: number;
+	/** A WAV data URI of the recording, for playing it back before it's sent. */
 	previewUri: string;
+	/** Its length, in seconds. */
 	duration: number;
+	/** The waveform's bar heights (0–1). */
 	peaks: number[];
 }
 
@@ -298,12 +310,15 @@ const WaveformPlayer: React.FC<{ recording: Recording }> = ({ recording }) => {
 	);
 };
 
+/** {@link MessageComposer}'s props. */
 export interface MessageComposerProps {
 	/** The typed message (kept by the caller, so a sent or picked message can clear it). */
 	text: string;
+	/** Called as the message is typed. */
 	onTextChange: (text: string) => void;
 	/** Send the typed message (Enter or the send button); the caller clears the box at once, and queues it. */
 	onSendText: (text: string) => void;
+	/** The text box's placeholder. */
 	placeholder: string;
 	/** The text box's accessible name. */
 	inputLabel: string;
@@ -317,6 +332,7 @@ export interface MessageComposerProps {
 	sendBlockedReason?: string;
 	/** The caller's last result ("Announcement sent to 2 speakers"), on the line under the row. */
 	status?: { text: string; isError?: boolean } | null;
+	/** The longest a recording may run before it stops itself, in seconds. */
 	maxSeconds?: number;
 }
 

@@ -1,3 +1,10 @@
+/**
+ * The theme editor: builds a theme from choices, previews it on the real components, and saves it
+ * with its Home Assistant theme. Loaded on demand (its default export is the lazy import's).
+ *
+ * @module
+ */
+
 import { ClipboardCopy, FileInput, Lightbulb, Lock, Trash2 } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useMemo, useState } from 'preact/compat';

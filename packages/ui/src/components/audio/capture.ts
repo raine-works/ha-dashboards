@@ -1,8 +1,12 @@
-// Microphone capture off the main thread. ScriptProcessorNode runs its callback on the main thread,
-// so on a busy, low-power device (the ROAMiQ wall panels: HA state updates, the clock, cameras, the
-// level meter) late callbacks drop or repeat blocks and the recording stutters. An AudioWorklet
-// runs on the audio rendering thread instead; its chunks reach the page later when the page is busy,
-// but none are lost.
+/**
+ * Microphone capture off the main thread. ScriptProcessorNode runs its callback on the main thread,
+ * so on a busy, low-power device (the ROAMiQ wall panels: HA state updates, the clock, cameras, the
+ * level meter) late callbacks drop or repeat blocks and the recording stutters. An AudioWorklet
+ * runs on the audio rendering thread instead; its chunks reach the page later when the page is
+ * busy, but none are lost.
+ *
+ * @module
+ */
 
 /** Samples per chunk handed to the page (~43ms at 48kHz), the same size the ScriptProcessor used. */
 export const CHUNK_SIZE = 2048;
