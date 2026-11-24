@@ -14,6 +14,9 @@ For desktops, laptops and phones (the Companion app included).
 - **Lighting is rooms first**: a tile per room, by floor (what's on, its scene, a power button for
   its lights). A tap on a room opens its lights, scenes, colors and bedtime; a light that's off
   shows only its name until it's on.
+- **Climate is a line per thing**: each thermostat zone (its mode, the temperature inside, the
+  setpoint between − and +; a tap opens its mode), curtain (open and close as icons; a tap opens its
+  position) and fan (a tap opens its speed, Oscillate and presets).
 - **Phones and portrait tablets**: a header with the greeting, weather and the house's status, and
   a tab bar: Lights, Security, Assist (the voice button, in the middle), Climate, Music. Cameras
   open from Security.

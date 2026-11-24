@@ -34,7 +34,21 @@ import { cn } from '../../lib/utils';
 import { isUnavailable } from '../../lib/values';
 import type { HassEntity } from '../../types/homeassistant';
 import { IconCurtains } from '../Icons';
-import { Button, Card, CardAction, CardDescription, CardHeader, CardTitle, Separator, Slider } from '../ui';
+import {
+	Button,
+	Card,
+	CardAction,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	Separator,
+	Slider,
+} from '../ui';
 
 // cover supported_features bits
 const SUPPORT_SET_POSITION = 4;
@@ -122,7 +136,10 @@ export const CoverTile: React.FC<{
 	);
 };
 
-/** One covering: its icon, name and state, the motors' battery, position, and open / stop / close. */
+/**
+ * One covering on one line: its icon, name, state and position, the motors' battery, and open / close
+ * (stop while it moves) as icons; a tap on its name opens the position slider.
+ */
 export const CoverRow: React.FC<{ cover: WindowCover; battery?: number; className?: string }> = ({
 	cover,
 	battery,
@@ -139,6 +156,8 @@ export const CoverRow: React.FC<{ cover: WindowCover; battery?: number; classNam
 	const [now, setNow] = useState(() => Date.now());
 	// A slider being dragged shows the finger's value
 	const [dragging, setDragging] = useState<number | null>(null);
+	// The position dialog (the slider and the full buttons)
+	const [adjusting, setAdjusting] = useState(false);
 
 	// Home Assistant says it moves: since the tap, else since the state changed. Past a full travel and
 	// a grace period it's stalled, and shown at rest.
@@ -196,102 +215,109 @@ export const CoverRow: React.FC<{ cover: WindowCover; battery?: number; classNam
 	const tone = battery != null ? batteryTone(battery) : 'normal';
 	const BatteryIcon = tone === 'normal' ? BatteryMedium : BatteryLow;
 
+	const status = unavailable ? STATUS_WORDS[view.status] : `${STATUS_WORDS[view.status]} · ${position}%`;
+	const batteryBadge = battery != null && (
+		<span
+			title={`Motor battery ${battery}%`}
+			className={cn(
+				'flex shrink-0 items-center gap-0.5 text-xs tabular-nums',
+				tone === 'warning' && 'text-warning',
+				tone === 'destructive' && 'text-destructive',
+			)}
+		>
+			<BatteryIcon className="size-3.5" />
+			{battery}%
+		</span>
+	);
+	// While it moves, Stop alone; once it stops, Open and Close. A cover that can't stop keeps Open and
+	// Close throughout
+	const actions = (size: 'icon-lg' | 'xl') =>
+		moving && view.canStop ? (
+			<Button variant="outline" size={size} onClick={stop} aria-label={`Stop ${name}`}>
+				<Square />
+				{size === 'xl' && 'Stop'}
+			</Button>
+		) : (
+			<>
+				<Button
+					variant={view.status === 'open' || view.status === 'opening' ? 'default' : 'outline'}
+					size={size}
+					onClick={() => move('opening')}
+					disabled={unavailable}
+					aria-label={`Open ${name}`}
+				>
+					{curtain ? <ChevronsLeftRight /> : <ChevronsUp />}
+					{size === 'xl' && 'Open'}
+				</Button>
+				<Button
+					variant={view.status === 'closed' || view.status === 'closing' ? 'default' : 'outline'}
+					size={size}
+					onClick={() => move('closing')}
+					disabled={unavailable}
+					aria-label={`Close ${name}`}
+				>
+					{curtain ? <ChevronsRightLeft /> : <ChevronsDown />}
+					{size === 'xl' && 'Close'}
+				</Button>
+			</>
+		);
+
 	return (
-		// The tile, name and position on top; the slider and buttons under them, the row's full width. A
-		// container, so the buttons drop their words when the row is narrow (a phone)
-		<div className={cn('@container flex flex-col gap-3 p-4', className)}>
-			<div className="flex items-center gap-3.5">
-				<CoverTile
-					kind={kind}
-					open={!unavailable && position > 0}
-					moving={moving}
-					className={cn('shrink-0', unavailable && 'opacity-50')}
-				/>
-				<div className="flex min-w-0 flex-1 items-start justify-between gap-3">
-					<div className="flex min-w-0 flex-col">
-						<span className="truncate font-semibold">{name}</span>
-						<span className="flex min-w-0 items-center gap-1.5 text-muted-foreground text-sm">
-							{/* The position is beside the name, so the status is just the word */}
-							<span className="truncate">
-								{STATUS_WORDS[view.status]}
-								{/* A narrow row (a phone) puts the position here, leaving the name the width */}
-								{!unavailable && <span className="@max-[20rem]:inline hidden tabular-nums"> · {position}%</span>}
-							</span>
-							{battery != null && (
-								<span
-									title={`Motor battery ${battery}%`}
-									className={cn(
-										'flex shrink-0 items-center gap-0.5 text-xs tabular-nums',
-										tone === 'warning' && 'text-warning',
-										tone === 'destructive' && 'text-destructive',
-									)}
-								>
-									<BatteryIcon className="size-3.5" />
-									{battery}%
-								</span>
-							)}
-						</span>
-					</div>
-					{/* Room for "100%", so the name never shifts as the position changes */}
-					{!unavailable && (
-						<span className="@max-[20rem]:hidden min-w-[4ch] shrink-0 text-right font-light text-2xl tabular-nums leading-none">
+		// One line: the tile, the name and its status (a tap opens the position slider), then open / close
+		// (stop while it moves) as icons
+		<div className={cn('flex items-center gap-3 px-4 py-3', className)}>
+			<CoverTile
+				kind={kind}
+				open={!unavailable && position > 0}
+				moving={moving}
+				className={cn('shrink-0', unavailable && 'opacity-50')}
+			/>
+			<button
+				type="button"
+				onClick={() => setAdjusting(true)}
+				disabled={!view.canSetPosition || unavailable}
+				aria-label={`${name}: ${status}. Set position`}
+				className="-mx-2 flex min-h-11 min-w-0 flex-1 flex-col items-start rounded-md px-2 py-1 text-left outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 enabled:hover:bg-accent/50"
+			>
+				<span className="w-full truncate font-semibold">{name}</span>
+				<span className="flex w-full min-w-0 items-center gap-1.5 text-muted-foreground text-sm">
+					<span className="truncate tabular-nums">{status}</span>
+					{batteryBadge}
+				</span>
+			</button>
+			<div className="flex shrink-0 gap-1">{actions('icon-lg')}</div>
+
+			<Dialog open={adjusting} onOpenChange={setAdjusting}>
+				<DialogContent size="sheet">
+					<DialogHeader>
+						<DialogTitle>{name}</DialogTitle>
+						<DialogDescription>{STATUS_WORDS[view.status]}</DialogDescription>
+					</DialogHeader>
+					<div className="flex items-center gap-4">
+						<Slider
+							min={0}
+							max={100}
+							value={position}
+							disabled={unavailable}
+							onValueChange={setDragging}
+							onValueCommit={(value) => {
+								setDragging(null);
+								go(value);
+								callService('cover', 'set_cover_position', { entity_id: entityId, position: value });
+							}}
+							aria-label={`${name} position`}
+							className="flex-1"
+						/>
+						{/* Room for "100%", so the slider never shifts as the position changes */}
+						<span className="min-w-[4ch] shrink-0 text-right font-light text-2xl tabular-nums leading-none">
 							{position}
 							<span className="text-muted-foreground text-sm">%</span>
 						</span>
-					)}
-				</div>
-			</div>
-
-			{view.canSetPosition && (
-				<Slider
-					min={0}
-					max={100}
-					value={position}
-					disabled={unavailable}
-					onValueChange={setDragging}
-					onValueCommit={(value) => {
-						setDragging(null);
-						go(value);
-						callService('cover', 'set_cover_position', { entity_id: entityId, position: value });
-					}}
-					aria-label={`${name} position`}
-				/>
-			)}
-
-			{/* While it moves, Stop alone (the whole row); once it stops, Open and Close. A cover that can't
-				    stop keeps Open and Close throughout. A flex row, not equal grid columns, so neither squeezes
-				    below its label; on a row under 20rem the words go and the icons stay. */}
-			<div className="flex gap-2 *:flex-1">
-				{moving && view.canStop ? (
-					<Button variant="outline" size="xl" onClick={stop} aria-label={`Stop ${name}`}>
-						<Square />
-						<span className="@max-[20rem]:sr-only">Stop</span>
-					</Button>
-				) : (
-					<>
-						<Button
-							variant={view.status === 'open' || view.status === 'opening' ? 'default' : 'outline'}
-							size="xl"
-							onClick={() => move('opening')}
-							disabled={unavailable}
-							aria-label={`Open ${name}`}
-						>
-							{curtain ? <ChevronsLeftRight /> : <ChevronsUp />}
-							<span className="@max-[20rem]:sr-only">Open</span>
-						</Button>
-						<Button
-							variant={view.status === 'closed' || view.status === 'closing' ? 'default' : 'outline'}
-							size="xl"
-							onClick={() => move('closing')}
-							disabled={unavailable}
-							aria-label={`Close ${name}`}
-						>
-							{curtain ? <ChevronsRightLeft /> : <ChevronsDown />}
-							<span className="@max-[20rem]:sr-only">Close</span>
-						</Button>
-					</>
-				)}
-			</div>
+					</div>
+					{/* A flex row, not equal grid columns, so neither squeezes below its label */}
+					<div className="flex gap-2 *:flex-1">{actions('xl')}</div>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 };

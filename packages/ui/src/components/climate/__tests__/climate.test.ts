@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import type { HassEntity } from '../../../types/homeassistant';
-import { formatStatus, formatTarget, presetChoices } from '../ClimateSection';
+import { formatStatus, formatTarget, formatZoneLine, presetChoices } from '../ClimateSection';
 
 const climate = (state: string, attributes: HassEntity['attributes']): HassEntity => ({
 	entity_id: 'climate.test',
@@ -31,6 +31,22 @@ describe('ClimateSection formatters', () => {
 			formatStatus(climate('heat_cool', { current_temperature: 72, current_humidity: 43, hvac_action: 'heating' })),
 		).toBe('72° inside · 43% · Heating');
 		expect(formatStatus(climate('off', { current_temperature: 71, hvac_action: 'off' }))).toBe('71° inside');
+	});
+});
+
+describe('formatZoneLine', () => {
+	it('leads with the mode, then what the thermostat reports', () => {
+		expect(formatZoneLine(climate('heat', { current_temperature: 69, hvac_action: 'heating' }))).toBe(
+			'Heat · 69° inside · Heating',
+		);
+		expect(formatZoneLine(climate('heat_cool', { current_temperature: 71, hvac_action: 'idle' }))).toBe(
+			'Auto · 71° inside · Idle',
+		);
+		expect(formatZoneLine(climate('off', { current_temperature: 71, hvac_action: 'off' }))).toBe('Off · 71° inside');
+	});
+
+	it('names a mode it does not know by itself', () => {
+		expect(formatZoneLine(climate('fan_only', {}))).toBe('Fan only');
 	});
 });
 
