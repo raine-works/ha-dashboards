@@ -5,18 +5,9 @@
  * @module
  */
 
-import {
-	BatteryLow,
-	BatteryMedium,
-	Blinds,
-	ChevronsDown,
-	ChevronsLeftRight,
-	ChevronsRightLeft,
-	ChevronsUp,
-	Square,
-} from 'lucide-react';
+import { Blinds, ChevronsDown, ChevronsLeftRight, ChevronsRightLeft, ChevronsUp, Square } from 'lucide-react';
 import type React from 'preact/compat';
-import { Fragment, useEffect, useState } from 'preact/compat';
+import { useEffect, useState } from 'preact/compat';
 import { useEntity, useHassApi, useHassSelector } from '../../context/HassContext';
 import {
 	batterySensorFor,
@@ -34,21 +25,8 @@ import { cn } from '../../lib/utils';
 import { isUnavailable } from '../../lib/values';
 import type { HassEntity } from '../../types/homeassistant';
 import { IconCurtains } from '../Icons';
-import {
-	Button,
-	Card,
-	CardAction,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-	Separator,
-	Slider,
-} from '../ui';
+import { SectionGroup } from '../layout/Section';
+import { Button, DeviceRow, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Slider } from '../ui';
 
 // cover supported_features bits
 const SUPPORT_SET_POSITION = 4;
@@ -112,28 +90,6 @@ const STATUS_WORDS: Record<CoverView['status'], string> = {
 	opening: 'Opening…',
 	closing: 'Closing…',
 	unavailable: 'Unavailable',
-};
-
-/** The covering's icon in a tile: blue while it's open (any amount), pulsing while it moves. */
-export const CoverTile: React.FC<{
-	kind: WindowCover['kind'];
-	open: boolean;
-	moving?: boolean;
-	className?: string;
-}> = ({ kind, open, moving, className }) => {
-	const Icon = kind === 'curtain' ? IconCurtains : Blinds;
-	return (
-		<div
-			aria-hidden
-			className={cn(
-				'flex size-12 items-center justify-center rounded-lg transition-colors',
-				open ? 'bg-info/15 text-info' : 'bg-muted text-muted-foreground',
-				className,
-			)}
-		>
-			<Icon size={22} className={cn(moving && 'animate-pulse')} />
-		</div>
-	);
 };
 
 /**
@@ -213,82 +169,66 @@ export const CoverRow: React.FC<{ cover: WindowCover; battery?: number; classNam
 
 	const curtain = kind === 'curtain';
 	const tone = battery != null ? batteryTone(battery) : 'normal';
-	const BatteryIcon = tone === 'normal' ? BatteryMedium : BatteryLow;
 
-	const status = unavailable ? STATUS_WORDS[view.status] : `${STATUS_WORDS[view.status]} · ${position}%`;
-	const batteryBadge = battery != null && (
-		<span
-			title={`Motor battery ${battery}%`}
-			className={cn(
-				'flex shrink-0 items-center gap-0.5 text-xs tabular-nums',
-				tone === 'warning' && 'text-warning',
-				tone === 'destructive' && 'text-destructive',
-			)}
-		>
-			<BatteryIcon className="size-3.5" />
-			{battery}%
-		</span>
-	);
-	// While it moves, Stop alone; once it stops, Open and Close. A cover that can't stop keeps Open and
-	// Close throughout
-	const actions = (size: 'icon-lg' | 'xl') =>
+	// One line: the state and position, and the motors' battery only when it's low (amber, red when very low)
+	const status = [
+		unavailable ? STATUS_WORDS[view.status] : `${STATUS_WORDS[view.status]} · ${position}%`,
+		battery != null && tone !== 'normal' ? `Battery ${battery}%` : undefined,
+	]
+		.filter(Boolean)
+		.join(' · ');
+	// While it moves, Stop alone; once it stops, Open and Close (both moves, neither marked as the state).
+	// A cover that can't stop keeps Open and Close throughout
+	const actions = (size: 'icon-md' | 'action') =>
 		moving && view.canStop ? (
-			<Button variant="outline" size={size} onClick={stop} aria-label={`Stop ${name}`}>
+			<Button variant="secondary" size={size} onClick={stop} aria-label={`Stop ${name}`}>
 				<Square />
-				{size === 'xl' && 'Stop'}
+				{size === 'action' && 'Stop'}
 			</Button>
 		) : (
 			<>
 				<Button
-					variant={view.status === 'open' || view.status === 'opening' ? 'default' : 'outline'}
+					variant="secondary"
 					size={size}
 					onClick={() => move('opening')}
 					disabled={unavailable}
 					aria-label={`Open ${name}`}
 				>
 					{curtain ? <ChevronsLeftRight /> : <ChevronsUp />}
-					{size === 'xl' && 'Open'}
+					{size === 'action' && 'Open'}
 				</Button>
 				<Button
-					variant={view.status === 'closed' || view.status === 'closing' ? 'default' : 'outline'}
+					variant="secondary"
 					size={size}
 					onClick={() => move('closing')}
 					disabled={unavailable}
 					aria-label={`Close ${name}`}
 				>
 					{curtain ? <ChevronsRightLeft /> : <ChevronsDown />}
-					{size === 'xl' && 'Close'}
+					{size === 'action' && 'Close'}
 				</Button>
 			</>
 		);
+	const Icon = curtain ? IconCurtains : Blinds;
 
 	return (
-		// One line: the tile, the name and its status (a tap opens the position slider), then open / close
-		// (stop while it moves) as icons
-		<div className={cn('flex items-center gap-3 px-4 py-3', className)}>
-			<CoverTile
-				kind={kind}
-				open={!unavailable && position > 0}
-				moving={moving}
-				className={cn('shrink-0', unavailable && 'opacity-50')}
+		// A DeviceRow (docs/design/components.md): the name and status open the position slider; open and
+		// close (stop while it moves) as icons at the end
+		<>
+			<DeviceRow
+				icon={<Icon className={cn(moving && 'animate-pulse')} />}
+				tone={!unavailable && position > 0 ? 'on' : 'off'}
+				name={name}
+				status={status}
+				statusTone={tone === 'destructive' ? 'alarm' : tone === 'warning' ? 'warning' : undefined}
+				onOpen={view.canSetPosition && !unavailable ? () => setAdjusting(true) : undefined}
+				disabled={unavailable}
+				trailing={actions('icon-md')}
+				className={className}
 			/>
-			<button
-				type="button"
-				onClick={() => setAdjusting(true)}
-				disabled={!view.canSetPosition || unavailable}
-				aria-label={`${name}: ${status}. Set position`}
-				className="-mx-2 flex min-h-11 min-w-0 flex-1 flex-col items-start rounded-md px-2 py-1 text-left outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 enabled:hover:bg-accent/50"
-			>
-				<span className="w-full truncate font-semibold">{name}</span>
-				<span className="flex w-full min-w-0 items-center gap-1.5 text-muted-foreground text-sm">
-					<span className="truncate tabular-nums">{status}</span>
-					{batteryBadge}
-				</span>
-			</button>
-			<div className="flex shrink-0 gap-1">{actions('icon-lg')}</div>
 
 			<Dialog open={adjusting} onOpenChange={setAdjusting}>
-				<DialogContent size="sheet">
+				<DialogContent size="detail">
 					<DialogHeader>
 						<DialogTitle>{name}</DialogTitle>
 						<DialogDescription>{STATUS_WORDS[view.status]}</DialogDescription>
@@ -315,16 +255,16 @@ export const CoverRow: React.FC<{ cover: WindowCover; battery?: number; classNam
 						</span>
 					</div>
 					{/* A flex row, not equal grid columns, so neither squeezes below its label */}
-					<div className="flex gap-2 *:flex-1">{actions('xl')}</div>
+					<div className="flex gap-2 *:flex-1">{actions('action')}</div>
 				</DialogContent>
 			</Dialog>
-		</div>
+		</>
 	);
 };
 
 /**
  * Every window covering in the house (curtains, blinds, shades; discovered, a cover group standing
- * for its motors) in one card: a row each, and Open all / Close all once there are several.
+ * for its motors) in one group: a row each, and Open all / Close all once there are several.
  * Nothing when there are none.
  */
 export const CoversCard: React.FC<{ className?: string }> = ({ className }) => {
@@ -351,26 +291,17 @@ export const CoversCard: React.FC<{ className?: string }> = ({ className }) => {
 	const title = kinds.size === 1 ? [...kinds][0] : 'Windows';
 
 	return (
-		// A container, so Open all / Close all go icon-only when the card is narrow
-		<Card className={cn('@container/covers gap-0 py-0', className)}>
-			<CardHeader className="items-center gap-3 border-b px-4 py-3 [.border-b]:pb-3">
-				<div className="flex min-w-0 items-center gap-3">
-					<Blinds className="size-5 shrink-0 text-info" />
-					<div className="min-w-0">
-						<CardTitle className="truncate text-lg">{title}</CardTitle>
-						<CardDescription className="truncate">
-							{covers.length === 1
-								? (covers[0].area ?? covers[0].name)
-								: openCount === 0
-									? 'All closed'
-									: `${openCount} of ${covers.length} open`}
-						</CardDescription>
-					</div>
-				</div>
-				{covers.length > 1 && (
-					<CardAction className="flex gap-2 self-center">
+		// A group in the Climate section (docs/design/components.md): "Curtains", "Blinds" or "Windows", with
+		// Open all / Close all once there are several; a container, so they go icon-only when it's narrow
+		<SectionGroup
+			label={covers.length > 1 && openCount > 0 ? `${title} · ${openCount} open` : title}
+			surface
+			className={cn('@container/covers', className)}
+			actions={
+				covers.length > 1 && (
+					<>
 						<Button
-							variant="outline"
+							variant="ghost"
 							size="sm"
 							onClick={() => callService('cover', 'open_cover', { entity_id: ids })}
 							aria-label="Open all"
@@ -380,7 +311,7 @@ export const CoversCard: React.FC<{ className?: string }> = ({ className }) => {
 							<span className="@max-[24rem]/covers:sr-only">Open all</span>
 						</Button>
 						<Button
-							variant="outline"
+							variant="ghost"
 							size="sm"
 							onClick={() => callService('cover', 'close_cover', { entity_id: ids })}
 							aria-label="Close all"
@@ -389,15 +320,13 @@ export const CoversCard: React.FC<{ className?: string }> = ({ className }) => {
 							<ChevronsRightLeft />
 							<span className="@max-[24rem]/covers:sr-only">Close all</span>
 						</Button>
-					</CardAction>
-				)}
-			</CardHeader>
-			{covers.map((cover, i) => (
-				<Fragment key={cover.entityId}>
-					{i > 0 && <Separator />}
-					<CoverRow cover={cover} battery={lowestBattery(cover, states)} />
-				</Fragment>
+					</>
+				)
+			}
+		>
+			{covers.map((cover) => (
+				<CoverRow key={cover.entityId} cover={cover} battery={lowestBattery(cover, states)} />
 			))}
-		</Card>
+		</SectionGroup>
 	);
 };
