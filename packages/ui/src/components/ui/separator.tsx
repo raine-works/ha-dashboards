@@ -1,11 +1,21 @@
+/**
+ * shadcn/ui's Separator (new-york v4), ported to Preact without Radix.
+ *
+ * @module
+ */
+
 import React from 'preact/compat';
 import { cn } from '../../lib/utils';
 
+/** A div's attributes, the line's direction and whether assistive technology skips it. */
 export interface SeparatorProps extends React.HTMLAttributes<HTMLDivElement> {
+	/** Default: horizontal. */
 	orientation?: 'horizontal' | 'vertical';
+	/** Only visual (`role="none"`, the default), else a `separator` screen readers announce. */
 	decorative?: boolean;
 }
 
+/** A hairline between content, in the border color. */
 export const Separator = React.forwardRef<HTMLDivElement, SeparatorProps>(
 	({ className, orientation = 'horizontal', decorative = true, ...props }, ref) => (
 		<div

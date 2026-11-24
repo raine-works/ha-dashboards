@@ -1,14 +1,26 @@
+/**
+ * shadcn/ui's Switch, without Radix (same `role`, `data-slot` and `data-state`), in the panel's
+ * own look.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import { cn } from '../../lib/utils';
 
+/** The switch's props (controlled). */
 export interface SwitchProps {
+	/** On. */
 	checked: boolean;
+	/** Tapped: the new value. */
 	onCheckedChange?: (checked: boolean) => void;
+	/** Can't be changed. */
 	disabled?: boolean;
 	className?: string;
 	'aria-label'?: string;
 	/** Panel extension: a switch that only shows a state its row owns (hidden from screen readers and Tab). */
 	'aria-hidden'?: boolean;
+	/** `-1` with `aria-hidden`, so Tab skips it too. */
 	tabIndex?: number;
 }
 

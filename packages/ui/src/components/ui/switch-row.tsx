@@ -1,7 +1,14 @@
+/**
+ * Panel extension: a row that toggles its switch wherever it's tapped.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import { cn } from '../../lib/utils';
 import { Switch, type SwitchProps } from './switch';
 
+/** The switch's props, the row's content and its layout. */
 export interface SwitchRowProps extends Omit<SwitchProps, 'className'> {
 	/** The row's content (name, status); the switch sits after it. */
 	children: React.ReactNode;

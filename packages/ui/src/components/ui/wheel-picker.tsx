@@ -1,6 +1,10 @@
-// Panel extension (not shadcn): an iOS-style picker wheel. A native scroll-snap column (the
-// platform's own momentum and settle), the value in a band across the middle, rows fading toward the
-// edges, a light haptic tick as each value passes the middle. Arrow keys step it; tapping a row picks it.
+/**
+ * Panel extension (not shadcn): an iOS-style picker wheel. A native scroll-snap column (the
+ * platform's own momentum and settle), the value in a band across the middle, rows fading toward the
+ * edges, a light haptic tick as each value passes the middle. Arrow keys step it; tapping a row picks it.
+ *
+ * @module
+ */
 
 import { useEffect, useState } from 'preact/compat';
 import { hapticTap } from '../../lib/tones';
@@ -9,9 +13,13 @@ import { cn } from '../../lib/utils';
 /** A row's height; the wheel shows five (two above and below the value). */
 const ROW_PX = 40;
 
+/** The wheel's rows and the value picked (controlled). */
 export interface WheelPickerProps<T extends string | number> {
+	/** The rows, top to bottom: each value and what it shows. */
 	items: { value: T; label: string }[];
+	/** The value in the middle band (the first row when it isn't one of `items`). */
 	value: T;
+	/** A new value reached the middle (scrolled, stepped or tapped). */
 	onChange: (value: T) => void;
 	/** What the wheel picks ("Hour"), for screen readers. */
 	label: string;
@@ -24,6 +32,7 @@ const markReady = (el: HTMLElement) => {
 	el.dataset.ready = '1';
 };
 
+/** A wheel of `items` to scroll to a value (`role="listbox"`). */
 export function WheelPicker<T extends string | number>({
 	items,
 	value,

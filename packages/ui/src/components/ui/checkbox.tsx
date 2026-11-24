@@ -1,11 +1,20 @@
+/**
+ * shadcn/ui's Checkbox (new-york v4), ported to Preact without Radix, with an `xl` size for touch.
+ *
+ * @module
+ */
+
 import { CheckIcon, MinusIcon } from 'lucide-react';
 import type React from 'preact/compat';
 import { cn } from '../../lib/utils';
 
+/** The checkbox's props (Radix's contract, controlled). */
 export interface CheckboxProps {
 	/** `indeterminate` (Radix's contract): some of what it stands for, e.g. a select-all box. */
 	checked: boolean | 'indeterminate';
+	/** Tapped: the new value (an indeterminate box becomes checked). */
 	onCheckedChange?: (checked: boolean) => void;
+	/** Can't be changed. */
 	disabled?: boolean;
 	/** Panel extension: `xl` is a 28px box for touch. */
 	size?: 'default' | 'xl';

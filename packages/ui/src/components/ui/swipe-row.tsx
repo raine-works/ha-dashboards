@@ -1,3 +1,10 @@
+/**
+ * Panel extension: a list row swiped sideways to act on it. The gesture is `lib/swipe.ts`'s
+ * reducer; this renders it.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import { useEffect, useReducer } from 'preact/compat';
 import {
@@ -12,19 +19,25 @@ import {
 import { hapticTap } from '../../lib/tones';
 import { cn } from '../../lib/utils';
 
+/** What a swipe to one side does. */
 export interface SwipeRowAction {
 	/** "Done", "Delete": shown under the row as it slides away. */
 	label: string;
+	/** Shown beside the label. */
 	icon: React.ReactNode;
+	/** The color under the row. */
 	tone: 'success' | 'destructive' | 'info';
+	/** Runs once the row has slid off. */
 	onAction: () => void;
 }
 
+/** The row's actions, long press and content. */
 export interface SwipeRowProps {
 	/** Swiped toward the right (revealed on the left). */
 	start?: SwipeRowAction;
 	/** Swiped toward the left (revealed on the right). */
 	end?: SwipeRowAction;
+	/** No swiping or long press. */
 	disabled?: boolean;
 	/** Held still for half a second (a buzz; the click it ends with is swallowed). */
 	onLongPress?: () => void;
@@ -32,7 +45,9 @@ export interface SwipeRowProps {
 	className?: string;
 	/** The sliding surface: give it its card look (opaque, so the action under it stays hidden). */
 	contentClassName?: string;
+	/** The row's content. */
 	children: React.ReactNode;
+	/** Set on the `li` (to find the row again, e.g. while reordering). */
 	'data-uid'?: string;
 	/** The outer element's own style (a row slid aside while another is dragged past it). */
 	style?: React.CSSProperties;

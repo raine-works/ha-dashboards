@@ -9,9 +9,12 @@
  * that want an entry and brings history in line with them a microtask after each change, one move
  * at a time. Its state key is its own: Home Assistant acts on popstates whose state has `dialog` or
  * `opensDialog` (its own dialogs), so its state is never copied into ours.
+ *
+ * @module
  */
 
 const STATE_KEY = 'haDashboardsDialogs';
+/** The URL's search parameter naming the open dialog (a marker only: a reload drops it). */
 export const DIALOG_PARAM = 'dialog';
 /** A move whose popstate never comes (the page navigated away meanwhile) stops blocking after this. */
 const MOVE_TIMEOUT_MS = 1000;
@@ -40,6 +43,10 @@ interface Entry {
 	close: () => void;
 }
 
+/**
+ * The dialog history for a window (`window`, or a fake in tests). It starts listening to popstate,
+ * and clears a dialog left in the URL by a reload, when the first dialog opens.
+ */
 export function createDialogHistory(win: HistoryWindow) {
 	const entries: Entry[] = [];
 	let started = false;

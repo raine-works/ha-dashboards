@@ -1,12 +1,17 @@
+/**
+ * shadcn/ui's Sonner (new-york v4), in the dashboard's light/dark mode (shadcn reads it from
+ * next-themes); sonner's CSS is imported by theme.css because its automatic `<head>` injection
+ * doesn't reach a ShadowRoot.
+ *
+ * @module
+ */
+
 import { CircleCheckIcon, InfoIcon, Loader2Icon, OctagonXIcon, TriangleAlertIcon } from 'lucide-react';
 import type React from 'preact/compat';
 import { type ExternalToast, Toaster as Sonner, toast as sonnerToast, type ToasterProps } from 'sonner';
 import { useColorScheme } from '../../context/ColorScheme';
 import { titleCase } from '../../lib/text';
 
-// shadcn/ui Sonner, in the dashboard's light/dark mode (shadcn reads it from next-themes); sonner's CSS is imported by theme.css
-// because its automatic <head> injection doesn't reach a ShadowRoot.
-//
 // Rich colors style each toast type like the status Button variants: a faded tint of the status
 // color with a solid status-color border and status-colored text. success = green, info = blue
 // (events), warning = amber, error = red (alarm). The tint is mixed into the popover color rather
@@ -15,6 +20,7 @@ const tint = (token: string) => `color-mix(in oklab, var(--${token}) 18%, var(--
 // Lift the status color toward the foreground so text stays legible on its own tint
 const ink = (token: string) => `color-mix(in oklab, var(--${token}) 75%, var(--foreground))`;
 
+/** Where toasts show: one per card, in the status colors. */
 const Toaster = ({ ...props }: ToasterProps) => {
 	const theme = useColorScheme();
 	return (
@@ -66,6 +72,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
 
 // Every toast's title in title case ("Front Door Opened"), whoever writes it
 const titled = <T,>(message: T): T => (typeof message === 'string' ? (titleCase(message) as T) : message);
+/** sonner's `toast` (and `toast.success`, `.error`…), titles in Title Case. */
 const toast: typeof sonnerToast = Object.assign(
 	(message: Parameters<typeof sonnerToast>[0], data?: ExternalToast) => sonnerToast(titled(message), data),
 	sonnerToast,

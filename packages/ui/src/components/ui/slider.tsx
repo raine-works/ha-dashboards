@@ -1,3 +1,10 @@
+/**
+ * Panel design (not shadcn's thin track and round thumb): a thick slider for brightness, volume
+ * and the like, safe to scroll past on touch.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import { useEffect, useRef, useState } from 'preact/compat';
 import { hapticTap } from '../../lib/tones';
@@ -8,17 +15,26 @@ const TOUCH_SLOP_PX = 8;
 // The grip's inset from the fill's end (and the track's ends), so it stays inside a rounded corner
 const GRIP_INSET_PX = 6;
 
+/** The slider's props (controlled). */
 export interface SliderProps {
+	/** The value shown (a drag shows its own until the new value comes back). */
 	value: number;
+	/** Default: 1. */
 	min?: number;
+	/** Default: 100. */
 	max?: number;
+	/** Values snap to it (default: 1). */
 	step?: number;
+	/** Can't be changed. */
 	disabled?: boolean;
+	/** Each new value while dragging (and each keyboard step). */
 	onValueChange?: (val: number) => void;
+	/** The value let go on (and each keyboard step): the one to send to Home Assistant. */
 	onValueCommit?: (val: number) => void;
 	className?: string;
 	/** Panel extension: paint the track (a color-temperature or hue gradient). */
 	trackClassName?: string;
+	/** Classes for the fill (transparent over a painted track). */
 	rangeClassName?: string;
 	'aria-label'?: string;
 }

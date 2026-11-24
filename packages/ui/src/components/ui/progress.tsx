@@ -1,8 +1,14 @@
+/**
+ * shadcn/ui's Progress (new-york v4), ported to Preact without Radix, with the panel's status variants.
+ *
+ * @module
+ */
+
 import { cva, type VariantProps } from 'class-variance-authority';
 import React from 'preact/compat';
 import { cn } from '../../lib/utils';
 
-// Panel extension: status variants (track tinted with the indicator color)
+/** The bar's classes by variant (panel extension: status variants, the track tinted with the indicator color). */
 const progressVariants = cva('relative h-2 w-full overflow-hidden rounded-full', {
 	variants: {
 		variant: {
@@ -18,10 +24,13 @@ const progressVariants = cva('relative h-2 w-full overflow-hidden rounded-full',
 	},
 });
 
+/** A div's attributes, the bar's `variant` and its value. */
 export interface ProgressProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof progressVariants> {
+	/** How full, 0–100 (default: 0). */
 	value?: number;
 }
 
+/** A progress bar (`role="progressbar"`). */
 const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(({ className, value = 0, variant, ...props }, ref) => (
 	<div
 		ref={ref}

@@ -1,11 +1,19 @@
+/**
+ * Panel extension: what a list shows when it's empty or couldn't load.
+ *
+ * @module
+ */
+
 import { RefreshCw } from 'lucide-react';
 import type React from 'preact/compat';
 import { cn } from '../../lib/utils';
 import { Button } from './button';
 
+/** The empty state's icon, text and, for a failure, its retry. */
 export interface EmptyStateProps {
 	/** A `size-10` icon (or `HolidayPeek` with one as its fallback). */
 	icon: React.ReactNode;
+	/** The line of text under the icon. */
 	children: React.ReactNode;
 	/** A failure: an outline Try again under the text. */
 	onRetry?: () => void;

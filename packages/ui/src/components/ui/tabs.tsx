@@ -1,3 +1,10 @@
+/**
+ * shadcn/ui's Tabs (new-york v4), ported to Preact without Radix (same markup, `role`s and
+ * `data-state`), a size up on wall panels.
+ *
+ * @module
+ */
+
 import React, { useState } from 'preact/compat';
 import { cn } from '../../lib/utils';
 
@@ -11,12 +18,17 @@ const TabsContext = React.createContext<TabsContextValue>({
 	onValueChange: () => {},
 });
 
+/** A div's attributes and the tab shown: controlled (`value`) or not (`defaultValue`). */
 export interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
+	/** The tab shown at first (uncontrolled). */
 	defaultValue?: string;
+	/** The tab shown (controlled). */
 	value?: string;
+	/** A tab was picked: its value. */
 	onValueChange?: (value: string) => void;
 }
 
+/** Tabs: a `TabsList` of `TabsTrigger`s, and a `TabsContent` for each. */
 const Tabs: React.FC<TabsProps> = ({
 	defaultValue,
 	value: controlledValue,
@@ -44,6 +56,7 @@ const Tabs: React.FC<TabsProps> = ({
 	);
 };
 
+/** The row of tabs (`role="tablist"`). */
 const TabsList = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
 	({ className, ...props }, ref) => (
 		<div
@@ -60,10 +73,13 @@ const TabsList = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
 );
 TabsList.displayName = 'TabsList';
 
+/** A button's attributes and the tab it shows. */
 export interface TabsTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+	/** The `TabsContent` it shows. */
 	value: string;
 }
 
+/** A tab (`role="tab"`), raised while its content shows. */
 const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(({ className, value, ...props }, ref) => {
 	const context = React.useContext(TabsContext);
 	const isActive = context.value === value;
@@ -87,10 +103,13 @@ const TabsTrigger = React.forwardRef<HTMLButtonElement, TabsTriggerProps>(({ cla
 });
 TabsTrigger.displayName = 'TabsTrigger';
 
+/** A div's attributes and the tab it belongs to. */
 export interface TabsContentProps extends React.HTMLAttributes<HTMLDivElement> {
+	/** The `TabsTrigger` that shows it. */
 	value: string;
 }
 
+/** A tab's content (`role="tabpanel"`), rendered only while its tab is picked. */
 const TabsContent = React.forwardRef<HTMLDivElement, TabsContentProps>(
 	({ className, value, children, ...props }, ref) => {
 		const context = React.useContext(TabsContext);
