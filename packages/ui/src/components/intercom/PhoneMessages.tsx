@@ -4,7 +4,7 @@
  * @module
  */
 
-import { Check, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useState } from 'preact/compat';
 import { useHassApi, useHassSelector } from '../../context/HassContext';
@@ -16,7 +16,9 @@ import { discoverPeople, householdFirstName, PEOPLE_WATCH } from '../../lib/peop
 import { nameList } from '../../lib/text';
 import { cn } from '../../lib/utils';
 import { useHoliday } from '../holiday/useHoliday';
-import { Avatar, AvatarFallback, AvatarImage, Button, Input, Separator, toggleVariants } from '../ui';
+import { SectionGroup } from '../layout/Section';
+import { Avatar, AvatarFallback, AvatarImage, Button, Input, Separator } from '../ui';
+import { CheckRow } from '../ui/check-row';
 import { PresetPicker } from './PresetPicker';
 
 // Close to the limit: the counter turns amber
@@ -102,49 +104,40 @@ export const PhoneMessages: React.FC<{
 
 	return (
 		<div className="flex min-h-0 flex-1 gap-6 short:gap-4 max-md:flex-col max-md:gap-4 max-md:overflow-y-auto">
-			{/* Who gets it */}
-			<div className="flex w-72 shrink-0 flex-col gap-3 max-md:w-full">
-				<div className="flex items-center justify-between">
-					<span className="font-medium text-sm">People</span>
-					<div className="flex gap-1">
-						<Button variant="ghost" size="sm" onClick={() => onRecipients(ids)}>
-							All
-						</Button>
-						<Button variant="ghost" size="sm" onClick={() => onRecipients([])}>
-							None
-						</Button>
-					</div>
-				</div>
-				<div className="flex min-h-0 flex-col gap-2 overflow-y-auto p-0.5">
-					{people.length === 0 && <p className="text-muted-foreground text-sm">No household phones found.</p>}
-					{people.map((person) => {
-						const isOn = selected.includes(person.entityId);
-						return (
-							<button
-								key={person.entityId}
-								type="button"
-								aria-pressed={isOn}
-								data-state={isOn ? 'on' : 'off'}
-								onClick={() => toggle(person.entityId)}
-								className={cn(toggleVariants({ variant: 'chip', size: 'xl' }), 'w-full shrink-0 justify-start')}
-							>
-								<Avatar className="size-7">
+			{/* Who gets it: a check row each, on one surface */}
+			<div className="flex w-72 shrink-0 flex-col overflow-y-auto p-0.5 max-md:w-full max-md:overflow-visible">
+				<SectionGroup
+					label="People"
+					surface
+					actions={
+						people.length > 1 && (
+							<>
+								<Button variant="ghost" size="sm" onClick={() => onRecipients(ids)}>
+									All
+								</Button>
+								<Button variant="ghost" size="sm" onClick={() => onRecipients([])}>
+									None
+								</Button>
+							</>
+						)
+					}
+				>
+					{people.length === 0 && <p className="py-3 text-muted-foreground text-sm">No household phones found.</p>}
+					{people.map((person) => (
+						<CheckRow
+							key={person.entityId}
+							label={person.name}
+							checked={selected.includes(person.entityId)}
+							onCheckedChange={() => toggle(person.entityId)}
+							icon={
+								<Avatar className="size-8">
 									{person.picture && <AvatarImage src={person.picture} alt="" />}
 									<AvatarFallback className="text-[11px]">{person.initials}</AvatarFallback>
 								</Avatar>
-								<span className="truncate">{person.name}</span>
-								<span
-									className={cn(
-										'ml-auto flex size-5 shrink-0 items-center justify-center rounded-full border',
-										isOn && 'border-primary bg-primary text-primary-foreground',
-									)}
-								>
-									{isOn && <Check className="size-3" />}
-								</span>
-							</button>
-						);
-					})}
-				</div>
+							}
+						/>
+					))}
+				</SectionGroup>
 			</div>
 
 			<Separator orientation="vertical" className="max-md:hidden" />

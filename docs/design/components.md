@@ -85,6 +85,13 @@ Every button has a label (icon-only: Close). `loading` stays. Header buttons are
 buttons and chips written with it took the design at once; new code says `secondary`. `warning`
 is tonal too, tinted amber.
 
+### CheckRow
+
+One of several things to pick (the speakers an announcement plays on, the people a message goes
+to): the name, a muted word ("Off", "Playing"), and a check at the end, an empty ring until picked;
+the whole row is the target (`ui/check-row.tsx`). Rows stack on one surface in a `SectionGroup`,
+whose actions are All / None. Picking many is a check, never a radio circle.
+
 ### Chips and segmented choices
 
 - **A chip** (a quick message, Play on's speaker, a filter, a person): tonal, filled with `primary`

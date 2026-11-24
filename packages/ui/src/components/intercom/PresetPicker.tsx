@@ -39,7 +39,7 @@ export function PresetPicker<T>({
 		// the categories and two rows: 172px, 200px with a wall panel's taller chips), so they never draw over
 		// what's under them; below that the column scrolls
 		<div className="grid min-h-43 touch:min-h-50 flex-1 grid-rows-[auto_auto_minmax(0,1fr)] gap-3 max-md:flex-none">
-			<span className="font-medium text-sm">{title}</span>
+			<h3 className="px-1 text-muted-foreground text-overline uppercase">{title}</h3>
 			<ChipRow role="radiogroup" aria-label={`${title} category`} className="shrink-0">
 				{categories.map((c) => (
 					<Button

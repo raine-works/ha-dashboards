@@ -23,9 +23,9 @@ rows, are each dialog's own.
 - **TVs**: the list of TVs as rows on one surface, the picked one filled; the TV's card with what's
   on as the dialog's hero (its poster large), the transport and volume under it; inputs as tonal
   chips; the apps in a grid that fills the space below, so there's no blank half.
-- **Messages**: speakers and TVs as rows with checkmarks on one surface (All / None as its
-  actions); the quick messages fill the middle; the volume, chime and composer as the footer.
-  Phones and Notes the same way.
+- **Messages** (done): speakers and TVs as `CheckRow`s on one surface each (All / None as the
+  group's actions), the people on Phones the same way; the quick messages under an overline; the
+  volume, chime and composer as the footer.
 - **Music**: the speakers as rows on one surface; Now Playing's cover as the hero; Browse's tiles
   and the queue's rows on the design's shapes.
 - **Cameras**: the camera list as tiles with the picked one ringed; the live view's controls on

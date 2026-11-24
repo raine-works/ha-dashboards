@@ -12,6 +12,7 @@ export * from './button';
 export * from './calendar';
 export * from './card';
 export * from './chart-card';
+export * from './check-row';
 export * from './checkbox';
 export * from './chip-row';
 export * from './confirm-button';
