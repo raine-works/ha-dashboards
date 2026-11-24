@@ -1,16 +1,25 @@
+/**
+ * Window covers (curtains, blinds, shades, shutters): discovery, their motors' batteries, and a
+ * moving cover's estimated position.
+ *
+ * @module
+ */
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
 import { entityArea } from './lights';
 
 /** Window coverings (curtains, blinds, shades, shutters): garage doors and gates aren't. */
 export const WINDOW_COVER_CLASSES = ['curtain', 'blind', 'shade', 'shutter'] as const;
+/** A window cover's device class. */
 export type WindowCoverKind = (typeof WINDOW_COVER_CLASSES)[number];
 
 /** Window covers and the battery sensors of their motors. */
 export const COVERS_WATCH = ['cover'];
 
+/** A window cover the dashboards show (a cover group stands for its motors). */
 export interface WindowCover {
 	/** `cover.*` */
 	entityId: string;
+	/** Its friendly name. */
 	name: string;
 	/** Curtains part from the middle; blinds, shades and shutters come down from the top. */
 	kind: WindowCoverKind;
@@ -84,7 +93,9 @@ export const FULL_TRAVEL_MS = 11_000;
 
 /** A cover on its way: from where it was, toward a position, since when (epoch ms). */
 export interface CoverMotion {
+	/** Position (0–100) when it started. */
 	from: number;
+	/** Position (0–100) it's headed to. */
 	to: number;
 	startedAt: number;
 }

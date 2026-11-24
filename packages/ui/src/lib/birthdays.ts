@@ -1,6 +1,9 @@
-// Birthday easter eggs: today's birthdays from the Birthdays calendar (Google Contacts' birthdays,
-// all-day events titled "Sam Rivera's birthday"), which the headers celebrate like a holiday.
-
+/**
+ * Birthday easter eggs: today's birthdays from the Birthdays calendar (Google Contacts' birthdays,
+ * all-day events titled "Sam Rivera's birthday"), which the headers celebrate like a holiday.
+ *
+ * @module
+ */
 import type { HassEntity } from '../types/homeassistant';
 import { nameList } from './text';
 import { dayKey } from './time';

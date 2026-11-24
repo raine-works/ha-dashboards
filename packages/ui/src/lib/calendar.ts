@@ -1,6 +1,13 @@
+/**
+ * Calendars: the calendar entities, their events (from the entities' attributes and
+ * `calendar.get_events`), the month grid, and how an event's time is written.
+ *
+ * @module
+ */
 import type { HassEntity } from '../types/homeassistant';
 import { addDays, daysBetween, startOfDay, formatTime as time } from './time';
 
+// Re-exported for the calendar's callers, which count days with them
 export { addDays, startOfDay };
 
 /** A `calendar.*` entity (Google Calendar, holidays, local calendars). */
@@ -13,15 +20,18 @@ export interface CalendarSource {
 	color: string;
 }
 
+/** One event of a calendar. */
 export interface CalendarEvent {
 	/** Unique within a fetch: calendar, start and summary. */
 	key: string;
 	calendar: CalendarSource;
+	/** Its title ("Busy" when it has none). */
 	summary: string;
 	start: Date;
 	/** Exclusive: an all-day event on Oct 31 ends Nov 1 00:00. */
 	end: Date;
 	allDay: boolean;
+	/** Its description, without Google's note on hiding observances. */
 	description?: string;
 	location?: string;
 }
@@ -117,6 +127,7 @@ export function nextCalendarEvent(
 	return sortEvents(events)[0];
 }
 
+/** `calendar.get_events`' response: each calendar's events, keyed by its entity id. */
 export interface GetEventsResponse {
 	[entityId: string]: {
 		events?: { summary?: string; start: string; end: string; description?: string | null; location?: string | null }[];
@@ -156,6 +167,7 @@ export function sortEvents(events: CalendarEvent[]): CalendarEvent[] {
 	);
 }
 
+/** Whether two times fall on the same local day. */
 export function isSameDay(a: Date, b: Date): boolean {
 	return startOfDay(a).getTime() === startOfDay(b).getTime();
 }

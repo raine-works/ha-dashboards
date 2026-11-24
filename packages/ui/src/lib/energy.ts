@@ -1,11 +1,15 @@
+/**
+ * Energy. Home Assistant's Energy dashboard settings (`energy/get_prefs`) are the source of truth: the
+ * grid meters are the house's total, the devices its circuits and appliances (a device's
+ * `included_in_stat` nests it under another, e.g. the washer under its laundry circuit). Live watts
+ * come from each energy sensor's power sensor; history from the recorder's hourly statistics.
+ *
+ * @module
+ */
 import type { HassEntity, HassEntityRegistryEntry } from '../types/homeassistant';
 import { startOfDay } from './time';
 
-// Home Assistant's Energy dashboard settings (`energy/get_prefs`) are the source of truth: the grid
-// meters are the house's total, the devices its circuits and appliances (a device's
-// `included_in_stat` nests it under another, e.g. the washer under its laundry circuit). Live watts
-// come from each energy sensor's power sensor; history from the recorder's hourly statistics.
-
+/** Home Assistant's Energy settings (`energy/get_prefs`), as much of them as the dashboards read. */
 export interface EnergyPrefs {
 	energy_sources?: {
 		type: string;
@@ -16,6 +20,7 @@ export interface EnergyPrefs {
 	device_consumption?: { stat_consumption: string; name?: string | null; included_in_stat?: string | null }[];
 }
 
+/** A measured energy statistic and its live power sensor. */
 export interface EnergyMeter {
 	/** The energy statistic (kWh). */
 	statId: string;
@@ -23,7 +28,9 @@ export interface EnergyMeter {
 	powerId?: string;
 }
 
+/** A device in the Energy settings: a circuit or an appliance. */
 export interface EnergyCircuit extends EnergyMeter {
+	/** The settings' name for it, else its sensor's name without the energy words. */
 	name: string;
 	/** The circuit this one is measured within (shown under it, left out of the house's split). */
 	parent?: string;
@@ -31,6 +38,7 @@ export interface EnergyCircuit extends EnergyMeter {
 	color?: number;
 }
 
+/** The house's energy as the dashboards measure it (`buildEnergyModel`). */
 export interface EnergyModel {
 	/** The house's total: every grid meter (a 240V service's two legs). */
 	grid: EnergyMeter[];
@@ -124,6 +132,7 @@ export function readWatts(state?: HassEntity): number | undefined {
 	return unit === 'kW' ? value * 1000 : unit === 'MW' ? value * 1_000_000 : value;
 }
 
+/** The house's draw now, in watts (`livePower`). */
 export interface LivePower {
 	/** The house's draw (every grid meter), undefined while none reports. */
 	total?: number;
@@ -135,6 +144,7 @@ export interface LivePower {
 
 const topLevel = (model: EnergyModel) => model.circuits.filter((c) => !c.parent);
 
+/** The house's and each circuit's draw now, and what the top-level circuits leave untracked. */
 export function livePower(model: EnergyModel, states: Record<string, HassEntity>): LivePower {
 	const grid = model.grid.map((m) => (m.powerId ? readWatts(states[m.powerId]) : undefined));
 	const total = grid.some((w) => w !== undefined) ? grid.reduce<number>((sum, w) => sum + (w ?? 0), 0) : undefined;
@@ -160,12 +170,16 @@ export function runningCircuits(
 
 // ── Periods and statistics ──────────────────────────────────────────────────────────────────────
 
+/** The span the energy view shows: today, this week (from Monday) or this month. */
 export type EnergyPeriod = 'today' | 'week' | 'month';
+/** How a period's chart is split: by hour (today) or by day. */
 export type EnergyBucket = 'hour' | 'day';
 
+/** A period's times (`periodBounds`). */
 export interface PeriodBounds {
 	period: EnergyPeriod;
 	bucket: EnergyBucket;
+	/** The period's first moment (midnight, Monday, the 1st). */
 	start: Date;
 	/** The period's end (tomorrow, next Monday, the 1st), for the chart's empty future. */
 	end: Date;
@@ -254,19 +268,23 @@ export function sumChange(rows: StatisticRows, statId: string, from: Date, to: D
 	return (rows[statId] ?? []).reduce((sum, r) => (r.start >= a && r.start < b ? sum + (r.change ?? 0) : sum), 0);
 }
 
+/** A circuit's energy over a period. */
 export interface CircuitTotal {
 	circuit: EnergyCircuit;
 	kWh: number;
 }
 
+/** A period's energy so far (`periodSummary`), in kWh. */
 export interface PeriodSummary {
 	/** The house's energy so far this period. */
 	total: number;
 	/** Each circuit's, in the settings' order (nested ones too). */
 	circuits: CircuitTotal[];
+	/** What no top-level circuit accounts for. */
 	untracked: number;
 }
 
+/** The house's and each circuit's energy from the period's start up to the bucket in progress. */
 export function periodSummary(model: EnergyModel, rows: StatisticRows, bounds: PeriodBounds): PeriodSummary {
 	const total = model.grid.reduce((sum, m) => sum + sumChange(rows, m.statId, bounds.start, bounds.now), 0);
 	const circuits = model.circuits.map((circuit) => ({
@@ -283,13 +301,17 @@ export const previousTotal = (model: EnergyModel, rows: StatisticRows, bounds: P
 
 /** A chart series: a colored circuit (its statistic), Other (uncolored circuits) or Untracked. */
 export type SeriesKey = string;
+/** The series of the circuits past the chart's colors. */
 export const OTHER = 'other';
+/** The series of what no top-level circuit accounts for. */
 export const UNTRACKED = 'untracked';
 
+/** One bar of the stacked chart (`chartBuckets`). */
 export interface ChartBucket {
 	start: Date;
 	/** Not reached yet (or in progress): drawn empty. */
 	future: boolean;
+	/** The house's energy in it (kWh), at least what its circuits measured. */
 	total: number;
 	/** Stacked from the baseline: colored circuits in order, Other, Untracked (zeros left out). */
 	parts: { key: SeriesKey; kWh: number }[];
@@ -335,9 +357,11 @@ export function chartSeries(model: EnergyModel): { id: string; name: string; col
 	];
 }
 
+/** A bucket as the chart library reads it (`chartRows`). */
 export interface ChartRow {
 	/** The bucket's start (ms). */
 	start: number;
+	/** Its axis label (`formatBucket`). */
 	label: string;
 	/** kWh per series id; null in the future, so nothing is drawn there. */
 	[series: string]: number | string | null;

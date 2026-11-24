@@ -1,10 +1,11 @@
-import type { HomeAssistant } from '../types/homeassistant';
-
 /**
  * Home Assistant's own chrome (the dashboard toolbar and the sidebar), changed from inside a card
  * for a dashboard with its own header: the toolbar hidden, the sidebar kept always hidden, and a
  * button of the card's opening it. The wall panels run in kiosk mode and need none of it.
+ *
+ * @module
  */
+import type { HomeAssistant } from '../types/homeassistant';
 
 const TOOLBAR_STYLE_ID = 'panel-hide-toolbar';
 

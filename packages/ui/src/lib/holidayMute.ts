@@ -1,8 +1,11 @@
+/**
+ * Until when the wall panels' holiday sounds are muted, house-wide: the raineworks_dashboards
+ * integration's `datetime` (its state an ISO time), else a house's own `input_datetime` (its
+ * `timestamp` attribute), as before the integration had one.
+ *
+ * @module
+ */
 import type { HassEntity } from '../types/homeassistant';
-
-// Until when the wall panels' holiday sounds are muted, house-wide: the raineworks_dashboards
-// integration's `datetime` (its state an ISO time), else a house's own `input_datetime` (its
-// `timestamp` attribute), as before the integration had one.
 
 /** The integration's mute. */
 export const HOLIDAY_MUTE = 'datetime.holiday_sounds_muted_until';

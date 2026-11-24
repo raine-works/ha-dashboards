@@ -1,6 +1,10 @@
-// Home Assistant's Assist pipeline over the websocket (`assist_pipeline/run`, speech in, speech out):
-// the run streams events (run-start, stt-*, intent-*, tts-*, run-end, error), and the page sends
-// the microphone as binary frames to the handler the run-start names. Pure pieces live here.
+/**
+ * Home Assistant's Assist pipeline over the websocket (`assist_pipeline/run`, speech in, speech out):
+ * the run streams events (run-start, stt-*, intent-*, tts-*, run-end, error), and the page sends
+ * the microphone as binary frames to the handler the run-start names. Pure pieces live here.
+ *
+ * @module
+ */
 
 /** The sample rate the pipeline is asked for (what Home Assistant's speech-to-text expects). */
 export const ASSIST_SAMPLE_RATE = 16_000;
@@ -19,6 +23,7 @@ export type AssistPhase =
 	| 'answered'
 	| 'error';
 
+/** An Assist run as the card shows it, folded from the pipeline's events (`reduceAssistEvent`). */
 export interface AssistState {
 	phase: AssistPhase;
 	/**
@@ -49,10 +54,14 @@ export interface AssistState {
 	ended?: boolean;
 }
 
+/** Nothing running: the state before a run and after it's dismissed. */
 export const IDLE_ASSIST: AssistState = { phase: 'idle' };
 
+/** One event of a pipeline run, as the websocket delivers it. */
 export interface AssistEvent {
+	/** `run-start`, `stt-end`, `intent-progress`, `intent-end`, `tts-end`, `run-end`, `error`… */
 	type: string;
+	/** The event's data; its shape depends on `type`. */
 	data?: Record<string, unknown> | null;
 }
 
@@ -83,6 +92,10 @@ const ERROR_MESSAGES: Record<string, string> = {
 	timeout: 'Assist took too long',
 };
 
+/**
+ * A failed run said simply: the known pipeline error `code`s in words, else the pipeline's own
+ * `message`, else "Something went wrong".
+ */
 export function assistErrorMessage(code: unknown, message?: unknown): string {
 	if (typeof code === 'string' && ERROR_MESSAGES[code]) return ERROR_MESSAGES[code];
 	return typeof message === 'string' && message ? message : 'Something went wrong';

@@ -1,17 +1,26 @@
+/**
+ * UniFi Protect event clips, as its Home Assistant media source browses them:
+ *
+ * ```text
+ * media-source://unifiprotect                   the NVR (`<nvr>:browse`), children are its cameras
+ * <nvr>:browse:<camera>                         the camera's event types (all, ring, motion, smart, audio)
+ * <nvr>:browse:<camera>:<type>:recent:<days>    its events from the last 1, 7 or 30 days, newest first
+ * <nvr>:event:<event id>                        one clip: `media_source/resolve_media` gives a signed MP4 URL
+ * ```
+ *
+ * @module
+ */
 import { cameraPrefix } from './cameras';
 import { capitalize } from './text';
 import { dayKey, formatClock, pad2 } from './time';
 
-// UniFi Protect event clips, as its Home Assistant media source browses them:
-//   media-source://unifiprotect                       the NVR (`<nvr>:browse`), children are its cameras
-//   <nvr>:browse:<camera>                             the camera's event types (all, ring, motion, smart, audio)
-//   <nvr>:browse:<camera>:<type>:recent:<days>        its events from the last 1, 7 or 30 days, newest first
-//   <nvr>:event:<event id>                            one clip: `media_source/resolve_media` gives a signed MP4 URL
-
+/** The UniFi Protect media source's root, whose children are the NVRs. */
 export const PROTECT_ROOT = 'media-source://unifiprotect';
 
+/** What a clip's event was, for its icon. */
 export type ClipKind = 'ring' | 'person' | 'vehicle' | 'animal' | 'package' | 'face' | 'motion' | 'audio' | 'other';
 
+/** One event clip of a camera. */
 export interface Clip {
 	/** Media source id to resolve for playback. */
 	id: string;
@@ -28,6 +37,7 @@ export interface Clip {
 
 /** Event types a camera's clips can be filtered to (doorbells add rings, AI cameras audio). */
 export type ClipFilter = 'all' | 'ring' | 'smart' | 'motion' | 'audio';
+/** Every event-type filter with its label, in the order the clip list offers them. */
 export const CLIP_FILTERS: { id: ClipFilter; label: string }[] = [
 	{ id: 'all', label: 'All' },
 	{ id: 'ring', label: 'Rings' },
@@ -36,13 +46,16 @@ export const CLIP_FILTERS: { id: ClipFilter; label: string }[] = [
 	{ id: 'audio', label: 'Audio' },
 ];
 
+/** How many days back the clip list reaches (Protect's `recent:<days>`). */
 export type ClipRange = 1 | 7 | 30;
+/** Every range with its label, shortest first. */
 export const CLIP_RANGES: { days: ClipRange; label: string }[] = [
 	{ days: 1, label: '24 hours' },
 	{ days: 7, label: '7 days' },
 	{ days: 30, label: '30 days' },
 ];
 
+/** A media source browse item (`media_source/browse_media`), as much of it as the clips read. */
 export interface BrowseItem {
 	title: string;
 	media_content_id: string;
@@ -135,6 +148,7 @@ export function clipFilters(camera: BrowseItem): ClipFilter[] {
 	return CLIP_FILTERS.map((f) => f.id).filter((id) => ids.has(id));
 }
 
+/** The browse id of a camera's clips of one event type over the last `days`. */
 export const clipListId = (cameraBrowseId: string, filter: ClipFilter, days: ClipRange) =>
 	`${cameraBrowseId}:${filter}:recent:${days}`;
 
@@ -206,6 +220,7 @@ export function clipFileName(camera: string, clip: Pick<Clip, 'start' | 'label'>
 
 /** Playback speeds the player cycles through (security footage is often watched fast). */
 export const CLIP_SPEEDS = [1, 2, 4] as const;
+/** The speed after `speed` in `CLIP_SPEEDS`, back to 1× after the fastest (and from an unknown one). */
 export const nextClipSpeed = (speed: number) => CLIP_SPEEDS[(CLIP_SPEEDS.indexOf(speed as 1) + 1) % CLIP_SPEEDS.length];
 
 /**

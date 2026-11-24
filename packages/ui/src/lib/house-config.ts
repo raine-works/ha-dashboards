@@ -1,27 +1,35 @@
-// The house's settings: what every dashboard needs to know about this house that discovery can't
-// tell (which speaker announces, which voice speaks, which sensors are the washer's). One object for
-// the whole page, given to every card as its `house` option (`house: !include ../house.yaml` in each
-// dashboards/*.yaml), so the source names no entity of its own. Anything left out falls back to
-// discovery, or leaves its feature off: a house with no settings at all still gets a dashboard.
-// Libraries read it with `houseConfig()`, components with `useHouseConfig()` (context/HouseConfig.tsx).
+/**
+ * The house's settings: what every dashboard needs to know about this house that discovery can't
+ * tell (which speaker announces, which voice speaks, which sensors are the washer's). One object for
+ * the whole page, given to every card as its `house` option (`house: !include ../house.yaml` in each
+ * dashboards/*.yaml), so the source names no entity of its own. Anything left out falls back to
+ * discovery, or leaves its feature off: a house with no settings at all still gets a dashboard.
+ * Libraries read it with `houseConfig()`, components with `useHouseConfig()` (context/HouseConfig.tsx).
+ *
+ * @module
+ */
 import { BEDTIME_STEP_KINDS, type BedtimeRoutine, type BedtimeStepKind } from './bedtime';
 import { deepEqual } from './hass-store';
 import type { LiveInput } from './music';
 
 /** A washer's or dryer's sensors (SmartThings: machine state, job state, time remaining). */
 export interface ApplianceEntities {
+	/** What the header calls it ("Washer"). */
 	name: string;
+	/** Entity ids of its machine state, job state and time remaining sensors. */
 	machineState: string;
 	jobState: string;
 	timeRemaining: string;
 }
 
+/** A thermostat the climate card shows, from the house settings. */
 export interface ThermostatZone {
 	entityId: string;
 	/** What the climate card calls it ("Main Floor"); else the entity's own name. */
 	name?: string;
 }
 
+/** How the house speaks (announcements, Assist's answers). */
 export interface HouseTts {
 	/** The house's text-to-speech entity; else the first `tts.*` Home Assistant has. */
 	engine?: string;
@@ -36,6 +44,7 @@ export interface HouseTts {
 	fallback?: string;
 }
 
+/** The house's settings, parsed (`parseHouseConfig`); every key optional but the lists and `tts`. */
 export interface HouseConfig {
 	/** The speaker that announces for the house (the kitchen timer, the Daily dialog's first pick). */
 	announceSpeaker?: string;
@@ -51,6 +60,7 @@ export interface HouseConfig {
 	guestWifiQr?: string;
 	/** Live audio inputs Music Assistant plays (a turntable). */
 	liveInputs: LiveInput[];
+	/** The house's voice. */
 	tts: HouseTts;
 	/** The birthdays calendar; else the one named "Birthdays". */
 	birthdayCalendar?: string;
@@ -184,6 +194,7 @@ export function setIntegrationHouse(raw: unknown) {
 	recompute();
 }
 
+/** Call `listener` whenever the house settings change; returns the function that stops it. */
 export function subscribeHouseConfig(listener: () => void) {
 	listeners.add(listener);
 	return () => {

@@ -1,3 +1,9 @@
+/**
+ * Scent diffusers (the EverScent integration): discovery, quick scents, and what a diffuser's row
+ * shows.
+ *
+ * @module
+ */
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
 import type { EntityWatch } from './hass-store';
 import { pad2 } from './time';
@@ -10,6 +16,7 @@ export const DIFFUSER_PLATFORM = 'everscent';
 export interface Diffuser {
 	/** `switch.<device>_power` */
 	power: string;
+	/** Its device's name. */
 	name: string;
 	/** `sensor.<device>_fragrance` */
 	fragrance: string;
@@ -109,6 +116,7 @@ export function formatScentLeft(ms: number): string {
 	return seconds < 60 ? `${seconds}s left` : `${Math.floor(seconds / 60)}:${pad2(seconds % 60)} left`;
 }
 
+/** What a diffuser's row shows (`getDiffuserView`). */
 export interface DiffuserView {
 	status: 'on' | 'off' | 'offline';
 	/** Diffusing right now (the fan runs in bursts while on). */
@@ -120,9 +128,11 @@ export interface DiffuserView {
 	 * reads 1 with a full bottle and a nearly empty one alike, so the dashboards don't show it.
 	 */
 	low: boolean;
+	/** The fragrance, its category and the concentration setting; null where unknown. */
 	fragrance: string | null;
 	category: string | null;
 	concentration: string | null;
+	/** Online, with its quick scent button available. */
 	canQuickScent: boolean;
 	/** "On · Strong · Diffusing", "On · Strong · Between bursts", "On · Quick scent", "Off", "Offline". */
 	label: string;

@@ -1,8 +1,16 @@
+/**
+ * Climate: the thermostats the climate card shows, and a setpoint step for a house without the
+ * adjust script.
+ *
+ * @module
+ */
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
 import type { ThermostatZone } from './house-config';
 
+/** A thermostat the climate card shows. */
 export interface Thermostat {
 	entityId: string;
+	/** The house settings' name for it, else its friendly name. */
 	name: string;
 }
 

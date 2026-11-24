@@ -1,3 +1,8 @@
+/**
+ * Daily affirmations: where each person's is stored, and reading it back.
+ *
+ * @module
+ */
 import type { HassEntity } from '../types/homeassistant';
 import { isSameDay } from './calendar';
 
@@ -15,8 +20,11 @@ export const affirmationEntity = (personId: string) => `sensor.daily_affirmation
 export const formerAffirmationEntity = (personId: string) =>
 	`input_text.daily_affirmation_${personId.replace(/^person\./, '')}`;
 
+/** A stored affirmation. */
 export interface DailyAffirmation {
+	/** When it was written (spoken). */
 	at: Date;
+	/** Its words, trimmed. */
 	text: string;
 }
 

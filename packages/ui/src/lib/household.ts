@@ -1,8 +1,12 @@
-// Who the household is: the people the dashboards list, message, assign chores to and greet. With
-// the raineworks_dashboards integration loaded, it says (`raineworks_dashboards/info`: a Warden
-// group's members, when one is picked in its options); without it, every person with a device
-// tracker, which leaves out the admin account and pets. One list for the page, set by
-// definePanelElement once the integration answers.
+/**
+ * Who the household is: the people the dashboards list, message, assign chores to and greet. With
+ * the raineworks_dashboards integration loaded, it says (`raineworks_dashboards/info`: a Warden
+ * group's members, when one is picked in its options); without it, every person with a device
+ * tracker, which leaves out the admin account and pets. One list for the page, set by
+ * definePanelElement once the integration answers.
+ *
+ * @module
+ */
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
 import { setIntegrationHouse } from './house-config';
 

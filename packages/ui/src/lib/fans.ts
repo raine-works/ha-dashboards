@@ -1,3 +1,8 @@
+/**
+ * Fans: discovery and what a fan's row shows.
+ *
+ * @module
+ */
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
 import { entityArea } from './lights';
 import { isUnavailable } from './values';
@@ -15,9 +20,11 @@ export const FAN_FEATURE = {
 	TURN_ON: 32,
 } as const;
 
+/** A fan the dashboards show. */
 export interface Fan {
 	/** `fan.*` */
 	entityId: string;
+	/** Its friendly name. */
 	name: string;
 	/** The fan's area name, for grouping and sorting. */
 	area?: string;
@@ -43,6 +50,7 @@ export function discoverFans(
 		.sort((a, b) => (a.area ?? '').localeCompare(b.area ?? '') || a.name.localeCompare(b.name));
 }
 
+/** What a fan's row shows (`getFanView`). */
 export interface FanView {
 	status: 'on' | 'off' | 'unavailable';
 	/** 0–100 while on (0 while off or unknown). */
@@ -50,8 +58,10 @@ export interface FanView {
 	/** The speed slider's step (`percentage_step`: 1, or 33.3 for a three-speed fan). */
 	step: number;
 	oscillating: boolean;
+	/** The preset mode while on, and every one it offers (none when it has no presets). */
 	preset?: string;
 	presets: string[];
+	/** Which controls the fan supports. */
 	canSetSpeed: boolean;
 	canOscillate: boolean;
 	/** "45% · Natural · Oscillating", "Off", "Unavailable". */
