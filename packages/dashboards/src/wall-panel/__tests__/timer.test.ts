@@ -49,7 +49,11 @@ describe('panel timer', () => {
 	});
 
 	it('formats the clock', () => {
+		expect(formatClock(0)).toBe('00:00');
+		expect(formatClock(5)).toBe('00:05');
 		expect(formatClock(245)).toBe('04:05');
+		expect(formatClock(600)).toBe('10:00');
+		expect(formatClock(3600)).toBe('1:00:00');
 		expect(formatClock(3845)).toBe('1:04:05');
 	});
 });
