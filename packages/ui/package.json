@@ -47,6 +47,7 @@
 		"recharts": "catalog:",
 		"sonner": "catalog:",
 		"tailwind-merge": "catalog:",
+		"jsqr": "catalog:",
 		"uqr": "catalog:"
 	},
 	"devDependencies": {

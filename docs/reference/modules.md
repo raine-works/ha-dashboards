@@ -43,4 +43,4 @@ house:
 | Daily | `daily` | The daily brief (weather, today's events, the news), a daily affirmation and a scripture study | The daily brief package: sensor.daily_brief and script.daily_brief_generate (an AI task and a conversation agent that can search) |
 | Assist | `assist` | Voice and typed commands through Home Assistant's preferred Assist pipeline, with the glow | An Assist pipeline with speech to text (and text to speech for spoken answers) |
 | Holidays | `holidays` | Easter eggs in the days around each holiday and on birthdays: characters, confetti, sounds | Nothing (birthdays: a calendar named "Birthdays") |
-| Guest Wi-Fi | `guest_wifi` | The guest network's QR code, on the wall panels | house.yaml `guest_wifi_qr`: an image entity with the QR code (UniFi’s, enabled) |
+| Guest Wi-Fi | `guest_wifi` | The guest network's QR code, with its name and password for a laptop, on the wall panels | house.yaml `guest_wifi_qr`: an image entity with the QR code (UniFi’s, enabled) |

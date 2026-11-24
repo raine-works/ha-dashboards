@@ -303,7 +303,7 @@ export const MODULES: readonly DashboardModule[] = [
 	{
 		id: 'guest_wifi',
 		name: 'Guest Wi-Fi',
-		description: "The guest network's QR code, on the wall panels",
+		description: "The guest network's QR code, with its name and password for a laptop, on the wall panels",
 		needs: 'house.yaml `guest_wifi_qr`: an image entity with the QR code (UniFi’s, enabled)',
 		watch: ['image'],
 		detect: ({ hass, house }) => !!house.guestWifiQr && !!hass.states[house.guestWifiQr],

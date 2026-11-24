@@ -86,6 +86,7 @@
         "@fontsource-variable/geist": "catalog:",
         "class-variance-authority": "catalog:",
         "clsx": "catalog:",
+        "jsqr": "catalog:",
         "leaflet": "catalog:",
         "lucide-react": "catalog:",
         "preact": "catalog:",
@@ -112,6 +113,7 @@
     "bun-plugin-tailwind": "0.1.2",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
+    "jsqr": "1.4.0",
     "leaflet": "1.9.4",
     "lucide-react": "1.58.0",
     "preact": "10.29.8",
@@ -328,6 +330,8 @@
     "jsesc": ["jsesc@3.1.0", "", { "bin": { "jsesc": "bin/jsesc" } }, "sha512-/sM3dO2FOzXjKQhJuo0Q173wf2KOo8t4I8vHy6lF9poUp7bKT0/NHE8fPX23PwfhnykfqnC2xRxOnVw5XuGIaA=="],
 
     "json5": ["json5@2.2.3", "", { "bin": { "json5": "lib/cli.js" } }, "sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg=="],
+
+    "jsqr": ["jsqr@1.4.0", "", {}, "sha512-dxLob7q65Xg2DvstYkRpkYtmKm2sPJ9oFhrhmudT1dZvNFFTlroai3AWSpLey/w5vMcLBXRgOJsbXpdN9HzU/A=="],
 
     "leaflet": ["leaflet@1.9.4", "", {}, "sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA=="],
 
