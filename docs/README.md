@@ -8,6 +8,7 @@
 | [Phone alerts](phone-alerts.md) | Which pushes each household member gets, and sending a push in a category |
 | [Wall panels](wall-panels.md) | Tablets on the wall: their hardware, the status light, a shared user |
 | [Setting up with an assistant](assistant.md) | The setup MCP server: let Claude or another assistant check and set up your Home Assistant |
+| [Design system](design/README.md) | How the dashboards look and behave: principles, color, shape, space and type, components, and the overhaul plan |
 | [Development](development.md) | Running the demo, building, testing and releasing |
 
 | Reference (written from the code) | |
