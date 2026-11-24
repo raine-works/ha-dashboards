@@ -1,13 +1,18 @@
 /**
- * The guest Wi-Fi's QR code and the dialog that shows it.
+ * The guest Wi-Fi's QR code and the dialog that shows it, with the network and password read from it.
  *
  * @module
  */
 
+import { Loader2 } from 'lucide-react';
 import type React from 'preact/compat';
+import { useEffect, useState } from 'preact/compat';
 import { useEntity, useHassSelector } from '../../context/HassContext';
 import { useHouseConfig } from '../../context/HouseConfig';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../ui';
+import { cn } from '../../lib/utils';
+import type { WifiNetwork } from '../../lib/wifi';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, SURFACE } from '../ui';
+import { readWifiCode } from './readWifiCode';
 
 /**
  * The guest network's QR code, while Home Assistant serves it, else undefined: the house settings'
@@ -31,24 +36,66 @@ export const useGuestWifi = (): { picture: string; network: string } | undefined
 	return { picture, network: network ?? 'Guest Wi-Fi' };
 };
 
-/** Guests point their phone's camera at the code to join the guest Wi-Fi. */
+/** The network and password in the code, once read (`readWifiCode`); null when it can't be read. */
+function useWifiNetwork(picture: string | undefined, enabled: boolean) {
+	const [read, setRead] = useState<{ picture: string; network: WifiNetwork | null } | null>(null);
+	useEffect(() => {
+		if (!picture || !enabled) return;
+		let current = true;
+		readWifiCode(picture).then((network) => {
+			if (current) setRead({ picture, network });
+		});
+		return () => {
+			current = false;
+		};
+	}, [picture, enabled]);
+	return read && read.picture === picture ? read.network : undefined;
+}
+
+/** One fact under the code: its label as an overline, the value large enough to read from a laptop's seat. */
+const Fact: React.FC<{ label: string; value: string; mono?: boolean }> = ({ label, value, mono }) => (
+	<div className="flex min-w-0 flex-col gap-1 py-3">
+		<span className="text-muted-foreground text-overline uppercase">{label}</span>
+		{/* Selectable (the panels lift user-select: none here), and wrapping a long password rather than cutting it */}
+		<span className={cn('select-text break-all text-title', mono && 'font-mono tracking-wide')}>{value}</span>
+	</div>
+);
+
+/**
+ * Guests point their phone's camera at the code to join the guest Wi-Fi; under it, the network's
+ * name and password, read from the code, for a laptop that can't scan it.
+ */
 export const GuestWifiDialog: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
 	const wifi = useGuestWifi();
+	const network = useWifiNetwork(wifi?.picture, isOpen);
 	return (
 		<Dialog open={isOpen && !!wifi} onOpenChange={(open) => !open && onClose()}>
-			<DialogContent className="max-sm:justify-center-safe">
+			<DialogContent size="detail" className="max-sm:justify-center-safe">
 				<DialogHeader className="items-center text-center sm:text-center">
 					<DialogTitle>Guest Wi-Fi</DialogTitle>
-					<DialogDescription>Point your phone's camera at the code to join {wifi?.network}</DialogDescription>
+					<DialogDescription>Point your phone's camera at the code, or type the password on a laptop</DialogDescription>
 				</DialogHeader>
 				{wifi && (
-					<div className="flex justify-center">
+					<div className="flex flex-col items-center gap-gap">
 						{/* UniFi's own code, dark on white with its quiet zone: what every phone camera reads */}
 						<img
 							src={wifi.picture}
-							alt={`QR code to join ${wifi.network}`}
-							className="aspect-square w-full max-w-72 short:max-w-40 rounded-xl bg-white [image-rendering:pixelated]"
+							alt={`QR code to join ${network?.ssid ?? wifi.network}`}
+							className="aspect-square w-full max-w-64 short:max-w-36 rounded-tile bg-white [image-rendering:pixelated]"
 						/>
+						<div className={cn(SURFACE, 'flex w-full flex-col divide-y px-4')}>
+							<Fact label="Network" value={network?.ssid ?? wifi.network} />
+							{network === undefined ? (
+								<div className="flex items-center gap-2 py-3 text-muted-foreground text-sm">
+									<Loader2 className="size-4 animate-spin" />
+									Reading the password…
+								</div>
+							) : network?.password ? (
+								<Fact label="Password" value={network.password} mono />
+							) : network?.security?.toLowerCase() === 'nopass' ? (
+								<Fact label="Password" value="None: it's an open network" />
+							) : null}
+						</div>
 					</div>
 				)}
 			</DialogContent>
