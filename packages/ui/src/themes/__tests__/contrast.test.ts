@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'bun:test';
+import { buildTheme } from '../build';
 import { contrast, cssToHex, mixHex } from '../color';
 import { PRESET_THEMES } from '../index';
+import { isNight, NIGHT_TOKENS } from '../night';
 import type { Tokens } from '../tokens';
 
 // docs/design/color.md: text at 4.5:1 (WCAG 1.4.3), a control's edge at 3:1 (1.4.11), in every theme
@@ -13,13 +15,29 @@ const STATUSES = ['success', 'warning', 'info', 'destructive', 'alarm'] as const
 const tint = (tokens: Tokens, status: string, dark: boolean) =>
 	mixHex(tokens[status as keyof Tokens], cssToHex(tokens.card) ?? '#000000', dark ? 0.14 : 0.1);
 
-for (const theme of PRESET_THEMES)
+// Themes made in the theme editor too: a deep accent gets white text in dark mode, which the night
+// level's light-gray primary would leave unreadable unless night sets the text with it
+const BUILT = [
+	buildTheme({
+		name: 'Deep blue',
+		from: PRESET_THEMES[0]!,
+		base: 'neutral',
+		accent: { kind: 'color', color: 'oklch(0.5 0.2 260)' },
+		radius: '0.625rem',
+		edges: false,
+		glow: false,
+	}),
+];
+
+for (const theme of [...PRESET_THEMES, ...BUILT])
 	describe(`${theme.name}`, () => {
 		for (const [mode, tokens] of [
 			['light', theme.light],
 			['dark', theme.dark],
+			// The wall panels at night (Home Bedtime): dimmer, and still readable
+			['night', { ...theme.dark, ...NIGHT_TOKENS } as Tokens],
 		] as const) {
-			const dark = mode === 'dark';
+			const dark = mode !== 'light';
 			// A translucent token (a dark border) shows over the card
 			const on = (fg: string, bg: string) => contrast(fg, bg, cssToHex(tokens.card) ?? '#000000');
 
@@ -53,3 +71,26 @@ for (const theme of PRESET_THEMES)
 			});
 		}
 	});
+
+describe('the night level', () => {
+	it('dims a wall panel while Home Bedtime is on, and nothing else', () => {
+		expect(isNight(true, 'on')).toBe(true);
+		expect(isNight(true, 'off')).toBe(false);
+		expect(isNight(true, undefined)).toBe(false);
+		// A phone or desktop is someone's own screen
+		expect(isNight(false, 'on')).toBe(false);
+	});
+
+	it('leaves the alarm at full strength', () => {
+		expect(NIGHT_TOKENS.destructive).toBeUndefined();
+		expect(NIGHT_TOKENS.alarm).toBeUndefined();
+	});
+
+	it('is darker than the dark mode it dims', () => {
+		const l = (color: string) => Number(/oklch\(([\d.]+)/.exec(color)?.[1]);
+		for (const theme of PRESET_THEMES) {
+			expect(l(NIGHT_TOKENS.background ?? '')).toBeLessThan(l(theme.dark.background));
+			expect(l(NIGHT_TOKENS.foreground ?? '')).toBeLessThan(l(theme.dark.foreground));
+		}
+	});
+});

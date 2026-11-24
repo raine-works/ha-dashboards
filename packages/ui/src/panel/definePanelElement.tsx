@@ -21,12 +21,14 @@ import {
 } from '../context/ColorScheme';
 import { HassProvider } from '../context/HassContext';
 import { WallPanelContext } from '../context/WallPanel';
+import { homeBedtimeEntity } from '../lib/bedtime';
 import { createHassStore } from '../lib/hass-store';
 import { setHouseConfig } from '../lib/house-config';
 import { loadHousehold } from '../lib/household';
 import { installTapHaptics } from '../lib/tones';
 import { activeTheme, loadThemeCatalog, subscribeThemeCatalog } from '../themes/catalog';
 import { themeCss, themeEffects } from '../themes/css';
+import { isNight, nightCss } from '../themes/night';
 import type { DashboardTheme } from '../themes/tokens';
 import type { HomeAssistant } from '../types/homeassistant';
 import { hidePageScrollbar, hideToolbar, keepSidebarHidden } from './chrome';
@@ -107,6 +109,8 @@ export function definePanelElement({
 		/** The active theme's tokens (themes/css.ts), after the compiled styles */
 		private _themeEl: HTMLStyleElement | null = null;
 		private _themeId = '';
+		// The theme's effects (edges, glow), the glow left out at night
+		private _effects = '';
 		private _stopCatalog: (() => void) | null = null;
 		/** hass goes to the store, not a re-render: only components showing what changed update */
 		private _store = createHassStore();
@@ -247,6 +251,7 @@ export function definePanelElement({
 			const scheme = resolveColorScheme(setting, this._store.get());
 			if (this._mountPoint.className !== scheme) this._mountPoint.className = scheme;
 			this._applyTheme(activeTheme(this._store.get(), this.config.theme));
+			this._applyNight();
 			if (scheme === this._renderedScheme) return;
 			this._renderedScheme = scheme;
 
@@ -277,8 +282,23 @@ export function definePanelElement({
 		private _applyTheme(theme: DashboardTheme) {
 			if (!this._themeEl || !this._mountPoint || theme.id === this._themeId) return;
 			this._themeId = theme.id;
-			this._themeEl.textContent = themeCss(theme);
-			const effects = themeEffects(theme);
+			this._themeEl.textContent = `${themeCss(theme)}\n${nightCss()}`;
+			this._effects = themeEffects(theme);
+			this._applyNight(true);
+		}
+
+		/**
+		 * The night level on a wall panel while Home Bedtime is on (themes/night.ts): `data-night` on the
+		 * mount point dims the tokens, and the theme's glow goes. Checked on every update (one state read).
+		 */
+		private _applyNight(force = false) {
+			if (!this._mountPoint) return;
+			const states = this._store.get()?.states;
+			const night = isNight(!!wallPanel, states?.[homeBedtimeEntity(states)]?.state);
+			if (!force && night === 'night' in this._mountPoint.dataset) return;
+			if (night) this._mountPoint.dataset.night = '';
+			else delete this._mountPoint.dataset.night;
+			const effects = night ? this._effects.replace(/\bglow\b/, '').trim() : this._effects;
 			if (effects) this._mountPoint.dataset.effects = effects;
 			else delete this._mountPoint.dataset.effects;
 		}

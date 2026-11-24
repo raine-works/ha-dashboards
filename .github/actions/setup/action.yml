@@ -12,6 +12,7 @@ runs:
       run: bun install --frozen-lockfile
     - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
       with:
-        python-version: "3.14"
+        # The exact release, in .python-version (the base rules: pin what runs the code); bumped on purpose
+        python-version-file: .python-version
     - shell: bash
       run: pip install -r requirements-test.txt

@@ -5,7 +5,7 @@
  *
  * @module
  */
-import { cssToHex, mixHex, oklchCss, parseCssColor } from './color';
+import { contrast, cssToHex, mixHex, oklchCss, parseCssColor } from './color';
 import { type DashboardTheme, TOKEN_NAMES, type TokenName, type Tokens } from './tokens';
 
 /** One of shadcn's gray bases, which tint a theme's grays. */
@@ -51,10 +51,14 @@ function tint(value: string, base: BaseGray): string {
 	return oklchCss({ l, c, h: gray.hue }, parsed.alpha);
 }
 
-/** Black or white text, whichever reads on `color`. */
+/**
+ * Black or white text, whichever contrasts more with `color` (a lightness cut picked white on a
+ * dark-mode accent at 0.62: 3.6:1).
+ */
 function textOn(color: string): string {
-	const l = parseCssColor(color)?.color.l ?? 0.5;
-	return l > 0.62 ? 'oklch(0.145 0 0)' : 'oklch(0.985 0 0)';
+	const black = 'oklch(0.145 0 0)';
+	const white = 'oklch(0.985 0 0)';
+	return contrast(black, color) >= contrast(white, color) ? black : white;
 }
 
 /** The accent a step darker on white and lighter on black, so it reads on both. */

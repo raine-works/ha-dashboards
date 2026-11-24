@@ -1,17 +1,16 @@
 /**
- * Rooms first: each room is a tile (its name, what's on, a power button), and its lights, scenes,
- * colors and bedtime are in a dialog a tap away. A house's lighting is then a short grid you can
+ * Rooms first: each room is a tile (its name and what's on), and its lights' switch, scenes, colors
+ * and bedtime are in a dialog a tap away. A house's lighting is then a short grid you can
  * read at a glance instead of every light's slider at once.
  *
  * @module
  */
 
-import { Lightbulb, Palette, Power, Sparkles } from 'lucide-react';
+import { Lightbulb, Palette, Sparkles } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEntity } from '../../context/HassContext';
 import { lightFill, type RoomScene, roomSummary } from '../../lib/lights';
-import { cn } from '../../lib/utils';
-import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, SwitchRow } from '../ui';
+import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, SwitchRow, Tile } from '../ui';
 import { BedtimeButton } from './BedtimeButton';
 import { type AdjustTarget, LightRow, SceneChips } from './LightRow';
 import type { LightControls, LightFixture } from './useLightControls';
@@ -37,8 +36,9 @@ function useRoomState(room: HouseRoom, controls: LightControls, bedtimeEntity?: 
 }
 
 /**
- * A room's tile: its icon (in its lights' colors while any is on), name and status line, and a
- * power button for its lights. A tap anywhere else opens the room.
+ * A room's tile (docs/design/components.md): its icon (in its lights' colors while any is on), name
+ * and status line; the whole tile opens the room, whose dialog has its lights' switch at the top.
+ * One tap target, so the eye lands on the room, not on a second control inside it.
  */
 export const RoomTile: React.FC<{
 	room: HouseRoom;
@@ -47,51 +47,18 @@ export const RoomTile: React.FC<{
 	bedtimeEntity?: string;
 	onOpen: () => void;
 }> = ({ room, controls, bedtimeEntity, onOpen }) => {
-	const { ids, onCount, fill, summary, on } = useRoomState(room, controls, bedtimeEntity);
+	const { ids, fill, summary, on } = useRoomState(room, controls, bedtimeEntity);
 	const Icon = ids.length > 0 ? Lightbulb : Sparkles;
 	return (
-		<div
-			className={cn(
-				'relative flex min-h-28 touch:min-h-32 flex-col justify-between gap-3 rounded-xl border bg-card p-3 text-card-foreground transition-colors',
-				on && 'border-warning/30 bg-warning/5',
-			)}
-		>
-			{/* The whole tile opens the room; the power button sits above it */}
-			<button
-				type="button"
-				onClick={onOpen}
-				aria-label={`${room.name}: ${summary}. Open`}
-				className="absolute inset-0 rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
-			/>
-			<div className="pointer-events-none flex items-start justify-between gap-2">
-				<span
-					style={fill ? { background: fill.background, color: fill.foreground } : undefined}
-					className={cn(
-						'flex size-11 shrink-0 items-center justify-center rounded-lg transition-colors',
-						fill ? undefined : on ? 'bg-warning/15 text-warning' : 'bg-muted text-muted-foreground',
-					)}
-				>
-					<Icon className="size-5" />
-				</span>
-				{ids.length > 0 && (
-					<Button
-						variant={onCount > 0 ? 'default' : 'secondary'}
-						size="icon-lg"
-						onClick={() => controls.setRoomLights(ids, onCount === 0, `the ${room.name} lights`)}
-						aria-label={`${room.name} lights ${onCount > 0 ? 'off' : 'on'}`}
-						aria-pressed={onCount > 0}
-						loading={false}
-						className="pointer-events-auto relative rounded-full"
-					>
-						<Power />
-					</Button>
-				)}
-			</div>
-			<div className="pointer-events-none min-w-0">
-				<div className="truncate font-semibold">{room.name}</div>
-				<div className={cn('truncate text-sm', on ? 'text-foreground/80' : 'text-muted-foreground')}>{summary}</div>
-			</div>
-		</div>
+		<Tile
+			icon={<Icon />}
+			iconStyle={fill ? { background: fill.background, color: fill.foreground } : undefined}
+			name={room.name}
+			status={summary}
+			on={on}
+			onClick={onOpen}
+			label={`${room.name}: ${summary}. Open`}
+		/>
 	);
 };
 
@@ -107,7 +74,7 @@ export const RoomDialog: React.FC<{
 	onClose: () => void;
 }> = ({ room, controls, bedtimeEntity, onAdjust, onClose }) => (
 	<Dialog open={!!room} onOpenChange={(open) => !open && onClose()}>
-		<DialogContent size="sheet" className="gap-4">
+		<DialogContent size="detail" className="gap-4">
 			{room && <RoomDialogBody room={room} controls={controls} bedtimeEntity={bedtimeEntity} onAdjust={onAdjust} />}
 		</DialogContent>
 	</Dialog>

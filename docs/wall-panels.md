@@ -34,6 +34,13 @@ found on the device, and you can pick or leave out each part:
 A tablet without any of them still runs the dashboard. The status light follows the integration's
 **Alarm panel** and **Bedtime** options ([reference](reference/options.md)).
 
+## At night
+
+While Home Bedtime is on, the panel's screen dims too, so it never lights up a dark hallway: the
+page and text a step darker, the status colors softer, the theme's glow off; the alarm keeps its
+full red. Everything stays readable (the contrast test checks the night colors in every theme).
+Phones and desktops aren't dimmed: they're someone's own screen.
+
 ## A shared user
 
 A panel's user doesn't need to be an administrator: the integration takes voice clip uploads from any

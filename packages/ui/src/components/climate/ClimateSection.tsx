@@ -5,9 +5,9 @@
  * @module
  */
 
-import { Minus, Plus, Thermometer, ThermometerSnowflake, ThermometerSun } from 'lucide-react';
+import { Minus, Plus, Thermometer, ThermometerSnowflake } from 'lucide-react';
 import type React from 'preact/compat';
-import { Fragment, useState } from 'preact/compat';
+import { useState } from 'preact/compat';
 import { useEntity, useHassApi, useHassSelector } from '../../context/HassContext';
 import { useHouseConfig } from '../../context/HouseConfig';
 import { ModuleGate, useModule } from '../../context/Modules';
@@ -20,24 +20,19 @@ import { CoversCard } from '../covers/CoverCard';
 import { DiffusersCard } from '../diffuser/DiffuserCard';
 import { FansCard } from '../fans/FanCard';
 import { withErrorBoundary } from '../layout/ErrorBoundary';
+import { SectionGroup } from '../layout/Section';
 import { SectionHeader } from '../layout/SectionHeader';
 import { SECTION_SCROLLER } from '../layout/scroll';
 import {
 	Badge,
 	Button,
-	Card,
-	CardAction,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
+	DeviceRow,
 	Dialog,
 	DialogContent,
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 	EmptyState,
-	Separator,
 	ToggleGroup,
 	ToggleGroupItem,
 } from '../ui';
@@ -137,47 +132,47 @@ const ZoneControl: React.FC<{ entityId: string; name: string }> = ({ entityId, n
 	};
 
 	return (
-		<div className="flex items-center gap-3">
-			<button
-				type="button"
-				onClick={() => setModeOpen(true)}
-				aria-label={`${name}: ${formatZoneLine(shown)}. Change mode`}
-				className="-mx-2 flex min-h-11 min-w-0 flex-1 flex-col items-start rounded-md px-2 py-1 text-left outline-none hover:bg-accent/50 focus-visible:ring-[3px] focus-visible:ring-ring/50"
-			>
-				<span className="w-full truncate font-semibold">{name}</span>
-				<span className="w-full truncate text-muted-foreground text-sm">{formatZoneLine(shown)}</span>
-			</button>
-			<div className="flex shrink-0 items-center gap-1">
-				<Button
-					variant="outline"
-					size="icon-lg"
-					onClick={() => adjust(-1)}
-					disabled={isOff}
-					aria-label={`Decrease ${name} temperature`}
-				>
-					<Minus />
-				</Button>
-				<span
-					className={cn(
-						'min-w-16 whitespace-nowrap text-center font-semibold text-xl tabular-nums',
-						adjusting > 0 && 'animate-pulse',
-					)}
-				>
-					{formatTarget(shown)}
-				</span>
-				<Button
-					variant="outline"
-					size="icon-lg"
-					onClick={() => adjust(1)}
-					disabled={isOff}
-					aria-label={`Increase ${name} temperature`}
-				>
-					<Plus />
-				</Button>
-			</div>
+		// A DeviceRow without an icon tile, so the setpoint has room beside the name in a narrow column: the name
+		// and line open its mode, the setpoint steps between - and + at the end
+		<>
+			<DeviceRow
+				name={name}
+				status={formatZoneLine(shown)}
+				onOpen={() => setModeOpen(true)}
+				trailing={
+					<>
+						<Button
+							variant="secondary"
+							size="icon-md"
+							onClick={() => adjust(-1)}
+							disabled={isOff}
+							aria-label={`Decrease ${name} temperature`}
+						>
+							<Minus />
+						</Button>
+						<span
+							className={cn(
+								'min-w-14 whitespace-nowrap text-center text-title tabular-nums',
+								adjusting > 0 && 'animate-pulse',
+							)}
+						>
+							{formatTarget(shown)}
+						</span>
+						<Button
+							variant="secondary"
+							size="icon-md"
+							onClick={() => adjust(1)}
+							disabled={isOff}
+							aria-label={`Increase ${name} temperature`}
+						>
+							<Plus />
+						</Button>
+					</>
+				}
+			/>
 
 			<Dialog open={modeOpen} onOpenChange={setModeOpen}>
-				<DialogContent size="sheet">
+				<DialogContent size="detail">
 					<DialogHeader>
 						<DialogTitle>{name}</DialogTitle>
 						<DialogDescription>{formatStatus(entity) || 'Thermostat'}</DialogDescription>
@@ -191,7 +186,7 @@ const ZoneControl: React.FC<{ entityId: string; name: string }> = ({ entityId, n
 					</ToggleGroup>
 				</DialogContent>
 			</Dialog>
-		</div>
+		</>
 	);
 };
 
@@ -220,34 +215,23 @@ const ClimateSectionContent: React.FC = () => {
 
 			{/* Scrolls under the section title when the cards don't fit (a short window, more curtains),
 			    to the screen's bottom edge like the other columns */}
-			<div className={cn('flex min-h-0 flex-1 flex-col gap-4 max-lg:gap-3', SECTION_SCROLLER)}>
-				{/* Headed like the Curtains and Fans cards under it: an icon, the title and a line, over a border */}
+			<div className={cn('flex min-h-0 flex-1 flex-col gap-gap', SECTION_SCROLLER)}>
+				{/* The Thermostats group (docs/design/components.md): the house-wide preset, then a row per zone; an
+				    override (set by hand) says so in the group's label */}
 				{thermostats && (
-					<Card className="shrink-0 gap-0 py-0">
-						<CardHeader className="items-center gap-3 border-b px-4 py-3 [.border-b]:pb-3">
-							<div className="flex min-w-0 items-center gap-3">
-								<ThermometerSun className="size-5 shrink-0 text-info" />
-								<div className="min-w-0">
-									<CardTitle className="truncate text-lg">Thermostats</CardTitle>
-									{overridden && (
-										<CardDescription className="truncate">Set by hand; pick a preset to apply it</CardDescription>
-									)}
-								</div>
-							</div>
-							{overridden && (
-								<CardAction className="self-center">
-									<Badge variant="outline">Override</Badge>
-								</CardAction>
-							)}
-						</CardHeader>
-
-						<CardContent className="flex flex-col gap-5 p-4 max-lg:gap-4 touch:max-lg:gap-3">
-							{/* House-wide preset, applied to every zone by automation.thermostat_sync_temperatures_to_preset_and_mode,
+					<SectionGroup
+						label={overridden ? 'Thermostats · set by hand' : 'Thermostats'}
+						actions={overridden && <Badge variant="outline">Override</Badge>}
+						surface
+						className="shrink-0"
+					>
+						{/* House-wide preset, applied to every zone by automation.thermostat_sync_temperatures_to_preset_and_mode,
 						    which also selects the preset the zones match when set by hand, else Override (none lit here) */}
-							{presets && (
+						{presets && (
+							<div className="py-3!">
 								<ToggleGroup
 									variant="outline"
-									size="xl"
+									size="lg"
 									value={preset.value}
 									onValueChange={(option) => {
 										preset.set(option);
@@ -261,16 +245,12 @@ const ClimateSectionContent: React.FC = () => {
 										</ToggleGroupItem>
 									))}
 								</ToggleGroup>
-							)}
-
-							{zones.map((zone) => (
-								<Fragment key={zone.entityId}>
-									{(presets || zone !== zones[0]) && <Separator />}
-									<ZoneControl entityId={zone.entityId} name={zone.name} />
-								</Fragment>
-							))}
-						</CardContent>
-					</Card>
+							</div>
+						)}
+						{zones.map((zone) => (
+							<ZoneControl key={zone.entityId} entityId={zone.entityId} name={zone.name} />
+						))}
+					</SectionGroup>
 				)}
 
 				{/* A new house: say what shows up here rather than leave the column blank */}
