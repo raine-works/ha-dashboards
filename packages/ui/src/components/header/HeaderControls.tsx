@@ -377,19 +377,20 @@ export const NotificationsButton: React.FC<HeaderButtonProps & { label?: boolean
  * header's More): how many are left (shopping lists aside; with a household member signed in, only
  * what's theirs or anyone's), `open()`, and the dialog to render, which a to-do notification's link
  * (`?todo=<list>&item=<uid>`) opens on that list with the item in view. `available` is false
- * without a `todo.*` list. One per page: the link is read once.
+ * without a `todo.*` list, or with `enabled` false (the house turned the To-do module off): then
+ * nothing opens, not even from a link. One per page: the link is read once.
  */
-export function useTodoLauncher() {
+export function useTodoLauncher(enabled = true) {
 	const [isOpen, setOpen] = useState(false);
 	const [link, clearLink] = useLinkedParams(['todo', 'item']);
 	useEffect(() => {
-		if (link) setOpen(true);
-	}, [link]);
+		if (link && enabled) setOpen(true);
+	}, [link, enabled]);
 	const lists = useTodoLists();
 	// A household member's own and anyone's; everyone's on the wall panels
 	const mine = useMyTodoCounts(lists);
 	const count = todoBadgeCount(lists, mine);
-	const dialog = (
+	const dialog = enabled && (
 		<TodoDialog
 			isOpen={isOpen}
 			onClose={() => {
@@ -401,7 +402,7 @@ export function useTodoLauncher() {
 			counts={mine}
 		/>
 	);
-	return { available: lists.length > 0, count, open: () => setOpen(true), dialog };
+	return { available: enabled && lists.length > 0, count, open: () => setOpen(true), dialog };
 }
 
 /**
@@ -572,9 +573,8 @@ export const MoreButton: React.FC<{ tvRemote?: boolean; colorSchemePicker?: bool
 	// The signed-in member's phone alerts, beside Appearance (the Home dashboard's personal settings)
 	const push = usePushPreferences();
 	// The to-do lists live here on the panel header (its quick actions are Assist, Cameras and Music)
-	const todo = useTodoLauncher();
-	const todoModule = useModule('todo');
-	const todoTile = todoModule && todo.available;
+	const todo = useTodoLauncher(useModule('todo'));
+	const todoTile = todo.available;
 	const close = () => {
 		setDialog(null);
 		clearLink();
