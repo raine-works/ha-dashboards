@@ -60,16 +60,18 @@ Three sizes and four roles, instead of today's ten sizes and `outline` on two-th
 
 | Size | Height | For |
 | :--- | :--- | :--- |
-| `md` | 44px | Most buttons |
-| `lg` | 52px (56px on panels) | A dialog's main action, a header tile |
-| `xl` | 64px | The PIN pad, full-screen video |
+| `md` / `icon-md` | 44px | Most buttons |
+| `action` / `icon-action` | 52px (56px on panels) | A dialog's main action, a header tile |
+| `pad` | 64px (phones: up to 88px) | The PIN pad's keys |
 
-| Role | Look | For |
-| :--- | :--- | :--- |
-| Primary | Filled `primary` (+ the brand edge) | The one main action in view |
-| Secondary | Tonal: the inset fill, no border | Everything else |
-| Quiet | Ghost | Low-emphasis actions, toolbars |
-| Danger | Filled `destructive` | Destroying something, and only then |
+(Named so they sit beside today's sizes, `sm` to `2xl`, until those go.)
+
+| Role | Variant | Look | For |
+| :--- | :--- | :--- | :--- |
+| Primary | `default` | Filled `primary` (+ the brand edge) | The one main action in view |
+| Secondary | `secondary` | Tonal: the inset fill, no border | Everything else |
+| Quiet | `ghost` | Ghost | Low-emphasis actions, toolbars |
+| Danger | `destructive` | Filled `destructive` | Destroying something, and only then |
 
 Every button has a label (icon-only: Close). `loading` stays. Header buttons are secondary tiles
 (icon over label).

@@ -12,6 +12,8 @@ import { PanelHeader } from '../header/PanelHeader';
 import { PartyModeHost } from '../music/PartyModeHost';
 
 export { ErrorBoundary, withErrorBoundary } from './ErrorBoundary';
+export { Section, SectionGroup } from './Section';
+export { SectionHeader } from './SectionHeader';
 
 /** What a dashboard puts in the shared layout: its content, header extras, and which overlays it mounts. */
 export interface PanelLayoutProps {

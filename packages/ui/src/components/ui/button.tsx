@@ -49,6 +49,13 @@ const buttonVariants = cva(
 				// The wall panel and desktop header's buttons: the icon over a short label ("To-do", "Cameras"),
 				// so every button says what it opens, 56px tall and as narrow as its label
 				tile: "h-14 min-w-14 flex-col gap-1 px-2 font-medium text-[11px] leading-none has-[>svg]:px-2 [&_svg:not([class*='size-'])]:size-5",
+				// The design's sizes (docs/design/components.md), replacing the ones above as each phase lands:
+				// md, most buttons (44px); action, a dialog's main action and a header tile (52px, 56 on the panels)
+				md: "h-11 gap-2 rounded-control px-4 has-[>svg]:px-3 [&_svg:not([class*='size-'])]:size-5",
+				'icon-md': "size-11 rounded-control [&_svg:not([class*='size-'])]:size-5",
+				action:
+					"h-13 touch:h-14 gap-2 rounded-control-lg px-6 text-base has-[>svg]:px-5 [&_svg:not([class*='size-'])]:size-5",
+				'icon-action': "size-13 touch:size-14 rounded-control-lg [&_svg:not([class*='size-'])]:size-6",
 				// The PIN pad's round keys, like a phone's own: bigger on phones, smaller on a short screen
 				pad: 'short:size-14 size-16 flex-col gap-0 rounded-full font-normal short:text-2xl text-3xl leading-none max-sm:size-[min(5.5rem,22vw,10svh)] max-sm:text-4xl',
 				icon: "size-9 touch:size-11 touch:[&_svg:not([class*='size-'])]:size-5",
