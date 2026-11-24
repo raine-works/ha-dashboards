@@ -65,7 +65,8 @@ The shared, most-seen surface; 960×600 is the hardest size, so it's the test.
 
 The workspace dialogs (music, cameras, to-do, calendar, weather, energy, TVs, the brief, messages)
 and the confirmations (bedtime, the keypad) rebuilt on the dialog anatomy, the button roles and
-DeviceRows; an audit of each first.
+DeviceRows; an audit of each first ([The dialogs](dialogs.md): what they had in common, and each
+one's plan).
 
 ## Phase 5: polish
 
