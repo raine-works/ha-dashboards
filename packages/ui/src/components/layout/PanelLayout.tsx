@@ -1,3 +1,10 @@
+/**
+ * The page every dashboard sits in: the shared header over the panel's own content, with the
+ * alerts and Party mode overlays.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import { useWallPanel } from '../../context/WallPanel';
 import { PanelAlerts } from '../alerts/PanelAlerts';
@@ -6,6 +13,7 @@ import { PartyModeHost } from '../music/PartyModeHost';
 
 export { ErrorBoundary, withErrorBoundary } from './ErrorBoundary';
 
+/** What a dashboard puts in the shared layout: its content, header extras, and which overlays it mounts. */
 export interface PanelLayoutProps {
 	/** Panel-specific header buttons (e.g. the kitchen timer). */
 	actions?: React.ReactNode;

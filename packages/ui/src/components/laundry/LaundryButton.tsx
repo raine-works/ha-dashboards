@@ -1,3 +1,9 @@
+/**
+ * The header's laundry button: shown while the washer or dryer is busy or done, opening both.
+ *
+ * @module
+ */
+
 import { WashingMachineIcon, WindIcon } from 'lucide-react';
 import type React from 'preact/compat';
 import { useState } from 'preact/compat';

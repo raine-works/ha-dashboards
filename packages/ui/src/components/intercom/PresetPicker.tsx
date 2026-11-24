@@ -1,3 +1,9 @@
+/**
+ * The Messages dialog's quick messages, by category: shared by its Speakers, Phones and Notes tabs.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import { useEffect, useState } from 'preact/compat';
 import type { PresetCategory } from '../../lib/intercom';

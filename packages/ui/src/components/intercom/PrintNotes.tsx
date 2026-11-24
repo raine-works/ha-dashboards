@@ -1,3 +1,9 @@
+/**
+ * The Messages dialog's Notes tab: a short note printed on the receipt printer.
+ *
+ * @module
+ */
+
 import { Printer as PrinterIcon } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useState } from 'preact/compat';

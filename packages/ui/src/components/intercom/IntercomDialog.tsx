@@ -1,3 +1,10 @@
+/**
+ * The Messages dialog (the intercom): announcements on the speakers and TVs (quick or typed, or a
+ * recorded voice clip), messages to household phones, and notes on the receipt printer.
+ *
+ * @module
+ */
+
 import { Bell, Check, Printer, Smartphone, Speaker, Tv, Volume2 } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useState } from 'preact/compat';
@@ -63,11 +70,18 @@ function loadSettings(): IntercomSettings {
 	return { ...defaults, ...(readStoredJson(SETTINGS_KEY) as Partial<IntercomSettings> | undefined) };
 }
 
+/** The Messages dialog's props: whether it's open, and what closes it. */
 export interface IntercomDialogProps {
 	isOpen: boolean;
 	onClose: () => void;
 }
 
+/**
+ * The Messages dialog: Speakers (announce to the picked speakers and TVs, with a volume and chime),
+ * Phones and, with a receipt printer, Notes. The tab, speakers and settings are remembered per
+ * device. It stays mounted in the header, so it also sweeps leftover voice clips from Home
+ * Assistant's media hourly.
+ */
 export const IntercomDialog: React.FC<IntercomDialogProps> = ({ isOpen, onClose }) => {
 	const { getHass } = useHassApi();
 	// In a holiday's days its quick announcements come first (and open)

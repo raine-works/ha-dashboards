@@ -1,3 +1,9 @@
+/**
+ * The colors dialog: a light's or a room's color, white temperature and effects.
+ *
+ * @module
+ */
+
 import { Check, Flame, Palette, Sparkles, Sun } from 'lucide-react';
 import type React from 'preact/compat';
 import { useEffect, useState } from 'preact/compat';
@@ -18,6 +24,7 @@ import {
 import type { AdjustTarget } from './LightRow';
 import { useLightingHass } from './useLightControls';
 
+/** The colors dialog's props: whether it's open, what closes it, and the lights it sets. */
 export interface LightAdjustModalProps {
 	isOpen: boolean;
 	onClose: () => void;
@@ -45,6 +52,10 @@ const PRESET_TEMPS: { name: string; kelvin: number }[] = [
 	{ name: 'Daylight', kelvin: 6000 },
 ];
 
+/**
+ * The colors dialog for one fixture or a room: preset colors and a hue slider, white temperatures and
+ * effects, each offered when some light in `target` has it. Renders nothing while closed.
+ */
 export const LightAdjustModal: React.FC<LightAdjustModalProps> = ({ isOpen, onClose, target }) => {
 	if (!target || !isOpen) return null;
 	// Keyed so each target starts from its own state (and its hooks always run in order)
