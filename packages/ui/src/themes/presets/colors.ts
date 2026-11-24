@@ -12,7 +12,8 @@ import { neutral } from './neutral';
  * selection in one hue (a step darker on white than on black, so text on it stays readable).
  */
 function colorTheme(id: string, name: string, hue: number, chroma: number): DashboardTheme {
-	const light = oklchCss({ l: 0.55, c: chroma, h: hue });
+	// 0.52, so white text on it reads (4.5:1) in every hue, green the hardest (contrast.test.ts)
+	const light = oklchCss({ l: 0.52, c: chroma, h: hue });
 	const dark = oklchCss({ l: 0.68, c: chroma, h: hue });
 	const ringLight = oklchCss({ l: 0.7, c: chroma * 0.7, h: hue });
 	const ringDark = oklchCss({ l: 0.5, c: chroma * 0.7, h: hue });

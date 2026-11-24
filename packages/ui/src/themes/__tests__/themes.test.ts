@@ -45,13 +45,14 @@ describe('as Home Assistant themes', () => {
 			}
 		});
 
-	it("Neutral's dark mode is Blackout's", () => {
+	it("Neutral's dark mode keeps Blackout's page and accent", () => {
 		const dark = haTheme(PRESET_THEMES.find((t) => t.id === 'neutral')!).modes.dark;
 		expect(dark['primary-background-color']).toBe('#0a0a0a');
 		expect(dark['app-header-background-color']).toBe('#0a0a0a');
 		expect(dark['primary-color']).toBe('#f59e0b');
-		expect(dark['card-background-color']).toBe('#171717');
-		expect(dark['divider-color']).toBe('rgba(255, 255, 255, 0.1)');
+		// A card one step above the page (docs/design/color.md: elevation by lightness), Blackout's was #171717
+		expect(dark['card-background-color']).toBe('#141414');
+		expect(dark['divider-color']).toBe('rgba(255, 255, 255, 0.09)');
 	});
 
 	it('gives Raineworks cards a faint peach-and-teal glow', () => {
