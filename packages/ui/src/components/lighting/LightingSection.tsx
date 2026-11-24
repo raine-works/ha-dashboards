@@ -26,7 +26,7 @@ import {
 	type RoomScene,
 } from '../../lib/lights';
 import { cn } from '../../lib/utils';
-import { EmptyState, Tabs, TabsContent, TabsList, TabsTrigger } from '../ui';
+import { EmptyState, Tabs, TabsContent, TabsList, TabsTrigger, TileGrid } from '../ui';
 import { BedtimeButton } from './BedtimeButton';
 import { BedtimeLightDialog } from './BedtimeLightDialog';
 import { LightAdjustModal } from './LightAdjustModal';
@@ -226,7 +226,7 @@ const LightingSectionContent: React.FC<LightingSectionProps> = ({
 	const scroller = pageScroll ? undefined : SECTION_SCROLLER;
 	// Floor names stay in view while their rooms scroll: under the sticky title and tabs on a scrolling page
 	const floorHeading = cn(
-		'sticky z-10 bg-background px-2 py-1 font-semibold text-muted-foreground text-xs uppercase tracking-wide',
+		'sticky z-10 bg-background px-1 py-1 text-muted-foreground text-overline uppercase',
 		pageScroll ? 'top-[calc(var(--panel-top)+var(--page-header,0px)+var(--lighting-header,0px))]' : 'top-0',
 	);
 
@@ -278,8 +278,8 @@ const LightingSectionContent: React.FC<LightingSectionProps> = ({
 						{houseRooms.map((houseFloor) => (
 							<div key={houseFloor.floorId} className="flex shrink-0 flex-col gap-3">
 								<h3 className={floorHeading}>{houseFloor.name}</h3>
-								{/* Rooms first: a tile per room (what's on, a power button); its lights and scenes open in a dialog */}
-								<div className="grid grid-cols-2 gap-3">
+								{/* Rooms first: a tile per room (what's on), equal columns filling the row; a tap opens its dialog */}
+								<TileGrid>
 									{houseFloor.rooms.map((room) => (
 										<RoomTile
 											key={room.areaId}
@@ -289,7 +289,7 @@ const LightingSectionContent: React.FC<LightingSectionProps> = ({
 											onOpen={() => setOpenRoom(room.areaId)}
 										/>
 									))}
-								</div>
+								</TileGrid>
 							</div>
 						))}
 					</TabsContent>

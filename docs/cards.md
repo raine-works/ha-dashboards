@@ -11,9 +11,9 @@ For desktops, laptops and phones (the Companion app included).
 - **Wide screens** (1024px and up): the header (clock, weather, calendar, what's open, music,
   people and pets, and a More menu; every button its icon over a label) over Lighting, Security and
   Climate side by side, each column scrolling on its own.
-- **Lighting is rooms first**: a tile per room, by floor (what's on, its scene, a power button for
-  its lights). A tap on a room opens its lights, scenes, colors and bedtime; a light that's off
-  shows only its name until it's on.
+- **Lighting is rooms first**: a tile per room, by floor (what's on, its scene), in equal columns.
+  A tap on a room opens it: its lights' switch at the top, then its scenes, colors, bedtime and a row
+  per light; a light that's off shows only its name until it's on.
 - **Climate is a line per thing**: each thermostat zone (its mode, the temperature inside, the
   setpoint between − and +; a tap opens its mode), curtain (open and close as icons; a tap opens its
   position) and fan (a tap opens its speed, Oscillate and presets).

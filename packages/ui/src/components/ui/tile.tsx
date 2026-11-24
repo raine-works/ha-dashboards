@@ -124,11 +124,15 @@ export const Tile: React.FC<TileProps> = ({
 );
 
 /**
- * Tiles in equal columns that fill the row (two across on a phone and a 10.5" panel's column, three
+ * Tiles in equal columns across the space they have (two in a wall panel's column or on a phone, three
  * on a wide one): no half-empty rows of fixed-width tiles.
  */
 export const TileGrid: React.FC<{ children: ComponentChildren; className?: string }> = ({ children, className }) => (
-	<div data-slot="tile-grid" className={cn('grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] gap-3', className)}>
-		{children}
+	// Columns by the space it has (a container query): two in a wall panel's column or on a phone, three
+	// from 36rem; every tile the same width on every floor, a lone one never stretching across
+	<div className="@container">
+		<div data-slot="tile-grid" className={cn('grid grid-cols-2 gap-3 @xl:grid-cols-3', className)}>
+			{children}
+		</div>
 	</div>
 );
