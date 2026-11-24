@@ -57,6 +57,19 @@ describe('the dashboards bundle', () => {
 		expect(await Bun.file(bundlePath).text()).toContain('import("./chunk-');
 	});
 
+	it('draws squircles where the browser can, and keeps circles round', async () => {
+		const text = await Bun.file(bundlePath).text();
+		expect(text).toMatch(/@supports \(?corner-shape: ?squircle\)?/);
+		expect(text).toContain('corner-shape:squircle');
+		expect(text).toContain('corner-shape:round');
+		// A circle drawn in CSS (the Assist orb) keeps its round curve too, and a pseudo-element (a ring
+		// around a round key) takes its element's
+		expect(text).toMatch(/\.assist-orb[^{}]*\{[^{}]*corner-shape:round/);
+		expect(text).toMatch(
+			/:before,\s*:after\{corner-shape:inherit\}|::before,\s*::after\s*\{\s*corner-shape:\s*inherit/,
+		);
+	});
+
 	it("embeds Geist, raineworks.com's typeface, and no longer Poppins", async () => {
 		const text = await Bun.file(bundlePath).text();
 		expect(text).toContain("font-family:'Geist'");
