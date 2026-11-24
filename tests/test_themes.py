@@ -1,5 +1,7 @@
 """The dashboards' themes in Home Assistant's list, the house theme, custom themes."""
 
+from pathlib import Path
+
 from homeassistant.components.frontend import DATA_THEMES
 from homeassistant.const import EVENT_THEMES_UPDATED
 from homeassistant.core import HomeAssistant
@@ -58,6 +60,35 @@ async def test_registers_again_after_a_reload_of_yaml_themes(
     hass.bus.async_fire(EVENT_THEMES_UPDATED)
     await hass.async_block_till_done()
     assert {"Mine", "Raineworks"} <= set(hass.data[DATA_THEMES])
+
+
+async def test_the_house_theme_is_the_default_again_after_a_reload_of_themes(
+    hass: HomeAssistant, setup
+) -> None:
+    await _frontend(hass)
+    await setup()
+    # frontend.reload_themes (which reads configuration.yaml) puts a default no YAML
+    # defines back to Home Assistant's
+    await hass.async_add_executor_job(
+        Path(hass.config.path("configuration.yaml")).write_text, "frontend:\n"
+    )
+    await hass.services.async_call("frontend", "reload_themes", blocking=True)
+    await hass.async_block_till_done()
+    assert "Raineworks" in hass.data[DATA_THEMES]
+    assert hass.data[DATA_DEFAULT_THEME] == "Raineworks"
+    assert hass.data[DATA_DEFAULT_DARK_THEME] == "Raineworks"
+
+
+async def test_a_default_set_to_another_theme_is_left_alone(
+    hass: HomeAssistant, setup
+) -> None:
+    await _frontend(hass)
+    await setup()
+    await hass.services.async_call(
+        "frontend", "set_theme", {"name": "Raineworks Blue"}, blocking=True
+    )
+    await hass.async_block_till_done()
+    assert hass.data[DATA_DEFAULT_THEME] == "Raineworks Blue"
 
 
 async def test_custom_themes_are_their_owners_or_the_houses(
