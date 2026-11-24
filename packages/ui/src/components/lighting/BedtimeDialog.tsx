@@ -148,8 +148,8 @@ export const BedtimeDialog: React.FC<BedtimeDialogProps> = ({
 		<Dialog open={open} onOpenChange={(next) => !next && onCancel()}>
 			<DialogContent className="gap-5">
 				<DialogHeader className="flex-row items-center gap-3 text-left max-sm:pl-0">
-					{/* Night's own color, a small hint like a section icon */}
-					<span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-indigo-500/15 text-indigo-500 dark:bg-indigo-400/15 dark:text-indigo-400">
+					{/* Night's own color (the theme's violet chart color, decoration, not a status), a small hint like a section icon */}
+					<span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-chart-7/15 text-chart-7">
 						{home ? <House className="size-5" /> : <Moon className="size-5" />}
 					</span>
 					<div className="flex min-w-0 flex-col gap-0.5">

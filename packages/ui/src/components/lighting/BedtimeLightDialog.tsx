@@ -21,7 +21,7 @@ export const BedtimeLightDialog: React.FC<{ controls: LightControls }> = ({ cont
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle className="flex items-center gap-2">
-						<Moon className="size-5 shrink-0 text-indigo-500 dark:text-indigo-400" />
+						<Moon className="size-5 shrink-0 text-chart-7" />
 						{pending?.room.name} Is in Bedtime
 					</DialogTitle>
 					<DialogDescription>

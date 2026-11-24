@@ -405,7 +405,7 @@ const AffirmationView: React.FC<{ affirmation?: DailyAffirmation; now: Date; bir
 					{birthday ? (
 						<HolidayCharacter id="birthday" animated className="size-12" />
 					) : (
-						<span className="flex size-12 items-center justify-center rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400">
+						<span className="flex size-12 items-center justify-center rounded-lg bg-chart-5/10 text-chart-5">
 							<Heart className="size-6" />
 						</span>
 					)}

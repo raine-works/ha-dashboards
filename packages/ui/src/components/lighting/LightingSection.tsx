@@ -265,7 +265,7 @@ const LightingSectionContent: React.FC<LightingSectionProps> = ({
 				>
 					<div className="flex items-center justify-between gap-3 px-2">
 						<div className="flex min-w-0 items-center gap-3">
-							<Lightbulb className="size-6 shrink-0 text-amber-500 dark:text-amber-400" />
+							<Lightbulb className="size-6 shrink-0 text-warning" />
 							<div className="min-w-0">
 								<h2 className="truncate font-semibold text-lg leading-tight">{title}</h2>
 								<p className="truncate text-muted-foreground text-sm max-lg:hidden">{subtitle}</p>
@@ -312,18 +312,15 @@ const LightingSectionContent: React.FC<LightingSectionProps> = ({
 															aria-label={`${room.name} lights`}
 															className="-mx-2 min-w-0 flex-1 rounded-md px-2 py-1"
 														>
-															{/* A room, not a light: stacked squares (a group) on a soft tile, amber-tinted while any of its lights are on */}
+															{/* A room, not a light: stacked squares (a group) on a soft tile, tinted the theme's warm warning color while any of its lights are on */}
 															<span
 																className={cn(
 																	'flex size-12 shrink-0 items-center justify-center rounded-lg transition-colors',
-																	onCount > 0 ? 'bg-amber-500/15 dark:bg-amber-400/15' : 'bg-muted',
+																	onCount > 0 ? 'bg-warning/15' : 'bg-muted',
 																)}
 															>
 																<SquareStack
-																	className={cn(
-																		'size-5',
-																		onCount > 0 ? 'text-amber-500 dark:text-amber-400' : 'text-muted-foreground',
-																	)}
+																	className={cn('size-5', onCount > 0 ? 'text-warning' : 'text-muted-foreground')}
 																/>
 															</span>
 															<div className="min-w-0 flex-1">
