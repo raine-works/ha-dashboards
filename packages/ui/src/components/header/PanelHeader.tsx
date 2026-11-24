@@ -14,7 +14,7 @@ import { HolidayMuteButton } from '../holiday/HolidayMute';
 import { LaundryButton } from '../laundry/LaundryButton';
 import { withErrorBoundary } from '../layout/ErrorBoundary';
 import { MusicButton, useMusicActive } from '../music/MusicDialog';
-import { Card, Separator } from '../ui';
+import { Separator, SURFACE } from '../ui';
 import {
 	CamerasButton,
 	DateSummary,
@@ -24,7 +24,6 @@ import {
 	PeopleStack,
 	PetsStack,
 	SidebarButton,
-	TodoButton,
 	useClock,
 	useOpenCount,
 	WeatherSummary,
@@ -53,10 +52,13 @@ export interface PanelHeaderProps {
 }
 
 /**
- * Header shared by every wall panel: clock, date (a greeting above it on the Home dashboard) (with the next calendar event; opens
- * the calendar), weather, open doors/windows, Home Assistant notifications (while there are any),
- * Assist (voice commands), to-do lists, cameras, music, a More menu (the daily brief, intercom, TVs and energy), people and pets. Below 1024px (10.5" panels) it tightens spacing and drops the
- * weather condition text so everything still fits on one row.
+ * The header every wall panel shares (and the Home dashboard's wide layout), in three zones
+ * (docs/design/overhaul-plan.md): **status** on the left, the clock, the date (the next calendar
+ * event; opens the calendar), the weather, and what needs someone while it does (doors open,
+ * notices, laundry: chips that come and go); **who's home**, people and pets; and **at most three
+ * quick actions**, Assist, Cameras and Music (after the panel's own, the kitchen's Timer), with
+ * everything else (to-do, the brief, messages, TVs, energy) in More. Below xl it tightens; the music
+ * button is the one control that shrinks.
  */
 const PanelHeaderContent: React.FC<PanelHeaderProps> = ({
 	actions,
@@ -68,29 +70,28 @@ const PanelHeaderContent: React.FC<PanelHeaderProps> = ({
 	const { time, ampm } = useClock();
 	// The now-playing chip needs the room the weather condition takes
 	const musicActive = useMusicActive();
-	// "N Open" takes the calendar hint's room while it shows (the open doors matter more)
+	// "N open" takes the calendar hint's room while it shows (the open doors matter more)
 	const anyOpen = useOpenCount() > 0;
 	const divider = <Separator orientation="vertical" className="data-[orientation=vertical]:h-10" />;
 
 	return (
-		<Card
+		<header
 			data-panel-header=""
-			className="flex-row items-center justify-between gap-3 px-6 py-4 max-xl:gap-2 max-xl:p-3"
+			className={cn(
+				SURFACE,
+				'relative flex items-center justify-between gap-4 px-5 py-3 max-xl:gap-2 max-xl:px-3 max-xl:py-2',
+			)}
 		>
-			{/* Left: Clock, Greeting & Date (calendar), Weather */}
-			{/* Keeps its width: the music button is what gives way */}
-			<div className="flex shrink-0 items-center gap-6 max-xl:gap-2.5">
-				{sidebarButton && <SidebarButton className="-mx-3 max-xl:-mx-1" />}
-				<div className="flex items-baseline gap-2">
-					<span className="font-light text-5xl leading-none tracking-tight max-xl:text-4xl">{time}</span>
+			{/* Status: the time, the date, the weather, then whatever needs someone (keeps its width) */}
+			<div className="flex shrink-0 items-center gap-5 max-xl:gap-2.5">
+				{sidebarButton && <SidebarButton className="-mx-2 max-xl:-mx-1" />}
+				<div className="flex items-baseline gap-1.5">
+					<span className="font-light text-5xl tabular-nums leading-none tracking-tight max-xl:text-4xl">{time}</span>
 					<span className="font-medium text-muted-foreground text-sm">{ampm}</span>
 				</div>
 
-				{divider}
-
-				{/* Tap for the calendar; the next event's hint takes the room left */}
-				{/* Below xl (the 10.5" panels, windows under 1280px) the header has no room for the next event: tapping the date still opens the calendar */}
-				{/* A holiday's character after the date, with room of its own */}
+				{/* Tap for the calendar; the next event's hint takes the room left (none below xl, nor while
+				    doors are open); a holiday's character after the date, with room of its own */}
 				<div className="flex items-center gap-3 max-xl:gap-2">
 					<DateSummary
 						greeting={greeting}
@@ -110,43 +111,46 @@ const PanelHeaderContent: React.FC<PanelHeaderProps> = ({
 				<ModuleGate id="weather">
 					<WeatherSummary before={divider} showCondition={!musicActive} />
 				</ModuleGate>
+
+				{/* What needs someone, only while it does: compact chips, so they read as status, not actions */}
+				<div className="flex items-center gap-2 empty:hidden max-xl:gap-1.5">
+					<OpenSensorsButton size="md" />
+					<ModuleGate id="notifications">
+						<NotificationsButton size="icon-md" />
+					</ModuleGate>
+					{/* While a load runs, waits or is done */}
+					<ModuleGate id="laundry">
+						<LaundryButton size="md" />
+					</ModuleGate>
+				</div>
 			</div>
 
-			{/* Right: Open sensors, notifications and laundry (only while there are some), Cameras, Messages & Presence Avatars */}
-			<div className="flex min-w-0 items-center gap-2 max-xl:gap-1.5">
-				<OpenSensorsButton size="tile" />
-				<ModuleGate id="notifications">
-					<NotificationsButton size="tile" />
-				</ModuleGate>
-				{/* While a load runs, waits or is done */}
-				<ModuleGate id="laundry">
-					<LaundryButton size="tile" />
-				</ModuleGate>
-				{actions}
-				<ModuleGate id="assist">
-					<AssistButton size="tile" />
-				</ModuleGate>
-				{/* Each button a tile, the icon over what it opens */}
-				<ModuleGate id="todo">
-					<TodoButton size="tile" />
-				</ModuleGate>
-				<ModuleGate id="cameras">
-					<CamerasButton size="tile" />
-				</ModuleGate>
-				{/* The one control that shrinks when the header is full: its text truncates down to the cover */}
-				<ModuleGate id="music">
-					<MusicButton size="tile" className="shrink overflow-hidden" />
-				</ModuleGate>
-				{/* The brief, intercom, TVs and energy, which don't all fit beside the rest */}
-				<MoreButton tvRemote={tvRemote} colorSchemePicker={colorSchemePicker} />
+			<div className="flex min-w-0 items-center gap-3 max-xl:gap-1.5">
+				{/* Who's home */}
 				<ModuleGate id="people">
 					<PeopleStack />
 				</ModuleGate>
 				<ModuleGate id="pets">
 					<PetsStack before={divider} />
 				</ModuleGate>
+
+				{/* The quick actions: the panel's own, then Assist, Cameras and Music; the rest in More */}
+				<div className="flex min-w-0 items-center gap-2 max-xl:gap-1.5">
+					{actions}
+					<ModuleGate id="assist">
+						<AssistButton size="tile" />
+					</ModuleGate>
+					<ModuleGate id="cameras">
+						<CamerasButton size="tile" />
+					</ModuleGate>
+					{/* The one control that shrinks when the header is full: its text truncates down to the cover */}
+					<ModuleGate id="music">
+						<MusicButton size="tile" className="shrink overflow-hidden" />
+					</ModuleGate>
+					<MoreButton tvRemote={tvRemote} colorSchemePicker={colorSchemePicker} />
+				</div>
 			</div>
-		</Card>
+		</header>
 	);
 };
 

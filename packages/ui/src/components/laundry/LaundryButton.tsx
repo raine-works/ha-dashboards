@@ -35,7 +35,7 @@ export const LaundryButton: React.FC<{ size?: ButtonProps['size']; className?: s
 		<>
 			{summary && style && (
 				<Button
-					variant="outline"
+					variant="secondary"
 					size={size}
 					onClick={() => setOpen(true)}
 					aria-label={`Laundry: ${summary.description}`}

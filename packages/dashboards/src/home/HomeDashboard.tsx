@@ -193,7 +193,7 @@ const PhoneHeader: React.FC<{ onIntercom: () => void; sticky: boolean; onHeight:
 					<DailyBriefButton size="xl" tile className={HEADER_TILE} />
 				</ModuleGate>
 				<ModuleGate id="messages">
-					<Button variant="outline" size="xl" onClick={onIntercom} className={HEADER_TILE}>
+					<Button variant="secondary" size="xl" onClick={onIntercom} className={HEADER_TILE}>
 						<MessagesSquare />
 						<span>Messages</span>
 					</Button>

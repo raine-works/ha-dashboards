@@ -8,9 +8,11 @@ For desktops, laptops and phones (the Companion app included).
 
 ![The Home dashboard in light mode](images/home-light.png)
 
-- **Wide screens** (1024px and up): the header (clock, weather, calendar, what's open, music,
-  people and pets, and a More menu; every button its icon over a label) over Lighting, Security and
-  Climate side by side, each column scrolling on its own.
+- **Wide screens** (1024px and up): the header over Lighting, Security and Climate side by side,
+  each column scrolling on its own. The header has three parts: the status (time, date, weather, and
+  chips for open doors, notices and laundry only while there are some), who's home (people and pets),
+  and three quick actions, Assist, Cameras and Music (after a panel's Timer), with To-do, Daily,
+  Messages, TVs and Energy in More, which shows the to-do count.
 - **Lighting is rooms first**: a tile per room, by floor (what's on, its scene), in equal columns.
   A tap on a room opens it: its lights' switch at the top, then its scenes, colors, bedtime and a row
   per light; a light that's off shows only its name until it's on.
