@@ -281,7 +281,7 @@ export function labeledBedtimeSteps(
 	// Lights by their short names, as the light rows show them ("Floor Lamp, Left Lamp"); a TV, speaker
 	// or curtain by its whole name, which reads better alone ("the Master Suite TV")
 	const lightNames = (ids: string[]) => someNames(ids.map((id) => withoutRoom(nameOf(id), room)).sort());
-	// "the Master Suite TV", but "Lott's TV" (a possessive needs no article) and a list as it is
+	// "the Master Suite TV", but "Kai's TV" (a possessive needs no article) and a list as it is
 	const names = (ids: string[]) => {
 		const list = someNames(ids.map(nameOf).sort());
 		return ids.length === 1 && !/'s\b/.test(list) ? `the ${list}` : list;
