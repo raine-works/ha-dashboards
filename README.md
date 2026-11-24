@@ -125,7 +125,7 @@ bun run typecheck
 bun run build         # build and upload to your Home Assistant (HA_URL, HA_TOKEN in .env)
 ```
 
-The integration's tests: `uv venv --python 3.14 .venv && uv pip install -r requirements-test.txt`,
+The integration's tests: `uv venv .venv && uv pip install -r requirements-test.txt`,
 then `.venv/bin/python -m pytest -q`. See [AGENTS.md](AGENTS.md) for how the code is laid out and
 the rules it follows.
 
