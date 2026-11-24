@@ -37,7 +37,7 @@ What the dashboards can't find on their own. A dashboard card's own `house` opti
 
 ## Bedtime
 
-A Bedtime switch for each room picked, and Home Bedtime: every room on turns Home Bedtime on, any room off turns it off, and Home Bedtime turned on puts every room to bed. What a room's bedtime does is up to your automations (trigger on its switch). A room that had a bedtime toggle (an input_boolean labeled Bedtime, in that area) keeps its name and state.
+A Bedtime switch for each room picked, and Home Bedtime: every room on turns Home Bedtime on, any room off turns it off, and Home Bedtime turned on puts every room to bed. What a room's bedtime does is up to your automations (trigger on its switch); its confirm dialog lists what it turns off by label ([Bedtime](../cards.md#bedtime)). A room that had a bedtime toggle (an input_boolean labeled Bedtime, in that area) keeps its name and state.
 
 | Option | Key | What it does |
 | :--- | :--- | :--- |
