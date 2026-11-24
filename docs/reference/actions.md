@@ -49,6 +49,7 @@ Sends a push to household members' phones (their Companion apps). No people: the
 ## `raineworks_dashboards.notify_todo_assignee`
 
 Pushes a to-do item to whom it's for (anyone: the household but whoever added it), with Mark done.
+It's a To-do push: people who turned To-do off in their [phone alerts](../phone-alerts.md) don't get it.
 
 | Field | Required | Default | What it is |
 | :--- | :--- | :--- | :--- |
