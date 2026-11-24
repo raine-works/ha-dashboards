@@ -20,9 +20,10 @@ rows, are each dialog's own.
 
 ## Each dialog
 
-- **TVs**: the list of TVs as rows on one surface, the picked one filled; the TV's card with what's
-  on as the dialog's hero (its poster large), the transport and volume under it; inputs as tonal
-  chips; the apps in a grid that fills the space below, so there's no blank half.
+- **TVs** (done): the list of TVs as rows on one surface, the picked one filled (a strip on
+  phones); the TV as one card: what's on (its poster larger) and power (Turn on filled, Turn off
+  tonal), then playback and volume; Inputs and Apps under overlines, the apps as many across as
+  fit.
 - **Messages** (done): speakers and TVs as `CheckRow`s on one surface each (All / None as the
   group's actions), the people on Phones the same way; the quick messages under an overline; the
   volume, chime and composer as the footer.
