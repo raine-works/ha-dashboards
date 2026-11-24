@@ -99,7 +99,7 @@ export const MODULES: readonly DashboardModule[] = [
 	{
 		id: 'lighting',
 		name: 'Lighting',
-		description: 'Every light and scene by floor and room, with dimmers, colors and All off',
+		description: 'A tile per room by floor (its lights, scenes, dimmers and colors a tap away) and All off',
 		needs: `Lights labeled "Household Light" (${HOUSEHOLD_LIGHT_LABEL}) in areas on floors; Stateful Scenes for scenes`,
 		watch: ['light', 'switch'],
 		detect: ({ hass }) =>

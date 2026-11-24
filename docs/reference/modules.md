@@ -18,7 +18,7 @@ house:
 
 | Module | Id | What it shows | What it needs |
 | :--- | :--- | :--- | :--- |
-| Lighting | `lighting` | Every light and scene by floor and room, with dimmers, colors and All off | Lights labeled "Household Light" (household_light) in areas on floors; Stateful Scenes for scenes |
+| Lighting | `lighting` | A tile per room by floor (its lights, scenes, dimmers and colors a tap away) and All off | Lights labeled "Household Light" (household_light) in areas on floors; Stateful Scenes for scenes |
 | Bedtime | `bedtime` | Each room's bedtime toggle and Home Bedtime, asking before lights come on in a room asleep | The integration's Bedtime rooms (its options), or input_booleans labeled "bedtime" in each room's area with input_boolean.home_bedtime |
 | Security | `security` | Door locks with their contact sensors, garage doors, and every opening left open | lock.* entities, garage covers, door/window binary sensors |
 | Alarm | `alarm` | Arm and disarm with a PIN pad, exit and entry countdowns, and the arming check | The Alarmo integration (an alarm_control_panel and the alarmo.arm action) |

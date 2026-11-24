@@ -16,6 +16,7 @@ import {
 	lightFill,
 	PRIVATE_SCENE_LABEL,
 	ringColors,
+	roomSummary,
 	sceneLights,
 	showsLightControls,
 } from '../lights';
@@ -59,6 +60,30 @@ const states: Record<string, HassEntity> = {
 	'light.master_suite_left_lamp': light({ friendly_name: 'Master Suite Left Lamp' }),
 	'light.desk_lamp': light({ friendly_name: 'Desk Lamp' }),
 };
+
+describe('roomSummary', () => {
+	it('counts the lights that are on', () => {
+		expect(roomSummary({ onCount: 0, lightCount: 3 })).toBe('Off');
+		expect(roomSummary({ onCount: 1, lightCount: 3 })).toBe('1 on');
+		expect(roomSummary({ onCount: 3, lightCount: 3 })).toBe('All on');
+		// One light on is just "1 on", not "All on"
+		expect(roomSummary({ onCount: 1, lightCount: 1 })).toBe('1 on');
+	});
+
+	it('names the scene that is on after the count', () => {
+		expect(roomSummary({ onCount: 2, lightCount: 3, activeScene: 'Dinner' })).toBe('2 on · Dinner');
+	});
+
+	it('leads with bedtime, leaving out Off', () => {
+		expect(roomSummary({ onCount: 0, lightCount: 2, bedtime: true })).toBe('Bedtime');
+		expect(roomSummary({ onCount: 1, lightCount: 2, bedtime: true })).toBe('Bedtime · 1 on');
+	});
+
+	it('says what a room with only scenes has', () => {
+		expect(roomSummary({ onCount: 0, lightCount: 0 })).toBe('Scenes');
+		expect(roomSummary({ onCount: 0, lightCount: 0, activeScene: 'Movie' })).toBe('Movie');
+	});
+});
 
 describe('showsLightControls', () => {
 	it('shows the dimmer and colors only while a light is on', () => {

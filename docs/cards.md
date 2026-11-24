@@ -11,6 +11,9 @@ For desktops, laptops and phones (the Companion app included).
 - **Wide screens** (1024px and up): the header (clock, weather, calendar, what's open, music,
   people and pets, and a More menu) over Lighting, Security and Climate side by side, each column
   scrolling on its own.
+- **Lighting is rooms first**: a tile per room, by floor (what's on, its scene, a power button for
+  its lights). A tap on a room opens its lights, scenes, colors and bedtime; a light that's off
+  shows only its name until it's on.
 - **Phones and portrait tablets**: a header with the greeting, weather and the house's status, and
   a tab bar: Lights, Security, Assist (the voice button, in the middle), Climate, Music. Cameras
   open from Security.
