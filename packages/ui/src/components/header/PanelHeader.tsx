@@ -114,28 +114,28 @@ const PanelHeaderContent: React.FC<PanelHeaderProps> = ({
 
 			{/* Right: Open sensors, notifications and laundry (only while there are some), Cameras, Messages & Presence Avatars */}
 			<div className="flex min-w-0 items-center gap-2 max-xl:gap-1.5">
-				<OpenSensorsButton />
+				<OpenSensorsButton size="tile" />
 				<ModuleGate id="notifications">
-					<NotificationsButton />
+					<NotificationsButton size="tile" />
 				</ModuleGate>
 				{/* While a load runs, waits or is done */}
 				<ModuleGate id="laundry">
-					<LaundryButton />
+					<LaundryButton size="tile" />
 				</ModuleGate>
 				{actions}
 				<ModuleGate id="assist">
-					<AssistButton />
+					<AssistButton size="tile" />
 				</ModuleGate>
-				{/* Icon-only so the header fits people and pets */}
+				{/* Each button a tile, the icon over what it opens */}
 				<ModuleGate id="todo">
-					<TodoButton />
+					<TodoButton size="tile" />
 				</ModuleGate>
 				<ModuleGate id="cameras">
-					<CamerasButton />
+					<CamerasButton size="tile" />
 				</ModuleGate>
 				{/* The one control that shrinks when the header is full: its text truncates down to the cover */}
 				<ModuleGate id="music">
-					<MusicButton className="min-w-12 shrink overflow-hidden" />
+					<MusicButton size="tile" className="shrink overflow-hidden" />
 				</ModuleGate>
 				{/* The brief, intercom, TVs and energy, which don't all fit beside the rest */}
 				<MoreButton tvRemote={tvRemote} colorSchemePicker={colorSchemePicker} />

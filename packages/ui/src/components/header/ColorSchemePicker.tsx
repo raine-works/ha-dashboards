@@ -44,10 +44,12 @@ export const ColorSchemeToggle: React.FC<{ className?: string }> = ({ className 
 };
 
 /** A header button showing Home Assistant's appearance (sun, moon, or both for Auto); opens Appearance. */
-export const ColorSchemeButton: React.FC<{ size?: ButtonProps['size']; className?: string }> = ({
-	size = 'icon-sm',
-	className,
-}) => {
+export const ColorSchemeButton: React.FC<{
+	size?: ButtonProps['size'];
+	/** "Theme" beside the icon (the phone header's chips). */
+	label?: boolean;
+	className?: string;
+}> = ({ size = 'icon-sm', label, className }) => {
 	const [setting] = useHomeAssistantColorScheme();
 	const [open, setOpen] = useState(false);
 	const Icon = CHOICES.find((c) => c.value === setting)?.icon ?? SunMoon;
@@ -62,6 +64,7 @@ export const ColorSchemeButton: React.FC<{ size?: ButtonProps['size']; className
 				onClick={() => setOpen(true)}
 			>
 				<Icon />
+				{label && <span>Theme</span>}
 			</Button>
 			<AppearanceDialog isOpen={open} onClose={() => setOpen(false)} />
 		</>

@@ -46,6 +46,9 @@ const buttonVariants = cva(
 				// Full screen video controls (a phone held away, a laptop across the room): 56px targets
 				'2xl':
 					"h-14 rounded-xl px-6 text-lg has-[>svg]:px-5 [&_svg:not([class*='size-'])]:size-6 [&_svg]:-translate-y-px",
+				// The wall panel and desktop header's buttons: the icon over a short label ("To-do", "Cameras"),
+				// so every button says what it opens, 56px tall and as narrow as its label
+				tile: "h-14 min-w-14 flex-col gap-1 px-2 font-medium text-[11px] leading-none has-[>svg]:px-2 [&_svg:not([class*='size-'])]:size-5",
 				// The PIN pad's round keys, like a phone's own: bigger on phones, smaller on a short screen
 				pad: 'short:size-14 size-16 flex-col gap-0 rounded-full font-normal short:text-2xl text-3xl leading-none max-sm:size-[min(5.5rem,22vw,10svh)] max-sm:text-4xl',
 				icon: "size-9 touch:size-11 touch:[&_svg:not([class*='size-'])]:size-5",

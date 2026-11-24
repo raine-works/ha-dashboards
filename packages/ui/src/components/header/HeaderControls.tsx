@@ -327,10 +327,10 @@ export const OpenSensorsButton: React.FC<HeaderButtonProps & { iconOnly?: boolea
 		>
 			<AlertTriangle />
 			{/* One flex item (separate "{n}" and " Open" nodes would be two); the word goes below xl so
-					    it takes little of the header's room when it appears */}
+					    it takes little of the header's room when it appears (a tile has room for it under the icon) */}
 			<span className="tabular-nums">
 				{count}
-				{!iconOnly && <span className="max-xl:hidden"> Open</span>}
+				{!iconOnly && <span className={size === 'tile' ? undefined : 'max-xl:hidden'}> open</span>}
 			</span>
 		</Button>
 	);
@@ -340,7 +340,11 @@ export const OpenSensorsButton: React.FC<HeaderButtonProps & { iconOnly?: boolea
  * Home Assistant's notifications (persistent notifications) with a count; opens them to dismiss
  * one by one or all at once. Shows only while there are some, like the Open button.
  */
-export const NotificationsButton: React.FC<HeaderButtonProps> = ({ size = 'icon-xl', className }) => {
+export const NotificationsButton: React.FC<HeaderButtonProps & { label?: boolean }> = ({
+	size = 'icon-xl',
+	label,
+	className,
+}) => {
 	const [open, setOpen] = useState(false);
 	const notifications = useNotifications();
 	const count = notifications.notifications.length;
@@ -359,6 +363,7 @@ export const NotificationsButton: React.FC<HeaderButtonProps> = ({ size = 'icon-
 					className={cn('relative', className)}
 				>
 					<Bell />
+					{(label || size === 'tile') && <span>Notices</span>}
 					<CountBadge>{count}</CountBadge>
 				</Button>
 			)}
@@ -397,7 +402,9 @@ export const TodoButton: React.FC<HeaderButtonProps & TileProps> = ({ size = 'ic
 				className={cn('relative', className)}
 			>
 				<ListTodo />
-				{(label || tile) && <span className={cn(!tile && 'max-[520px]:sr-only')}>To-do</span>}
+				{(label || tile || size === 'tile') && (
+					<span className={cn(!tile && size !== 'tile' && 'max-[520px]:sr-only')}>To-do</span>
+				)}
 				{count > 0 && <CountBadge>{count}</CountBadge>}
 			</Button>
 			<TodoDialog
@@ -485,6 +492,7 @@ export const CamerasButton: React.FC<HeaderButtonProps> = ({ size = 'icon-xl', c
 				className={className}
 			>
 				<Cctv className={cn(activity.length > 0 && 'animate-pulse')} />
+				{size === 'tile' && <span>Cameras</span>}
 			</Button>
 			<CameraModal isOpen={open} onClose={() => setOpen(false)} />
 		</>
@@ -558,16 +566,16 @@ export const MoreButton: React.FC<{ tvRemote?: boolean; colorSchemePicker?: bool
 		<>
 			<Popover open={menuOpen} onOpenChange={setMenuOpen}>
 				<PopoverTrigger asChild>
-					{/* "More" beside its grid from 2xl (a desktop window); the icon alone where the header is full */}
+					{/* A tile like the header's other buttons: its grid over "More" */}
 					<Button
 						variant="outline"
-						size="xl"
+						size="tile"
 						aria-label="More"
 						title="More: Daily, Messages, TVs, Energy"
-						className={cn('max-2xl:w-12 max-2xl:has-[>svg]:px-0', className)}
+						className={className}
 					>
 						<LayoutGrid />
-						<span className="max-2xl:sr-only">More</span>
+						<span>More</span>
 					</Button>
 				</PopoverTrigger>
 				<PopoverContent align="end" className="flex w-80 flex-col gap-2 p-2">

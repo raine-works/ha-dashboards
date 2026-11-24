@@ -208,7 +208,7 @@ export const PanelTimerAction: React.FC = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	return (
 		<>
-			<Button variant="outline" size="xl" onClick={() => setIsOpen(true)}>
+			<Button variant="outline" size="tile" onClick={() => setIsOpen(true)} className="min-w-16">
 				<Timer />
 				{/* Live countdown while a timer is set */}
 				<span className={timer.active ? 'font-mono tabular-nums' : undefined}>
