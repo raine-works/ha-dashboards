@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+import { buildTheme } from '../build';
 import { contrast, cssToHex, mixHex } from '../color';
 import { PRESET_THEMES } from '../index';
 import { isNight, NIGHT_TOKENS } from '../night';
@@ -14,7 +15,21 @@ const STATUSES = ['success', 'warning', 'info', 'destructive', 'alarm'] as const
 const tint = (tokens: Tokens, status: string, dark: boolean) =>
 	mixHex(tokens[status as keyof Tokens], cssToHex(tokens.card) ?? '#000000', dark ? 0.14 : 0.1);
 
-for (const theme of PRESET_THEMES)
+// Themes made in the theme editor too: a deep accent gets white text in dark mode, which the night
+// level's light-gray primary would leave unreadable unless night sets the text with it
+const BUILT = [
+	buildTheme({
+		name: 'Deep blue',
+		from: PRESET_THEMES[0]!,
+		base: 'neutral',
+		accent: { kind: 'color', color: 'oklch(0.5 0.2 260)' },
+		radius: '0.625rem',
+		edges: false,
+		glow: false,
+	}),
+];
+
+for (const theme of [...PRESET_THEMES, ...BUILT])
 	describe(`${theme.name}`, () => {
 		for (const [mode, tokens] of [
 			['light', theme.light],

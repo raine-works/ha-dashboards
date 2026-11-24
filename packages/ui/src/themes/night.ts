@@ -16,7 +16,10 @@ export const NIGHT_TOKENS: Partial<Record<TokenName, string>> = {
 	'card-foreground': 'oklch(0.86 0 0)',
 	popover: 'oklch(0.18 0 0)',
 	'popover-foreground': 'oklch(0.86 0 0)',
+	// Each color night sets, it sets with its text: a theme's own foreground (white on a deep accent from
+	// the theme editor) would be unreadable on the night's light gray or softened statuses
 	primary: 'oklch(0.84 0 0)',
+	'primary-foreground': 'oklch(0.145 0 0)',
 	secondary: 'oklch(0.21 0 0)',
 	'secondary-foreground': 'oklch(0.86 0 0)',
 	muted: 'oklch(0.21 0 0)',
@@ -27,6 +30,9 @@ export const NIGHT_TOKENS: Partial<Record<TokenName, string>> = {
 	success: 'oklch(0.7 0.11 170)',
 	warning: 'oklch(0.78 0.12 88)',
 	info: 'oklch(0.66 0.1 255)',
+	'success-foreground': 'oklch(0.145 0 0)',
+	'warning-foreground': 'oklch(0.145 0 0)',
+	'info-foreground': 'oklch(0.145 0 0)',
 };
 
 /** The night level as CSS, over the dark tokens on the mount point (`.dark[data-night]` wins over `.dark`). */
