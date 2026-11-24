@@ -31,14 +31,29 @@ export const STATUS_ICON_TONES: Record<StatusTone, IconTone> = {
  */
 export const actionLeads = (tone: StatusTone) => tone === 'attention' || tone === 'danger';
 
+/**
+ * The detail line's classes: cut to one line unless it must be read whole (`wraps`: a refusal to arm,
+ * whose Arm anyway bypasses what it names), amber with its words when it warns.
+ */
+export const detailClasses = (wraps?: boolean, tone?: 'warning') =>
+	cn(
+		'text-caption touch:text-sm',
+		wraps ? 'text-pretty' : 'truncate',
+		tone === 'warning' ? 'text-warning' : 'text-muted-foreground',
+	);
+
 /** A StatusTile's state and its one action. */
 export interface StatusTileProps {
 	icon: ComponentChildren;
 	tone: StatusTone;
 	/** The state in a word or two ("Armed Home", "All closed"). */
 	state: string;
-	/** One line of detail ("Perimeter armed", "Garage open 12 min"). */
+	/** One line of detail ("Perimeter armed", "Garage open 12 min"), its full text as the tooltip. */
 	detail?: string;
+	/** The detail in amber, with its words (open doors before arming). */
+	detailTone?: 'warning';
+	/** Let the detail wrap instead of cutting it to one line: when it must be read whole (a refusal to arm). */
+	detailWraps?: boolean;
 	/**
 	 * At most one action, a Button: `variant="secondary"` while the state is good, `default` when it
 	 * needs action (`actionLeads()`).
@@ -58,7 +73,17 @@ export interface StatusTileProps {
  * action at the end. Calm when all is well, so an exception stands out on its own; the color always
  * comes with the icon and the word.
  */
-export const StatusTile: React.FC<StatusTileProps> = ({ icon, tone, state, detail, action, children, className }) => (
+export const StatusTile: React.FC<StatusTileProps> = ({
+	icon,
+	tone,
+	state,
+	detail,
+	detailTone,
+	detailWraps,
+	action,
+	children,
+	className,
+}) => (
 	<div
 		data-slot="status-tile"
 		data-tone={tone}
@@ -68,7 +93,11 @@ export const StatusTile: React.FC<StatusTileProps> = ({ icon, tone, state, detai
 			<IconTile tone={STATUS_ICON_TONES[tone]}>{icon}</IconTile>
 			<div className="flex min-w-0 flex-1 flex-col gap-0.5">
 				<span className="truncate text-title">{state}</span>
-				{detail && <span className="truncate text-caption text-muted-foreground touch:text-sm">{detail}</span>}
+				{detail && (
+					<span title={detail} className={detailClasses(detailWraps, detailTone)}>
+						{detail}
+					</span>
+				)}
 			</div>
 			{action && <div className="shrink-0">{action}</div>}
 		</div>

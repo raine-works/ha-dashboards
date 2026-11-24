@@ -355,7 +355,15 @@ export const AlarmCard: React.FC = () => {
 				: 'neutral';
 
 	return (
-		<StatusTile icon={<Icon />} tone={tone} state={title} detail={description}>
+		<StatusTile
+			icon={<Icon />}
+			tone={tone}
+			state={title}
+			detail={description}
+			// Open doors in amber; a refusal to arm, which needs reading before Arm anyway, wraps whole
+			detailTone={warn ? 'warning' : undefined}
+			detailWraps={isBlocked}
+		>
 			{/* Actions get their own full-width row so they never squeeze the state. Disarm is quiet while the
 			    house is safe, and red only while the alarm is going off (or about to): it still asks for the PIN */}
 			<div className="flex gap-2 *:flex-1">
