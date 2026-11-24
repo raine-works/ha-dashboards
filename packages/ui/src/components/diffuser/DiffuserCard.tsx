@@ -1,3 +1,9 @@
+/**
+ * Scent diffusers: a row each (on or off, the oil, the fragrance, Quick scent) in one card.
+ *
+ * @module
+ */
+
 import { Droplet, Loader2, SprayCan } from 'lucide-react';
 import type React from 'preact/compat';
 import { Fragment, useEffect, useState } from 'preact/compat';

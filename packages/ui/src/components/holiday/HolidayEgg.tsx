@@ -1,3 +1,10 @@
+/**
+ * The holidays' and birthdays' easter eggs: their characters in the header (a tap toasts a greeting
+ * and plays a sound), peeking in for an icon, and marking a calendar day.
+ *
+ * @module
+ */
+
 import type React from 'preact/compat';
 import { lazy, Suspense, useState } from 'preact/compat';
 import { useHassApi } from '../../context/HassContext';

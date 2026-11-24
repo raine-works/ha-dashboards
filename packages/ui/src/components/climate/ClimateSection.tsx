@@ -1,3 +1,10 @@
+/**
+ * The Climate section: the thermostats (a house-wide preset, each zone's setpoint and mode), then the
+ * diffusers, curtains and blinds, and fans.
+ *
+ * @module
+ */
+
 import { Minus, Plus, Thermometer, ThermometerSnowflake, ThermometerSun } from 'lucide-react';
 import type React from 'preact/compat';
 import { Fragment, useState } from 'preact/compat';
@@ -30,7 +37,7 @@ import {
 } from '../ui';
 
 const PRESET_ENTITY = 'input_select.thermostat_preset';
-// The preset's state while the thermostats match no preset (set by hand): shown, never picked
+/** The preset's state while the thermostats match no preset (set by hand): shown, never picked. */
 export const OVERRIDE_PRESET = 'override';
 
 const HVAC_MODES = [
@@ -45,6 +52,10 @@ const HVAC_MODES = [
 export const presetChoices = (options: string[] | undefined): string[] =>
 	(options ?? ['home', 'away', 'sleep']).filter((option) => option !== OVERRIDE_PRESET);
 
+/**
+ * A thermostat's target as the stepper shows it: "Off", a range ("68°–74°") in Auto, one setpoint
+ * ("70°"), or "--" when it reports none.
+ */
 export function formatTarget(entity: HassEntity): string {
 	const { temperature, target_temp_low: low, target_temp_high: high } = entity.attributes;
 	if (entity.state === 'off') return 'Off';
@@ -53,6 +64,10 @@ export function formatTarget(entity: HassEntity): string {
 	return '--';
 }
 
+/**
+ * A thermostat's status line: the temperature inside, the humidity and what it's doing ("Heating"),
+ * each left out when it doesn't report it, joined with " · " (empty when it reports none).
+ */
 export function formatStatus(entity: HassEntity): string {
 	const { current_temperature: current, current_humidity: humidity, hvac_action: action } = entity.attributes;
 	return [

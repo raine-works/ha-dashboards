@@ -1,3 +1,10 @@
+/**
+ * Energy data for the header and the Energy dialog: Home Assistant's Energy settings, live watts, and
+ * the long-term statistics behind the charts.
+ *
+ * @module
+ */
+
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'preact/compat';
 import { useHassApi, useHassReady, useHassSelector } from '../../context/HassContext';
 import {
@@ -101,15 +108,21 @@ export function useHouseWatts(): string | undefined {
 /** Statistics are compiled at the end of each hour; reading them more often finds nothing new. */
 const HISTORY_REFRESH_MS = 5 * 60_000;
 
+/** A period's energy, from {@link useEnergyHistory}. */
 export interface EnergyHistory {
+	/** The period's start and end, and its chart's bucket. */
 	bounds: PeriodBounds;
+	/** The period's totals, house and circuits; undefined until its statistics load. */
 	summary?: PeriodSummary;
 	/** The house's energy over the previous period, up to the same point. */
 	previous?: number;
+	/** The chart's bars, by circuit (empty until loaded). */
 	buckets: ChartBucket[];
 	/** The always-on draw (W), from the last week's hours. */
 	baseLoad?: number;
+	/** The statistics are being fetched. */
 	loading: boolean;
+	/** The last fetch failed. */
 	error: boolean;
 	/** Fetch the statistics again (after a failure). */
 	retry: () => void;

@@ -1,3 +1,10 @@
+/**
+ * The Energy dialog (what the house uses now, by circuit, and over today, this week or this month) and
+ * the header's live-watts chip that opens it.
+ *
+ * @module
+ */
+
 import { CornerDownRight, Gauge, Loader2, TrendingDown, TrendingUp, Zap } from 'lucide-react';
 import type React from 'preact/compat';
 import { lazy, Suspense, useMemo, useState } from 'preact/compat';
@@ -333,8 +340,11 @@ const EnergyContent: React.FC = () => {
 	);
 };
 
+/** {@link EnergyDialog}'s props. */
 export interface EnergyDialogProps {
+	/** Whether the dialog is open. */
 	isOpen: boolean;
+	/** Called to close it. */
 	onClose: () => void;
 }
 

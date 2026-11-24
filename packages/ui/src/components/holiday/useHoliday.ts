@@ -1,7 +1,11 @@
-// Today's holiday for the whole page: one store outside the tree, re-evaluated just after local
-// midnight (and when the page comes back into view, since a sleeping page's timer fires late), so
-// nothing re-renders more than once a day. `?holiday=<id>` previews one (`none` hides them), read
-// once on load and on Home Assistant's in-app navigation, then taken off the URL.
+/**
+ * Today's holiday for the whole page: one store outside the tree, re-evaluated just after local
+ * midnight (and when the page comes back into view, since a sleeping page's timer fires late), so
+ * nothing re-renders more than once a day. `?holiday=<id>` previews one (`none` hides them), read
+ * once on load and on Home Assistant's in-app navigation, then taken off the URL.
+ *
+ * @module
+ */
 
 import { useSyncExternalStore } from 'preact/compat';
 import { type ActiveHoliday, activeHoliday, holidayById, previewHoliday } from '../../lib/holidays';

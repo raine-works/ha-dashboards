@@ -1,3 +1,10 @@
+/**
+ * The header's building blocks, shared by the wall panels and the Home dashboard: the clock, date and
+ * weather, the alert and launcher buttons (each owns its dialog), the More menu, and people and pets.
+ *
+ * @module
+ */
+
 import {
 	AlertTriangle,
 	Bell,
@@ -65,14 +72,15 @@ import { WeatherDialog } from '../weather/WeatherDialog';
 import { WeatherIcon } from '../weather/WeatherIcon';
 import { GuestWifiDialog, useGuestWifi } from '../wifi/GuestWifiDialog';
 
-// Header building blocks shared by the wall panels and the home dashboard. Each button owns its dialog.
-
+/** What the header's clock shows, from {@link useClock}. */
 export interface Clock {
 	/** "7:05" */
 	time: string;
+	/** "AM" or "PM". */
 	ampm: string;
 	/** "Sat, Oct 18" */
 	date: string;
+	/** The time of day's greeting ("Good morning"), without a name. */
 	greeting: string;
 }
 

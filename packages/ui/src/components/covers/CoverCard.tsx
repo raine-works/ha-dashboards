@@ -1,3 +1,10 @@
+/**
+ * Window coverings (curtains, blinds, shades): a row each with its position and controls, gathered in
+ * one card.
+ *
+ * @module
+ */
+
 import {
 	BatteryLow,
 	BatteryMedium,
@@ -39,12 +46,17 @@ const MOTION_TICK_MS = 100;
 // A reported move this long past a full travel is stalled (shown at rest)
 const STALL_GRACE_MS = 4000;
 
+/** What a covering's row shows, from {@link getCoverView}. */
 export interface CoverView {
+	/** At rest open or closed, moving (tapped here or reported), or unavailable. */
 	status: 'open' | 'closed' | 'opening' | 'closing' | 'unavailable';
+	/** The status in words ("Open 40%", "Closing…"). */
 	label: string;
 	/** 0 (closed) – 100 (open), when reported. */
 	position: number | null;
+	/** It takes a position (shows a slider). */
 	canSetPosition: boolean;
+	/** It stops mid-move (shows Stop while it moves). */
 	canStop: boolean;
 }
 
