@@ -92,7 +92,7 @@ tiles two across; desktop up to 1600px wide.
 | Section / card title | 18–20 / 1.3 | 600 | −0.01em |
 | Body | 16 / 1.5 (14 / 1.45 on a dense desktop) | 400 | 0 |
 | Control label | 14–16 / 1.2 | 500 | 0 |
-| Caption, status line | 13–14 / 1.4 | 400 | 0 |
+| Caption, status line | 13–14 / 1.4 (14 on wall panels) | 400 | 0 |
 | Overline (a floor's name) | 12 / 1.2 | 600, uppercase | +0.04em |
 
 - **Nothing a user reads on a wall panel under 14px**; nothing anywhere under 12px. Today 70% of

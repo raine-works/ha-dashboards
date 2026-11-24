@@ -1,7 +1,9 @@
 # Components
 
 **One way to draw one thing.** Every feature is built from these blocks; a feature that needs
-something they can't do adds a variant here first.
+something they can't do adds a variant here first. These are the target: the blocks arrive in
+phase 1 of the [overhaul plan](overhaul-plan.md) (`DeviceRow`, `StatusTile`, the new button sizes
+and dialog sizes don't exist before it), and what's marked retired goes as each phase lands.
 
 ## The blocks
 

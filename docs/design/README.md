@@ -1,7 +1,10 @@
 # Design system
 
-How Raineworks Dashboards should look and behave, and why. These pages are the policy every
-screen follows; a change that breaks one changes the page first.
+How Raineworks Dashboards should look and behave, and why: **the target design** the
+[overhaul plan](overhaul-plan.md) works toward. Until a phase lands, [AGENTS.md](../../AGENTS.md)'s
+rules and the components as they are still apply (today's dialog sizes, the 44px minimum on the
+panels); the pull request that lands a phase changes AGENTS.md to match. Once landed, a change that
+breaks one of these pages changes the page first.
 
 | Page | What it settles |
 | :--- | :--- |
@@ -20,7 +23,7 @@ screen follows; a change that breaks one changes the page first.
 3. **One way to draw one thing.** A device is a `DeviceRow` or a `Tile` wherever it appears; one
    header per section; one dialog anatomy.
 4. **Big enough to hit, at arm's length.** 44px everywhere, 48px on wall panels, 56px for the main
-   action; 8px between targets; nothing a user must read under 13px on a wall.
+   action; 8px between targets; nothing a user must read under 14px on a wall.
 5. **Squircles, on a 4/8 grid, in Geist.** Continuous corners where the browser can draw them,
    rounded corners where it can't, and spacing that's always on the scale.
 6. **Every word is a label.** No icon-only control but Close; buttons say what happens.
