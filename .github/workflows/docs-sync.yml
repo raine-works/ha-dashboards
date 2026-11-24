@@ -22,5 +22,11 @@ jobs:
     name: Docs sync
     uses: raine-works/agents/.github/workflows/docs-sync.yml@9bac93eafd58b8d22e41d179650b6d1573cee55b # raine-works/agents master
     secrets: inherit
-    # with:
-    #   docs: AGENTS.md, README.md and docs/*.md.
+    with:
+      # docs/reference/ is written from the code (bun scripts/docs.ts, checked by docs.test.ts), so an edit there
+      # by hand fails the tests; its words live in the integration's strings and lib/modules.ts
+      docs: >-
+        AGENTS.md, README.md and docs/*.md. Never edit docs/reference/: its pages are written from the code by
+        bun scripts/docs.ts, and docs.test.ts fails when one differs from it. If one is wrong, leave it and say
+        so in the pull request (its words come from custom_components/raineworks_dashboards/strings.json and
+        packages/ui/src/lib/modules.ts).
