@@ -72,3 +72,12 @@ describe('the design roles in the stock components', () => {
 		expect(chip).toContain('data-[state=on]:bg-primary');
 	});
 });
+
+describe('a check row', () => {
+	it('is an empty ring until picked, then a filled check (never a radio for picking many)', async () => {
+		const { checkMarkClasses } = await import('../ui/check-row');
+		expect(checkMarkClasses(false)).toContain('ring-2');
+		expect(checkMarkClasses(false)).not.toContain('bg-primary');
+		expect(checkMarkClasses(true)).toContain('bg-primary');
+	});
+});
