@@ -56,7 +56,19 @@ describe('dialog sizes', () => {
 		const sheet = sizeClasses(source, 'SHEET');
 		expect(sheet).toContain('max-sm:top-auto');
 		expect(sheet).toContain('max-sm:max-h-[calc(var(--panel-height)-2rem)]');
-		expect(source).toContain("size === 'sheet' && SHEET,\n\t\t\t\t\tclassName,");
+		expect(source).toContain("(size === 'sheet' || size === 'detail') && SHEET,");
+	});
+
+	it('detail is a sheet on phones and 480px with the design corners elsewhere', () => {
+		// docs/design/components.md: the dialog for a room, a device, a confirmation or a picker
+		const source = dialogSource();
+		const detail = sizeClasses(source, 'DETAIL');
+		expect(detail).toContain('sm:max-w-120');
+		expect(detail).toContain('sm:rounded-dialog');
+		// After the phone's full-screen classes, so the sheet's shape wins there, and before className
+		expect(source).toContain(
+			"(size === 'sheet' || size === 'detail') && SHEET,\n\t\t\t\t\tsize === 'detail' && DETAIL,\n\t\t\t\t\tclassName,",
+		);
 	});
 
 	it('fullscreen stays under the toolbar, never using vh', () => {

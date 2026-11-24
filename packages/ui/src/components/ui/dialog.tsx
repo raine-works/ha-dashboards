@@ -290,9 +290,11 @@ export interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement>
 	 * under the toolbar less 2rem (pickers such as the due date). `compact`: `default`, narrower on wider
 	 * screens (24rem), for a phone-shaped column such as the alarm keypad. `fullscreen`: the whole screen
 	 * under Home Assistant's toolbar (`--panel-top`, `--panel-height`), edge to edge without a border or
-	 * rounded corners, a flex column (Party mode).
+	 * rounded corners, a flex column (Party mode). `detail`: the design's dialog for a room, a device,
+	 * a confirmation or a picker (docs/design/components.md): 480px wide with its corners and
+	 * padding, the sheet's shape on phones; it replaces `default` and `sheet` as the overhaul lands.
 	 */
-	size?: 'default' | 'workspace' | 'sheet' | 'compact' | 'fullscreen';
+	size?: 'default' | 'workspace' | 'sheet' | 'compact' | 'fullscreen' | 'detail';
 }
 
 // The compact size: a narrow column on wider screens (phones take the whole screen like every dialog)
@@ -305,6 +307,10 @@ const FULLSCREEN =
 // The sheet size's phone shape, applied after the phone's full-screen classes so it overrides their top and height
 const SHEET =
 	'max-sm:top-auto max-sm:max-h-[calc(var(--panel-height)-2rem)] max-sm:animate-sheet-in max-sm:rounded-t-2xl max-sm:border-t';
+
+// The detail size (docs/design/components.md): a room, a device, a confirmation, a picker. 480px wide
+// with the design's dialog corners and padding; on phones the sheet's shape, from the bottom edge
+const DETAIL = 'sm:max-w-120 sm:rounded-dialog sm:p-pad';
 
 // The workspace size: one shape for every feature dialog, so none is narrower or shorter than the rest. The
 // 10.5" wall panels (touch, below lg) take the screen's height less 1rem, room for their bigger controls
@@ -383,7 +389,8 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
 					!ownLayout && 'max-sm:*:shrink-0',
 					// The sheet size: on phones, let go of the top and rise from the bottom edge as tall as its content,
 					// capped under the toolbar so a tall one scrolls inside instead of running up past it
-					size === 'sheet' && SHEET,
+					(size === 'sheet' || size === 'detail') && SHEET,
+					size === 'detail' && DETAIL,
 					className,
 				)}
 				{...props}

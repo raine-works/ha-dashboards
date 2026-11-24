@@ -117,7 +117,14 @@ module, with its detection tested.
 - Dialog sizes: `workspace` for feature dialogs, `default` for confirmations and pickers, `sheet`
   for a picker that rises from the bottom edge on phones (`default` elsewhere), `compact` for a
   narrow column (the alarm keypad), `fullscreen` for the whole screen under the toolbar (Party
-  mode). A dialog never sets its own width or height.
+  mode), and `detail` (the design's dialog for a room, a device, a confirmation or a picker: 480px,
+  a sheet on phones), which replaces `default` and `sheet` as the overhaul lands. A dialog never sets
+  its own width or height.
+- The design's building blocks (docs/design/components.md): `Section` and `SectionGroup`
+  (`@app/ui/layout`), `Tile` / `TileGrid`, `StatusTile`, `DeviceRow` and `IconTile`
+  (`@app/ui/components`), on the radius, type and density tokens (`rounded-tile`, `text-title`,
+  `p-pad`…) and Button's `md` / `action` sizes. New UI is built from them; the older patterns go
+  as each phase of docs/design/overhaul-plan.md lands.
 - Buttons never squish: share a row with `flex-1`, never equal grid columns.
 - Wall panels are a size up for fingers (`touch:` variant, nothing under 44px). Check layouts at
   1280×800 and 960×600, and phones at 540px wide.
