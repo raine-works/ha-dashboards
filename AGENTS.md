@@ -60,8 +60,9 @@ bun run report          # which modules a real Home Assistant would show
   `try`/`catch` around optional chaining in a component.
 - **Dependencies** come from the root `catalog`, pinned to exact versions (`dependencies.test.ts`).
 - **Releases:** bumping `custom_components/raineworks_dashboards/manifest.json`'s version on master
-  publishes a release (after the tests pass) whose zip carries the built bundle, and the npm package
-  `@raineworks/ha-dashboards` (`packages/kit`, its `package.json` at the same version: `kit.test.ts`).
+  (and `packages/kit/package.json`'s, kept equal by `kit.test.ts`) publishes, after the tests pass, the
+  npm package `@raineworks/ha-dashboards` (`packages/kit`) and then a release whose zip carries the
+  built bundle.
 
 ## Themes
 
