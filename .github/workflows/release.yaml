@@ -48,20 +48,12 @@ jobs:
         run: |
           bun install --frozen-lockfile
           bun run build:integration
-      - name: Create the release with the integration's zip
-        if: steps.version.outputs.new == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          SHA: ${{ github.event.workflow_run.head_sha }}
-          TAG: ${{ steps.version.outputs.tag }}
-        run: |
-          (cd custom_components/raineworks_dashboards && zip -qr "$GITHUB_WORKSPACE/raineworks_dashboards.zip" . -x '__pycache__/*')
-          gh release create "$TAG" raineworks_dashboards.zip --target "$SHA" --title "$TAG" --generate-notes
       # The npm package (packages/kit: the house settings parser, bedtime routines and setup MCP that a house's own
       # config repository uses), the same version as the integration, with provenance. Published with npm's trusted
       # publishing (this workflow is the package's trusted publisher on npmjs.com); the NPM_TOKEN secret is only for
-      # the first publish, before the package exists to name one, and is deleted after. A version already on npm (a
-      # re-run) is skipped.
+      # the first publish, before the package exists to name one, and is deleted after. It goes before the GitHub
+      # release, so a publish that fails leaves no release behind and a re-run tries both again; a version already
+      # on npm (a re-run after the release itself failed) is skipped.
       - name: Build the npm package
         if: steps.version.outputs.new == 'true'
         run: bun run --cwd packages/kit build
@@ -83,3 +75,12 @@ jobs:
           else
             npm publish --access public --provenance
           fi
+      - name: Create the release with the integration's zip
+        if: steps.version.outputs.new == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          (cd custom_components/raineworks_dashboards && zip -qr "$GITHUB_WORKSPACE/raineworks_dashboards.zip" . -x '__pycache__/*')
+          gh release create "$TAG" raineworks_dashboards.zip --target "$SHA" --title "$TAG" --generate-notes
