@@ -7,12 +7,14 @@ with a device tracker, which leaves out the admin account and pets.
 
 from __future__ import annotations
 
+from types import ModuleType
+
 from homeassistant.core import HomeAssistant
 
 from .const import WARDEN_DOMAIN
 
 
-def _warden_api():
+def _warden_api() -> ModuleType | None:
     """Warden's public API (Warden 0.3.2+), or None without it."""
     try:
         from custom_components.warden import api  # noqa: PLC0415
