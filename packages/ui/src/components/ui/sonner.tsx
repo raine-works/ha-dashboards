@@ -50,7 +50,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
 					'--normal-bg': 'var(--popover)',
 					'--normal-text': 'var(--popover-foreground)',
 					'--normal-border': 'var(--border)',
-					'--border-radius': 'var(--radius)',
+					// rounded-lg's corners, capped like it where squircles aren't drawn (theme.css, --corner-cap)
+					'--border-radius': 'min(var(--radius), 0.625rem * var(--corner-cap, 1))',
 					'--success-bg': tint('success'),
 					'--success-border': 'var(--success)',
 					'--success-text': ink('success'),

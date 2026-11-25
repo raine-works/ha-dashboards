@@ -26,14 +26,21 @@ export const ColorRing: React.FC<{
 		<span className={cn('relative isolate inline-flex shrink-0 rounded-md', className)}>
 			{ring && (
 				<>
-					{/* The gradient turns inside a clipped ring (@property can't animate in a ShadowRoot) */}
-					<span aria-hidden className="absolute -inset-1 -z-20 overflow-hidden rounded-[calc(var(--radius)+2px)]">
+					{/* The gradient turns inside a clipped ring (@property can't animate in a ShadowRoot). Its corners
+					    are rounded-lg's, capped like it where squircles aren't drawn (theme.css, --corner-cap) */}
+					<span
+						aria-hidden
+						className="absolute -inset-1 -z-20 overflow-hidden rounded-[calc(min(var(--radius),0.625rem*var(--corner-cap,1))+2px)]"
+					>
 						<span
 							style={{ background: ring }}
 							className={cn('absolute -inset-1/2', effect && 'animate-ring-spin motion-reduce:animate-none')}
 						/>
 					</span>
-					<span aria-hidden className="absolute -inset-0.5 -z-10 rounded-(--radius) bg-card" />
+					<span
+						aria-hidden
+						className="absolute -inset-0.5 -z-10 rounded-[min(var(--radius),0.625rem*var(--corner-cap,1))] bg-card"
+					/>
 				</>
 			)}
 			{children}

@@ -30,7 +30,9 @@ editor, with a preview in light and dark on the dashboards' own buttons, toggles
   each of which can be turned off.
 - **Grays**: Neutral, Zinc, Stone or Slate, shadcn's bases.
 - **Corners**: from square to round. Every corner follows it in proportion (buttons, tiles, cards,
-  dialogs); where the browser draws them (Chrome, Android, the wall panels), corners are squircles.
+  dialogs); where the browser draws them (Chrome, recent Android WebViews), corners are squircles.
+  Corners rounder than the default (0.625rem) show only there: elsewhere (Safari, older WebViews such as
+  the ROAMiQ panels') they stay at the default, so a big corner never turns a button into a circle.
   Raineworks uses 1rem, the others 0.625rem.
 - **Import** takes a theme from [ui.shadcn.com/themes](https://ui.shadcn.com/themes),
   [tweakcn](https://tweakcn.com) or a project's `globals.css` (its `:root { … }` and
