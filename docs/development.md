@@ -52,9 +52,12 @@ integration's options or actions (a test fails until you do).
 
 ## Releasing
 
-Bump `version` in `custom_components/raineworks_dashboards/manifest.json` and `packages/kit/package.json`
-on `master` (a test fails while they differ). Once the tests pass, the release workflow builds the bundle
-into the integration, publishes the npm package `@raineworks/ha-dashboards` (`packages/kit`: `house.yaml`'s
-parser, the bedtime routines and the setup MCP, bundled) at the same version with npm's trusted publishing,
-then the release the Home Assistant Marketplace installs. A failed npm publish leaves no release; re-running
-the workflow tries both again.
+On every push to `master`, the release pull request workflow (`.github/workflows/release-pr.yml`, Raineworks'
+shared one) keeps one pull request, `Release v<version>`, open with the next version in
+`custom_components/raineworks_dashboards/manifest.json` and `packages/kit/package.json`: major for a breaking change
+(`type!:`), minor for a `feat`, patch for anything else that changes `custom_components/` or `packages/` (not tests
+or the demo). To release, merge it; don't bump the versions by hand. Once the tests pass, the release workflow builds
+the bundle into the integration, publishes the npm package `@raineworks/ha-dashboards` (`packages/kit`: `house.yaml`'s
+parser, the bedtime routines and the setup MCP, bundled) at the same version with npm's trusted publishing, then the
+release the Home Assistant Marketplace installs. A failed npm publish leaves no release; re-running the workflow tries
+both again.

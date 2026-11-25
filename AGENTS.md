@@ -59,10 +59,11 @@ bun run report          # which modules a real Home Assistant would show
   code compilable: no ref reads or writes during render, no hooks after an early return, no
   `try`/`catch` around optional chaining in a component.
 - **Dependencies** come from the root `catalog`, pinned to exact versions (`dependencies.test.ts`).
-- **Releases:** bumping `custom_components/raineworks_dashboards/manifest.json`'s version on master
-  (and `packages/kit/package.json`'s, kept equal by `kit.test.ts`) publishes, after the tests pass, the
-  npm package `@raineworks/ha-dashboards` (`packages/kit`) and then a release whose zip carries the
-  built bundle.
+- **Releases:** merging the release pull request (`release-pr.yml`, Raineworks' shared one: `Release v<version>`,
+  kept open on master with the next version from what's merged) sets the version in
+  `custom_components/raineworks_dashboards/manifest.json` and `packages/kit/package.json` (`kit.test.ts` keeps them
+  equal); after the tests pass, the release workflow publishes the npm package `@raineworks/ha-dashboards`
+  (`packages/kit`) and then a release whose zip carries the built bundle. Never bump the version by hand.
 
 ## Themes
 
