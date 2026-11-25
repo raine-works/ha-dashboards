@@ -153,8 +153,9 @@ const PhoneHeader: React.FC<{ onIntercom: () => void; sticky: boolean; onHeight:
 					<DateSummary quietDate hintBelow={false} />
 				</div>
 			</div>
-			{/* Who's home, then what the house is doing now: a ChipRow at the right, scrolling sideways when
-			    the open doors, notifications and laundry show too; room past its box for the count badge */}
+			{/* Who's home, then what the house is doing now: a ChipRow at the right, icons but for the
+			    readings (open doors, laundry's time left, the watts), so it fits without scrolling; it still
+			    scrolls sideways on the narrowest phone; room past its box for the count badge */}
 			<div className="flex items-center gap-3">
 				<div className="flex shrink-0 items-center gap-1.5">
 					<ModuleGate id="people">
@@ -171,7 +172,7 @@ const PhoneHeader: React.FC<{ onIntercom: () => void; sticky: boolean; onHeight:
 				<ChipRow className="justify-end-safe -m-2 min-w-0 flex-1 p-2">
 					<OpenSensorsButton size="sm" iconOnly />
 					<ModuleGate id="notifications">
-						<NotificationsButton size="sm" label />
+						<NotificationsButton size="icon-sm" />
 					</ModuleGate>
 					<ModuleGate id="laundry">
 						<LaundryButton size="sm" />
@@ -181,9 +182,9 @@ const PhoneHeader: React.FC<{ onIntercom: () => void; sticky: boolean; onHeight:
 						<EnergyButton size="sm" />
 					</ModuleGate>
 					{/* The signed-in member's phone alerts (nothing for anyone else) */}
-					<PushSettingsButton size="sm" label />
+					<PushSettingsButton />
 					{/* This device's Light / Dark / Auto */}
-					<ColorSchemeButton size="sm" label />
+					<ColorSchemeButton />
 				</ChipRow>
 			</div>
 			{/* What opens a dialog, a labeled tile each, in alphabetical order, sharing the width (a missing

@@ -1,7 +1,7 @@
 # Phone alerts
 
 Every household member chooses which pushes the house sends to their phone. In the Home dashboard,
-open **Phone alerts** (**Alerts** on a phone's header, or the More menu on a wider screen): a switch
+open **Phone alerts** (the bell with a ring on a phone's header, or the More menu on a wider screen): a switch
 for each kind of push. The choice is kept by the integration for that person, so it follows them to
 every phone they have. Only a household member signed in sees it: never a wall panel's shared user
 or the admin.
