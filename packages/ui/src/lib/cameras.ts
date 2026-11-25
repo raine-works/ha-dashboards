@@ -162,16 +162,21 @@ export function cameraDetections(
  * token Home Assistant replaces on a restart or a reload of the camera's integration, so a panel
  * holding states from before one asked with a dead token: Home Assistant logged each as a failed
  * login (and counts it toward an IP ban). So none while the websocket is down (the states are from
- * before), and none while the picture is still the one Home Assistant `rejected` (401/403), until
- * fresh states bring a new token.
+ * before), none while the picture is still the one Home Assistant `rejected` (401/403), until
+ * fresh states bring a new token, and none while the camera's state is still `held`: the one it had
+ * when the connection dropped. A panel reconnects to a restarted Home Assistant before the new
+ * states arrive, and asked with the old token in that moment.
  */
 export function snapshotUrl(
 	hass: Pick<HomeAssistant, 'states' | 'connection'> | null | undefined,
 	entityId: string,
 	rejected?: string,
+	held?: HassEntity,
 ): string | undefined {
 	if (!hass || hass.connection?.connected === false) return undefined;
-	const picture = hass.states[entityId]?.attributes.entity_picture;
+	const entity = hass.states[entityId];
+	if (held && entity === held) return undefined;
+	const picture = entity?.attributes.entity_picture;
 	return typeof picture === 'string' && picture && picture !== rejected ? picture : undefined;
 }
 

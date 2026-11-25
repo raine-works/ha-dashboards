@@ -273,6 +273,16 @@ describe('snapshotUrl', () => {
 		expect(snapshotUrl({ states }, camera, `/api/camera_proxy/${camera}?token=old`)).toBe(picture);
 	});
 
+	it('waits after a reconnect until fresh states replace the camera state (a restart brings a new token)', () => {
+		const held = states[camera];
+		const hass = { states, connection: { connected: true } as never };
+		// Reconnected, the states still those from before the drop
+		expect(snapshotUrl(hass, camera, undefined, held)).toBeUndefined();
+		// The subscription's fresh state, even with the same token (a blip, not a restart)
+		const fresh = { [camera]: { ...held } };
+		expect(snapshotUrl({ states: fresh }, camera, undefined, held)).toBe(picture);
+	});
+
 	it('has none for a camera without a picture or not there', () => {
 		expect(snapshotUrl({ states }, 'camera.gone')).toBeUndefined();
 		expect(snapshotUrl(undefined, camera)).toBeUndefined();
