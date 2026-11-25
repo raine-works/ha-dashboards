@@ -208,12 +208,16 @@ export const PanelTimerAction: React.FC = () => {
 	const [isOpen, setIsOpen] = useState(false);
 	return (
 		<>
-			<Button variant="secondary" size="tile" onClick={() => setIsOpen(true)} className="min-w-16">
+			{/* A plain icon like the header's other buttons; while a timer is set, its countdown beside it */}
+			<Button
+				variant="secondary"
+				size={timer.active ? 'xl' : 'icon-xl'}
+				onClick={() => setIsOpen(true)}
+				aria-label={timer.active ? `Timer: ${formatClock(timer.seconds)} left` : 'Timer'}
+				title="Timer"
+			>
 				<Timer />
-				{/* Live countdown while a timer is set */}
-				<span className={timer.active ? 'font-mono tabular-nums' : undefined}>
-					{timer.active ? formatClock(timer.seconds) : 'Timer'}
-				</span>
+				{timer.active && <span className="font-mono tabular-nums">{formatClock(timer.seconds)}</span>}
 			</Button>
 			<PanelTimerDialog timer={timer} isOpen={isOpen} onClose={() => setIsOpen(false)} />
 		</>
