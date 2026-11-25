@@ -7,6 +7,7 @@
 import { useEffect, useState } from 'preact/compat';
 import { useHassApi } from '../../context/HassContext';
 import { snapshotUrl } from '../../lib/cameras';
+import type { HassEntity } from '../../types/homeassistant';
 
 /**
  * A new snapshot this long after the last one arrived (UniFi Protect makes a fresh frame for every
@@ -53,6 +54,14 @@ export function useCameraSnapshot(entityId: string, enabled = true): CameraSnaps
 		let fetching = false;
 		// The last picture URL Home Assistant refused (a token from before a restart)
 		let rejected: string | undefined;
+		// The camera's state when the connection dropped: its token may not outlive a restart, so
+		// nothing is fetched until the reconnected subscription replaces it
+		let held: HassEntity | undefined;
+		const connection = getHass()?.connection;
+		const onDisconnected = () => {
+			held = getHass()?.states[entityId];
+		};
+		connection?.addEventListener?.('disconnected', onDisconnected);
 
 		const markStale = () => active && setSnapshot((prev) => (prev.stale ? prev : { ...prev, stale: true }));
 
@@ -80,7 +89,9 @@ export function useCameraSnapshot(entityId: string, enabled = true): CameraSnaps
 			if (!active || fetching || document.visibilityState === 'hidden') return;
 			// The entity's picture URL carries an access token Home Assistant rotates every 5 minutes,
 			// and replaces on a restart: none while the socket is down or the token was refused
-			const picture = snapshotUrl(getHass(), entityId, rejected);
+			const hass = getHass();
+			if (held && hass?.states[entityId] !== held) held = undefined;
+			const picture = snapshotUrl(hass, entityId, rejected, held);
 			fetching = true;
 			const next = picture
 				? fetch(picture, { cache: 'no-store' })
@@ -113,6 +124,7 @@ export function useCameraSnapshot(entityId: string, enabled = true): CameraSnaps
 			clearTimeout(timer);
 			clearTimeout(staleTimer);
 			document.removeEventListener('visibilitychange', onVisibility);
+			connection?.removeEventListener?.('disconnected', onDisconnected);
 		};
 	}, [entityId, enabled]);
 
