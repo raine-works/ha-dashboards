@@ -540,7 +540,7 @@ const MORE_TILE =
 	"h-20 min-w-0 flex-1 basis-32 flex-col gap-1 px-2 text-sm has-[>svg]:px-2 [&_svg:not([class*='size-'])]:size-5";
 
 /**
- * The panel header's More (a grid icon, labeled from 2xl; it was a bare ⋯, which nobody knew to
+ * The panel header's More (a grid icon, like the other quick actions; it was a bare ⋯, which nobody knew to
  * open), a popover of labeled tiles: the daily brief, the intercom, the TVs (with how many are on) and energy
  * (with the house's live draw, when Home Assistant's Energy settings have a grid meter), the guest
  * Wi-Fi's QR code (the wall panels, where guests are; `GuestWifiDialog`), plus Home
@@ -608,16 +608,15 @@ export const MoreButton: React.FC<{ tvRemote?: boolean; colorSchemePicker?: bool
 		<>
 			<Popover open={menuOpen} onOpenChange={setMenuOpen}>
 				<PopoverTrigger asChild>
-					{/* A tile like the header's other buttons: its grid over "More" */}
+					{/* An icon like the header's other buttons; its name is the tooltip */}
 					<Button
 						variant="secondary"
-						size="tile"
+						size="icon-xl"
 						aria-label={waiting > 0 ? `More: ${waiting} to do` : 'More'}
 						title="More: To-do, Daily, Messages, TVs, Energy"
 						className={cn('relative', className)}
 					>
 						<LayoutGrid />
-						<span>More</span>
 						{waiting > 0 && <CountBadge>{waiting}</CountBadge>}
 					</Button>
 				</PopoverTrigger>
