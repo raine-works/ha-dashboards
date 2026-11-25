@@ -16,6 +16,7 @@ is why it beats clip-path masks.
 ```css
 /* theme.css: the radii are the design; the squircle is a bonus where it's drawn */
 @supports (corner-shape: squircle) {
+	:host, :root { --corner-cap: 1000; } /* corners rounder than the default only here (below) */
 	* { corner-shape: squircle; }
 	::before, ::after { corner-shape: inherit; } /* a ring around a circle stays a circle */
 	.rounded-full, .assist-orb { corner-shape: round; } /* avatars, round keys and the orb stay circles */
@@ -24,11 +25,16 @@ is why it beats clip-path masks.
 
 | Where | Squircles? |
 | :--- | :--- |
-| Chrome, Edge, Android WebView (the wall panels, the Android app) | Yes, from Chromium 139, Aug 2025 ([web.dev](https://web.dev/blog/web-platform-08-2025)), if the WebView is that recent |
+| Chrome, Edge, Android WebView (the wall panels, the Android app) | Yes, from Chromium 139, Aug 2025 ([web.dev](https://web.dev/blog/web-platform-08-2025)), if the WebView is that recent. The ROAMiQ panels' isn't (Nov 2026): rounded corners |
 | Safari, the iOS app (WKWebView) | Not as of Safari 26: rounded corners |
 | Firefox | Not reliably: rounded corners |
 
 - **The design must stand on plain rounded corners**; squircles make it better where they're drawn.
+- **Rounder than the default only as squircles.** A round corner half a shape's height makes it a
+  circle (Raineworks' icon tiles and header buttons were circles on the wall panels). So the radii
+  take a theme's corners above the default (`--corner-scale` over 1, or `--radius` over 0.625rem)
+  only where the browser draws squircles: elsewhere `--corner-cap` (1, lifted in the `@supports`
+  block) holds them at the default, rounded squares (`theme.css`, tested in `contrast.test.ts`).
 - **No clip-path or mask fallback**: it cuts off shadows, borders and focus rings and needs script
   on every resize.
 - **Check the panels' WebView version** before relying on it there.
@@ -43,7 +49,8 @@ Set by role (`rounded-chip`, `rounded-control`, `rounded-control-lg`, `rounded-i
 editor's **Corners** ÷ 0.625rem, pixels times it, since Home Assistant's rem is 14px), so a theme
 shapes everything in proportion. Raineworks, the default, uses
 1rem: the icon tiles and the big buttons are full squircles (a corner about half their height), the
-look of an app icon. The other presets keep 0.625rem.
+look of an app icon. Where squircles aren't drawn, it falls back to the × 1 column. The other
+presets keep 0.625rem.
 
 | Role | Base | At 0.625rem (× 1) | Raineworks (1rem, × 1.6) |
 | :--- | :--- | :--- | :--- |

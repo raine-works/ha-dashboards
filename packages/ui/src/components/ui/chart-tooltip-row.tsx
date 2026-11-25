@@ -16,7 +16,7 @@ export const ChartTooltipRow: React.FC<{ fill: string; name: React.ReactNode; va
 	value,
 }) => (
 	<div className="flex w-full items-center gap-2">
-		<span aria-hidden className="size-2.5 shrink-0 rounded-[2px]" style={{ background: fill }} />
+		<span aria-hidden className="size-2.5 shrink-0 rounded-xs" style={{ background: fill }} />
 		<span className="flex-1 text-muted-foreground">{name}</span>
 		<span className="font-medium font-mono text-foreground tabular-nums">{value}</span>
 	</div>

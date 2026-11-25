@@ -62,6 +62,11 @@ describe('the dashboards bundle', () => {
 		expect(text).toMatch(/@supports \(?corner-shape: ?squircle\)?/);
 		expect(text).toContain('corner-shape:squircle');
 		expect(text).toContain('corner-shape:round');
+		// Rounder than the default only where squircles are drawn (elsewhere a full squircle is a circle)
+		expect(text).toMatch(/@supports \(?corner-shape: ?squircle\)?\s*\{\s*:host,\s*:root\s*\{\s*--corner-cap:\s*1000/);
+		expect(text).toMatch(
+			/rounded-icon\{border-radius:calc\(14px\s*\*\s*min\(var\(--corner-cap,\s*1\),\s*var\(--corner-scale,\s*1\)\)\)\}/,
+		);
 		// A circle drawn in CSS (the Assist orb) keeps its round curve too, and a pseudo-element (a ring
 		// around a round key) takes its element's
 		expect(text).toMatch(/\.assist-orb[^{}]*\{[^{}]*corner-shape:round/);

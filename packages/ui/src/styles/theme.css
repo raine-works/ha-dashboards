@@ -256,24 +256,40 @@
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-ring: var(--sidebar-ring);
 
-	--radius-sm: calc(var(--radius) - 4px);
-	--radius-md: calc(var(--radius) - 2px);
-	--radius-lg: var(--radius);
-	--radius-xl: calc(var(--radius) + 4px);
-	--radius-2xl: calc(var(--radius) + 8px);
+	/* shadcn's scale, off --radius, kept to the default 0.625rem where corners aren't squircles
+	   (--corner-cap, set by the squircle block below) */
+	--radius-sm: calc(min(var(--radius), 0.625rem * var(--corner-cap, 1)) - 4px);
+	--radius-md: calc(min(var(--radius), 0.625rem * var(--corner-cap, 1)) - 2px);
+	--radius-lg: min(var(--radius), 0.625rem * var(--corner-cap, 1));
+	--radius-xl: calc(min(var(--radius), 0.625rem * var(--corner-cap, 1)) + 4px);
+	--radius-2xl: calc(min(var(--radius), 0.625rem * var(--corner-cap, 1)) + 8px);
 
 	/* The design's shapes, by role (docs/design/shape-space-type.md): rounded-chip, rounded-control…,
 	   each its size at the default corners times the theme's --corner-scale (its Corners ÷ 0.625rem,
 	   themes/css.ts), so a theme shapes everything in proportion. Pixels, not multiples of --radius:
 	   Home Assistant's rem is 14px. Raineworks' 1rem (1.6) makes the icon tiles and the big buttons
 	   full squircles (a corner about half their height). The tile's is 24px on the wall panels
-	   (--tile-base, set by surface below) */
-	--radius-chip: calc(8px * var(--corner-scale, 1));
-	--radius-control: calc(12px * var(--corner-scale, 1));
-	--radius-control-lg: calc(16px * var(--corner-scale, 1));
-	--radius-icon: calc(14px * var(--corner-scale, 1));
-	--radius-tile: calc(var(--tile-base) * var(--corner-scale, 1));
-	--radius-dialog: calc(28px * var(--corner-scale, 1));
+	   (--tile-base, set by surface below). Rounder than the default only where the browser draws
+	   squircles: a plain round corner half a shape's height makes it a circle, so elsewhere the scale
+	   stops at 1 (--corner-cap: 1, lifted by the squircle block below) */
+	--radius-chip: calc(8px * min(var(--corner-cap, 1), var(--corner-scale, 1)));
+	--radius-control: calc(
+		12px *
+		min(var(--corner-cap, 1), var(--corner-scale, 1))
+	);
+	--radius-control-lg: calc(
+		16px *
+		min(var(--corner-cap, 1), var(--corner-scale, 1))
+	);
+	--radius-icon: calc(14px * min(var(--corner-cap, 1), var(--corner-scale, 1)));
+	--radius-tile: calc(
+		var(--tile-base) *
+		min(var(--corner-cap, 1), var(--corner-scale, 1))
+	);
+	--radius-dialog: calc(
+		28px *
+		min(var(--corner-cap, 1), var(--corner-scale, 1))
+	);
 
 	/* The type scale, Geist at about 1.2 (text-caption, text-label…; with its line height and tracking) */
 	--text-overline: 0.75rem;
@@ -361,8 +377,14 @@
 
 	/* Squircles (docs/design/shape-space-type.md): every rounded corner continuous where the browser
 	   draws corner-shape (Chromium 139+: the wall panels' WebView, Android, Chrome), plain rounded
-	   elsewhere; the radii are the design, the curve a bonus. Circles (avatars, round keys) stay round */
+	   elsewhere; the radii are the design, the curve a bonus. Circles (avatars, round keys) stay round.
+	   A theme rounder than the default (Raineworks) is only that round here: --corner-cap lifts the
+	   cap on the radii above, which elsewhere keeps its icon tiles and buttons from turning into circles */
 	@supports (corner-shape: squircle) {
+		:host,
+		:root {
+			--corner-cap: 1000;
+		}
 		* {
 			corner-shape: squircle;
 		}
