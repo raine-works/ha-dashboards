@@ -35,6 +35,9 @@ is why it beats clip-path masks.
   take a theme's corners above the default (`--corner-scale` over 1, or `--radius` over 0.625rem)
   only where the browser draws squircles: elsewhere `--corner-cap` (1, lifted in the `@supports`
   block) holds them at the default, rounded squares (`theme.css`, tested in `contrast.test.ts`).
+  A component drawing its own corners off `--radius` (the color ring around a light's icon, the
+  toasts) caps it the same way, `min(var(--radius), 0.625rem * var(--corner-cap, 1))`; a test fails
+  on an uncapped one.
 - **No clip-path or mask fallback**: it cuts off shadows, borders and focus rings and needs script
   on every resize.
 - **Check the panels' WebView version** before relying on it there.
