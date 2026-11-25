@@ -30,6 +30,7 @@ ha-dashboards/
 │   ├── dashboard-build/ # the Bun build: React Compiler, CSS into the ShadowRoot, chunks
 │   ├── ha-client/     # the tools' websocket client (HA_URL / HA_TOKEN) and house snapshot
 │   ├── mcp/           # the setup MCP server (stdio, no SDK): `bun run mcp`
+│   ├── kit/           # @raineworks/ha-dashboards on npm: house.yaml's parser, bedtime routines, the MCP (bundled)
 │   └── demo/          # a made-up house and mock hass: `bun run demo`
 └── scripts/           # house-audit, capability report, brand icons, holiday fixture, Tailwind lint
 ```
@@ -59,7 +60,8 @@ bun run report          # which modules a real Home Assistant would show
   `try`/`catch` around optional chaining in a component.
 - **Dependencies** come from the root `catalog`, pinned to exact versions (`dependencies.test.ts`).
 - **Releases:** bumping `custom_components/raineworks_dashboards/manifest.json`'s version on master
-  publishes a release (after the tests pass) whose zip carries the built bundle.
+  publishes a release (after the tests pass) whose zip carries the built bundle, and the npm package
+  `@raineworks/ha-dashboards` (`packages/kit`, its `package.json` at the same version: `kit.test.ts`).
 
 ## Themes
 
