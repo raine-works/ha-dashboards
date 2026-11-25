@@ -43,25 +43,29 @@ tokens).
 repository's `.env`.
 
 **From your own configuration repository**: if you keep your Home Assistant configuration in Git
-(with [GitOps](https://github.com/raine-works/ha-gitops), say), add this repository as a submodule
-and point the server at it, so the assistant has it wherever you work on your house:
+(with [GitOps](https://github.com/raine-works/ha-gitops), say), add the
+[`@raineworks/ha-dashboards`](https://www.npmjs.com/package/@raineworks/ha-dashboards) package to it, pinned to
+the version you have installed, and run the server from it, so the assistant has it wherever you work on your
+house. It reads `HA_URL` and `HA_TOKEN` from the environment or that repository's `.env` (gitignored):
 
 ```bash
-git submodule add https://github.com/raine-works/ha-dashboards.git ha-dashboards
-(cd ha-dashboards && bun install)
+bun add --dev --exact @raineworks/ha-dashboards@<version>
 ```
 
 ```json
 {
   "mcpServers": {
     "raineworks-dashboards": {
-      "command": "bun",
-      "args": ["--cwd", "ha-dashboards", "packages/mcp/src/index.ts"],
-      "env": { "HA_URL": "https://homeassistant.example.com", "HA_TOKEN": "${HOMEASSISTANT_TOKEN}" }
+      "command": "bunx",
+      "args": ["--bun", "raineworks-dashboards-mcp"],
+      "env": { "HA_URL": "https://homeassistant.example.com" }
     }
   }
 }
 ```
+
+The package also has the parser the dashboards read `house.yaml` with (`@raineworks/ha-dashboards/house`), for a
+test that your settings lose nothing to it. Each release of the integration publishes it, the same version.
 
 Keep the token in an environment variable, as here, so `.mcp.json` can be committed with nothing
 secret in it.
