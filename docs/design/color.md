@@ -70,7 +70,8 @@ the status color itself.
 | `destructive` = `alarm` | `oklch(0.52 0.21 27)` | `oklch(0.68 0.20 22)` | 6.2 / 5.3 / 6.2 | ~5.6 / ~4.8 / ~6.3 |
 
 Contrast computed by the color research (WCAG 2.x, with APCA as a cross-check); the values marked ~
-were estimated; `contrast.test.ts` now holds every one at 4.5:1 or more.
+were estimated; `contrast.test.ts` now holds every one at 4.5:1 or more (the red solid's through `alarm-foreground`,
+since `destructive` has no foreground token of its own).
 
 - **`alarm` is `destructive`**: one red for danger. There were four different reds across light
   and dark, some outside what a screen can show.
