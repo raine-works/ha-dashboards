@@ -198,7 +198,9 @@ class DashboardsOptionsFlow(OptionsFlow):
             }
             return self._save({CONF_HOUSE: house})
 
-        def entity(key: str, domain: str, value: Any = None, multiple: bool = False):
+        def entity(
+            key: str, domain: str, value: Any = None, multiple: bool = False
+        ) -> dict[Any, Any]:
             return {
                 vol.Optional(
                     key,

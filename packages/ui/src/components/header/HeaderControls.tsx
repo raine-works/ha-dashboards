@@ -524,6 +524,7 @@ export const MORE_ITEMS = {
 	todo: 'To-do',
 	tv: 'TVs',
 } as const;
+/** One of the More menu's items, by its key in `MORE_ITEMS`. */
 export type MoreItem = keyof typeof MORE_ITEMS;
 
 /**
