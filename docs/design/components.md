@@ -80,8 +80,9 @@ Three sizes and four roles, instead of today's ten sizes and `outline` on two-th
 | Quiet | `ghost` | Ghost | Low-emphasis actions, toolbars |
 | Danger | `destructive` | Filled `destructive` | Destroying something, and only then |
 
-Every button has a label (icon-only: Close). `loading` stays. Header buttons are secondary tiles
-(icon over label). `outline` remains as a name only: it draws as the tonal secondary, so the
+Every button has a label (icon-only: Close). `loading` stays. Header buttons are plain secondary
+icons (`icon-xl`), named by their tooltip and `aria-label`; the phone header's launchers keep their
+labels. `outline` remains as a name only: it draws as the tonal secondary, so the
 buttons and chips written with it took the design at once; new code says `secondary`. `warning`
 is tonal too, tinted amber.
 

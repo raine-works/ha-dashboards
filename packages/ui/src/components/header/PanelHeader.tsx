@@ -134,18 +134,18 @@ const PanelHeaderContent: React.FC<PanelHeaderProps> = ({
 					<PetsStack before={divider} />
 				</ModuleGate>
 
-				{/* The quick actions: the panel's own, then Assist, Cameras and Music; the rest in More */}
+				{/* The quick actions as plain icons: the panel's own, then Assist, Cameras and Music; the rest in More */}
 				<div className="flex min-w-0 items-center gap-2 max-xl:gap-1.5">
 					{actions}
 					<ModuleGate id="assist">
-						<AssistButton size="tile" />
+						<AssistButton size="icon-xl" />
 					</ModuleGate>
 					<ModuleGate id="cameras">
-						<CamerasButton size="tile" />
+						<CamerasButton />
 					</ModuleGate>
 					{/* The one control that shrinks when the header is full: its text truncates down to the cover */}
 					<ModuleGate id="music">
-						<MusicButton size="tile" className="shrink overflow-hidden" />
+						<MusicButton className="shrink overflow-hidden" />
 					</ModuleGate>
 					<MoreButton tvRemote={tvRemote} colorSchemePicker={colorSchemePicker} />
 				</div>
