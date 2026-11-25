@@ -130,6 +130,20 @@ describe('corners', () => {
 		expect(squircles).toMatch(/^@supports \(corner-shape: squircle\) \{\s*:host,\s*:root \{\s*--corner-cap: 1000;/);
 	});
 
+	it('are capped wherever a component reads the theme radius itself', () => {
+		// A component drawing its own corners off --radius (a ring around an icon, the toasts) skips the
+		// cap the radius scale has, and stops matching what it sits around
+		const root = new URL('../../../../', import.meta.url).pathname;
+		const uncapped: string[] = [];
+		for (const file of new Bun.Glob('*/src/**/*.{ts,tsx,css}').scanSync(root)) {
+			if (file.includes('__tests__') || file.endsWith('styles/theme.css')) continue;
+			const text = readFileSync(`${root}${file}`, 'utf8');
+			for (const match of text.matchAll(/(.{0,4})(?:var\(--radius\)|\(--radius\))/g))
+				if (match[1] !== 'min(') uncapped.push(`${file}: ${match[0]}`);
+		}
+		expect(uncapped).toEqual([]);
+	});
+
 	it('are full squircles in Raineworks, the default', () => {
 		const raineworks = PRESET_THEMES.find((t) => t.id === 'raineworks');
 		expect(raineworks?.radius).toBe('1rem');
