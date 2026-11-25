@@ -1,6 +1,6 @@
 {
 	"name": "@raineworks/ha-dashboards",
-	"version": "1.0.8",
+	"version": "1.1.0",
 	"type": "module",
 	"description": "Raineworks Dashboards' house settings parser, bedtime routines and setup MCP server, for a house's own Home Assistant config repository",
 	"license": "MIT",
