@@ -16,6 +16,108 @@
 @custom-variant short (@media (max-height: 480px));
 /* A wall panel (a touch tablet, `data-touch` on the mount point): controls a size up for fingers */
 @custom-variant touch (&:is([data-touch] *));
+/* A section card (definePanelElement's `card`) sits in a column of Home Assistant's sections view, a
+   phone's width on a desktop: inside its content (`[data-card]`, the `card` container) the breakpoints
+   follow the card's own width, not the screen's. Everywhere else, and in dialogs (which portal outside
+   the content), they're Tailwind's own media queries. `:where()` keeps every rule's specificity.
+   Not 2xl (Biome's CSS parser refuses a variant named with a digit): it's used only in dialogs, which
+   follow the screen anyway. */
+@custom-variant sm {
+	&:where([data-card] *) {
+		@container card (width >= 40rem) {
+			@slot;
+		}
+	}
+	&:not(:where([data-card] *)) {
+		@media (width >= 40rem) {
+			@slot;
+		}
+	}
+}
+@custom-variant max-sm {
+	&:where([data-card] *) {
+		@container card (width < 40rem) {
+			@slot;
+		}
+	}
+	&:not(:where([data-card] *)) {
+		@media (width < 40rem) {
+			@slot;
+		}
+	}
+}
+@custom-variant md {
+	&:where([data-card] *) {
+		@container card (width >= 48rem) {
+			@slot;
+		}
+	}
+	&:not(:where([data-card] *)) {
+		@media (width >= 48rem) {
+			@slot;
+		}
+	}
+}
+@custom-variant max-md {
+	&:where([data-card] *) {
+		@container card (width < 48rem) {
+			@slot;
+		}
+	}
+	&:not(:where([data-card] *)) {
+		@media (width < 48rem) {
+			@slot;
+		}
+	}
+}
+@custom-variant lg {
+	&:where([data-card] *) {
+		@container card (width >= 64rem) {
+			@slot;
+		}
+	}
+	&:not(:where([data-card] *)) {
+		@media (width >= 64rem) {
+			@slot;
+		}
+	}
+}
+@custom-variant max-lg {
+	&:where([data-card] *) {
+		@container card (width < 64rem) {
+			@slot;
+		}
+	}
+	&:not(:where([data-card] *)) {
+		@media (width < 64rem) {
+			@slot;
+		}
+	}
+}
+@custom-variant xl {
+	&:where([data-card] *) {
+		@container card (width >= 80rem) {
+			@slot;
+		}
+	}
+	&:not(:where([data-card] *)) {
+		@media (width >= 80rem) {
+			@slot;
+		}
+	}
+}
+@custom-variant max-xl {
+	&:where([data-card] *) {
+		@container card (width < 80rem) {
+			@slot;
+		}
+	}
+	&:not(:where([data-card] *)) {
+		@media (width < 80rem) {
+			@slot;
+		}
+	}
+}
 
 /* Hide a scroller's scrollbar (Firefox, Chromium and WebKit). Tailwind 4.3 has it built in, which the
    editor knows; the build's compiler (bun-plugin-tailwind's 4.1.14) doesn't, so it's defined here */
@@ -442,6 +544,18 @@
 	:host,
 	body {
 		@apply bg-background font-sans text-foreground antialiased;
+	}
+
+	/* A section card (definePanelElement's `card`): as tall as its content in the flow of Home
+	   Assistant's page, on the view's own background, its own cards drawing theirs */
+	:host([data-card-mode]) {
+		height: auto;
+		overflow: visible;
+		background-color: transparent;
+	}
+	:host([data-card-mode]) .light,
+	:host([data-card-mode]) .dark {
+		background-color: transparent;
 	}
 
 	/* Touch panel disables text selection globally; fields still need it to be editable */

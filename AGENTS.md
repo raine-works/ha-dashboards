@@ -26,7 +26,7 @@ ha-dashboards/
 │   │       ├── lib/              # pure logic: discovery and data shaping, unit tested
 │   │       ├── panel/            # definePanelElement(): the custom element, ShadowRoot and providers
 │   │       └── styles/theme.css  # the design tokens
-│   ├── dashboards/    # @app/dashboards: the cards (src/home, src/wall-panel), one bundle
+│   ├── dashboards/    # @app/dashboards: the cards (src/home, src/wall-panel, src/sections), one bundle
 │   ├── dashboard-build/ # the Bun build: React Compiler, CSS into the ShadowRoot, chunks
 │   ├── ha-client/     # the tools' websocket client (HA_URL / HA_TOKEN) and house snapshot
 │   ├── mcp/           # the setup MCP server run locally (stdio, no SDK): `bun run mcp`; the integration has the same tools
@@ -137,6 +137,12 @@ module, with its detection tested.
 - Buttons never squish: share a row with `flex-1`, never equal grid columns.
 - Wall panels are a size up for fingers (`touch:` variant, nothing under 44px). Check layouts at
   1280×800 and 960×600, and phones at 540px wide.
+- **Section cards** (`src/sections`, `definePanelElement`'s `card`) sit in Home Assistant's own layout:
+  inside one, the breakpoint variants follow the card's width (the `[data-card]` container, theme.css),
+  so a section must lay out from its classes, never the window's size; dialogs portal outside it and
+  follow the screen. What the page needs once (toasts, the Assist glow, the banner) mounts on the page
+  host only (`panel/page-host.ts`), never in a section. Check a section card at a column's width
+  (~360px) on a desktop window ([docs/cards.md](docs/cards.md#section-cards-your-own-layout)).
 - Words: dialog titles in Title Case, everything else sentence case, "…" never "...".
 
 ### Shadow DOM

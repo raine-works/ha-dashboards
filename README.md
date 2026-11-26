@@ -9,6 +9,9 @@ tablets. Built with Preact, shadcn/ui and Tailwind CSS, they discover your house
 lights by room and floor, locks, garage doors, cameras, thermostats, curtains, fans, music, TVs and
 people. You add a card; there's nothing to configure per entity.
 
+The whole suite is a drop-in replacement for Home Assistant's own interface: the dashboards, with the
+themes the integration gives Home Assistant's own pages, change its look and feel throughout.
+
 [![Home Assistant Marketplace](https://img.shields.io/badge/Home_Assistant-Marketplace-41BDF5.svg?style=for-the-badge)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=raine-works&repository=ha-dashboards&category=integration)
 [![License](https://img.shields.io/badge/License-MIT-lightgrey.svg?style=for-the-badge)](LICENSE)
 
@@ -76,6 +79,10 @@ the way when it doesn't:
 
 3. **Label your lights.** Give room lights the label `household_light` (*Household Light*) so the
    lighting section lists them. Indicator LEDs and other non-room lights stay unlabeled.
+
+Only want a part of it? Each part (the header, Lighting, Security, Climate, Music, Cameras) is also a
+card in Home Assistant's card picker, to place among your own cards
+([section cards](docs/cards.md#section-cards-your-own-layout)).
 
 ### Wall panels
 
