@@ -124,7 +124,8 @@ module, with its detection tested.
   mode), and `detail` (the design's dialog for a room, a device, a confirmation or a picker: 480px,
   a sheet on phones), which replaces `default` and `sheet` as the overhaul lands. A dialog never sets
   its own width or height. On phones `sheet` and `detail` drag down to close (Vaul's gesture,
-  hand-written: `lib/sheet-drag.ts`); mark what takes a vertical drag itself `data-sheet-no-drag`.
+  hand-written: `lib/sheet-drag.ts`), and slide away the same way when closed otherwise (a tap
+  outside, the X, Back); mark what takes a vertical drag itself `data-sheet-no-drag`.
 - A number that changes in place (a setpoint, a temperature, a count) is a `NumberFlow`, never one
   that changes every second at a panel's edge or as a slider moves
   ([components.md](docs/design/components.md#numberflow)).

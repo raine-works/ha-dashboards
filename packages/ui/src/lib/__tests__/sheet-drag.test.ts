@@ -110,3 +110,22 @@ describe('holding the touch from the page', () => {
 		expect(sheetHoldsTouch(SHEET_IDLE, 100, 200)).toBe(false);
 	});
 });
+
+describe('closing a sheet without a drag', () => {
+	it('slides away from rest', () => {
+		expect(sheetDragReducer(SHEET_IDLE, { type: 'close' }).phase).toBe('closing');
+	});
+
+	it('slides away from a drag under way, and pointer events no longer move it', () => {
+		const closing = run(move(100, 112, 10), move(100, 140, 50), { type: 'close' });
+		expect(closing.phase).toBe('closing');
+		expect(sheetDragReducer(closing, move(100, 200, 80))).toBe(closing);
+		expect(sheetDragReducer(closing, { type: 'up', t: 100 })).toBe(closing);
+		expect(sheetDragReducer(closing, { type: 'down', x: 0, y: 0, t: 120, height: HEIGHT })).toBe(closing);
+	});
+
+	it('asked twice, is the same close', () => {
+		const closing = sheetDragReducer(SHEET_IDLE, { type: 'close' });
+		expect(sheetDragReducer(closing, { type: 'close' })).toBe(closing);
+	});
+});

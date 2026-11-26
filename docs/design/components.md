@@ -110,7 +110,7 @@ Three sizes, one anatomy (`ui/dialog.tsx` keeps its history, focus trap and idle
 
 | Size | Width | For |
 | :--- | :--- | :--- |
-| `detail` | 480px; a bottom sheet on phones, dragged down to close | A room, a device, a confirmation, a picker |
+| `detail` | 480px; a bottom sheet on phones, dragged down to close (and sliding away however it's closed) | A room, a device, a confirmation, a picker |
 | `workspace` | Most of the screen | Music, cameras, to-do, calendar, energy |
 | `fullscreen` | The screen | Party mode, a camera full screen |
 
