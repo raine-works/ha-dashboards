@@ -79,7 +79,8 @@ administrator, voice satellites included.
 
 ## From a clone, or your configuration repository
 
-The repository also has the same tools as a small MCP server you run yourself, from a clone or from the
+The repository also has the same tools, but for `set_default_dashboard`, `set_house_theme`,
+`find_wall_panel_devices` and `add_wall_panel`, as a small MCP server you run yourself, from a clone or from the
 [`@raineworks/ha-dashboards`](https://www.npmjs.com/package/@raineworks/ha-dashboards) package. Unlike the
 integration's, it has to be kept at the version of the integration you have installed. Prefer the
 integration's; this one stays for now for setups already using it.
