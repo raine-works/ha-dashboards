@@ -105,7 +105,7 @@ const ThemeShowcase: React.FC<{ theme: DashboardTheme; mode: 'light' | 'dark'; c
 		<Card className="gap-3 py-4">
 			<CardHeader className="px-4">
 				<CardTitle className="flex items-center gap-2">
-					<Lightbulb className="size-4 text-amber-500" />
+					<Lightbulb className="size-4 text-muted-foreground" />
 					Living Room
 				</CardTitle>
 				<CardDescription>2 of 3 on · Relaxed</CardDescription>

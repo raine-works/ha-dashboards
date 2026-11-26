@@ -647,24 +647,9 @@ export const DailyBriefDialog: React.FC<DailyBriefDialogProps> = ({ isOpen, onCl
 									<TodaySection events={brief.events} />
 								</div>
 								<div className="grid min-h-min shrink-0 gap-3 sm:grid-cols-2 xl:flex-1 xl:grid-cols-4">
-									<NewsSection
-										icon={MapPin}
-										tone="text-emerald-600 dark:text-emerald-400"
-										title="Local"
-										stories={brief.news.local}
-									/>
-									<NewsSection
-										icon={Flag}
-										tone="text-sky-600 dark:text-sky-400"
-										title="National"
-										stories={brief.news.national}
-									/>
-									<NewsSection
-										icon={Globe}
-										tone="text-violet-600 dark:text-violet-400"
-										title="World"
-										stories={brief.news.world}
-									/>
+									<NewsSection icon={MapPin} tone="text-foreground" title="Local" stories={brief.news.local} />
+									<NewsSection icon={Flag} tone="text-foreground" title="National" stories={brief.news.national} />
+									<NewsSection icon={Globe} tone="text-foreground" title="World" stories={brief.news.world} />
 									<NewsSection
 										icon={IconX}
 										tone="size-4.5 text-foreground"

@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'bun:test';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { moreItems } from '../header/HeaderControls';
 import { actionLeads, detailClasses, STATUS_ICON_TONES, type StatusTone } from '../ui/status-tile';
 import { ICON_TONES } from '../ui/tile';
@@ -6,6 +8,34 @@ import { ICON_TONES } from '../ui/tile';
 // docs/design/color.md: theme tokens only, never raw palette colors
 const RAW_PALETTE =
 	/\b(?:bg|text|border|ring)-(?:red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|slate|gray|zinc|neutral|stone)-\d/;
+
+/** Every raw palette class in a source, as `line: class`. */
+function rawPaletteClasses(source: string): string[] {
+	const found: string[] = [];
+	const global = new RegExp(`${RAW_PALETTE.source}\\d*`, 'g');
+	for (const [i, line] of source.split('\n').entries())
+		for (const match of line.matchAll(global)) found.push(`${i + 1}: ${match[0]}`);
+	return found;
+}
+
+describe('component sources', () => {
+	it('finds a raw palette class, with its line', () => {
+		expect(
+			rawPaletteClasses('<a className="p-2">\n<Icon className="size-4 text-sky-600 dark:bg-amber-400" />'),
+		).toEqual(['2: text-sky-600', '2: bg-amber-400']);
+		expect(rawPaletteClasses('<Icon className="text-chart-4 bg-success/10 text-muted-foreground" />')).toEqual([]);
+	});
+
+	it('color surfaces, text and icons with theme tokens only', () => {
+		const packages = resolve(import.meta.dir, '../../../..');
+		const found: string[] = [];
+		for (const file of new Bun.Glob('*/src/**/*.tsx').scanSync(packages)) {
+			if (file.includes('__tests__')) continue;
+			for (const hit of rawPaletteClasses(readFileSync(resolve(packages, file), 'utf8'))) found.push(`${file}:${hit}`);
+		}
+		expect(found).toEqual([]);
+	});
+});
 
 describe('icon tile tones', () => {
 	it('use theme tokens only', () => {

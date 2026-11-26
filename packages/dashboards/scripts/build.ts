@@ -1,3 +1,24 @@
+/**
+ * Builds the one dashboards bundle every card shares (`src/index.tsx`, through `@app/dashboard-build`'s
+ * `runPanelBuild`) into `dist/dashboards.js` with its chunks, then publishes it. What `bun run build`,
+ * `build:local`, `dev` and `build:integration` run.
+ *
+ * Flags:
+ * - none: build and upload to Home Assistant (`POST /api/raineworks_dashboards/bundle`, `publish.ts`;
+ *   `HA_URL` / `HA_TOKEN`), skipped when Home Assistant already serves this bundle.
+ * - `--force`: upload even when Home Assistant already serves this bundle.
+ * - `--no-sync`: build into `dist/` only; upload nothing (`build:local`).
+ * - `--watch`: like `--no-sync`, then rebuild into `dist/` on every change to the dashboards' or
+ *   `@app/ui`'s sources (`dev`); never deploys.
+ * - `--integration`: instead of uploading, write the bundle, its chunks and compressed copies into
+ *   `custom_components/raineworks_dashboards/www/` and the holiday chimes into its `sounds/`
+ *   (`build:integration`, what a release ships), replacing what was there.
+ *
+ * Exits non-zero when the build or the upload fails (`runPanelBuild`).
+ *
+ * @module
+ */
+
 import { copyFileSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { type BuildChunk, runPanelBuild } from '@app/dashboard-build';

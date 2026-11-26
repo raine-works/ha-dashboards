@@ -77,8 +77,11 @@ since `destructive` has no foreground token of its own).
   and dark, some outside what a screen can show.
 - **Every theme** gets status colors that pass, not only Raineworks: they're the Neutral preset's,
   which every other theme inherits (its dark status solids were 3.0–3.5:1).
-- **No raw palette classes** (`text-violet-*`, `sky`, `indigo`, `cyan`, `emerald`, `amber`): about
-  twenty uses today compete with the status tokens.
+- **No raw palette classes** (`text-violet-*`, `sky`, `indigo`, `cyan`, `emerald`, `amber`): they
+  compete with the status tokens. Icons are neutral (`text-foreground`, `text-muted-foreground`);
+  where a hue tells things apart without being a status (a weather condition), it's a chart token
+  (`text-chart-4`). `design-primitives.test.ts` fails on a `bg-`, `text-`, `border-` or `ring-`
+  palette class in any component.
 
 ## "On"
 

@@ -23,13 +23,15 @@ import {
 import type React from 'preact/compat';
 import { cn } from '../../lib/utils';
 
-// Small semantic accents (both shades): sun amber, night indigo, rain sky, snow cyan, storms violet
-const SUN = 'text-amber-500 dark:text-amber-400';
-const NIGHT = 'text-indigo-500 dark:text-indigo-300';
-const RAIN = 'text-sky-600 dark:text-sky-400';
-const SNOW = 'text-cyan-600 dark:text-cyan-300';
-const STORM = 'text-violet-600 dark:text-violet-400';
+// Small accents from the theme's chart colors (never a status, never a raw palette class: docs/design/color.md),
+// so each theme tints them its own way: sun the warm series, rain the blue, night and storms the violet. Snow and
+// fog stay neutral; the icon tells them apart.
+const SUN = 'text-chart-4';
+const NIGHT = 'text-chart-7';
+const RAIN = 'text-chart-1';
+const STORM = 'text-chart-7';
 const MUTED = 'text-muted-foreground';
+const SNOW = MUTED;
 
 /** A Home Assistant weather condition's icon and color, by day or night. */
 export function weatherIcon(condition: string | undefined, night = false): { icon: LucideIcon; color: string } {
