@@ -415,6 +415,14 @@ async def test_making_a_dashboard_everyones_default(
     status = await _call(hass, hass_admin_user, "integration_status")
     assert status["default_dashboard"] == "dashboard-home"
 
+    # And back: Home Assistant's own Overview, which isn't in the dashboards list
+    result = await _call(
+        hass, hass_admin_user, "set_default_dashboard", {"url_path": "lovelace"}
+    )
+    assert result["previous"] == "dashboard-home"
+    store = await frontend.async_system_store(hass)
+    assert store.data["core"]["default_panel"] == "lovelace"
+
     error = await _call_error(
         hass, hass_admin_user, "set_default_dashboard", {"url_path": "dashboard-nope"}
     )

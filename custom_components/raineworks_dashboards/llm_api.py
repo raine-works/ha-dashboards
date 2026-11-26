@@ -97,6 +97,8 @@ _SETS = llm.ToolAnnotations(
 # Indicators and status LEDs are lights too, but not room lights
 _INDICATOR = re.compile(r"\b(led|indicator|status|night ?light|backlight)\b", re.I)
 _URL_PATH = re.compile(r"[a-z0-9]+(-[a-z0-9]+)+")
+# Home Assistant's own Overview dashboard, outside the dashboards list
+OVERVIEW = "lovelace"
 _CARD_TYPE = re.compile(r"custom:[\w-]+")
 
 
@@ -540,7 +542,9 @@ async def _set_default_dashboard(
 ) -> Any:
     url_path = args["url_path"]
     dashboards = await run_command(hass, user, {"type": "lovelace/dashboards/list"})
-    if url_path not in {d["url_path"] for d in dashboards}:
+    # Home Assistant's own Overview isn't in the list, and is how a takeover is undone
+    known = {OVERVIEW, *(d["url_path"] for d in dashboards)}
+    if url_path not in known:
         raise HomeAssistantError(
             f"There's no dashboard at {url_path}: integration_status lists them"
         )
@@ -773,14 +777,16 @@ SPECS: tuple[_Spec, ...] = (
             "Makes a dashboard everyone's default, the page Home Assistant opens on "
             "(anyone who picked their own in their profile keeps it): the Home "
             "dashboard, for the dashboards to replace Home Assistant's own. Takes a "
-            "url_path from integration_status. Changes Home Assistant: confirm with "
-            "the user first."
+            "url_path from integration_status, or lovelace (Home Assistant's own "
+            "Overview, to put it back). Changes Home Assistant: confirm with the user "
+            "first."
         ),
         run=_set_default_dashboard,
         annotations=_SETS,
         parameters={
             probatio.Required(
-                "url_path", description="A dashboard's url_path (dashboard-home)"
+                "url_path",
+                description="A dashboard's url_path (dashboard-home), or lovelace",
             ): str
         },
     ),

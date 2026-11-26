@@ -22,7 +22,7 @@ their rooms.
 | `find_wall_panel_devices` | | Tablets the integration can drive (a wake or screen control, a restart button, a status light), and which are wall panels already |
 | `label_household_lights` | yes | Labels lights "Household Light" |
 | `create_dashboard` | yes | Creates a dashboard with the Home or wall panel card |
-| `set_default_dashboard` | yes | Makes a dashboard everyone's default, the page Home Assistant opens on (anyone who picked their own in their profile keeps it) |
+| `set_default_dashboard` | yes | Makes a dashboard everyone's default, the page Home Assistant opens on (anyone who picked their own in their profile keeps it); `lovelace` puts Home Assistant's own Overview back |
 | `set_house_theme` | yes | The house theme, for the dashboards and Home Assistant's own pages, for anyone without one of their own |
 | `add_wall_panel` | yes | A tablet end to end: its dashboard, and its device registered for its status light and wake on the doorbell |
 
