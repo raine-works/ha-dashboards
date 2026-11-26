@@ -105,11 +105,12 @@ describe('the dashboards bundle', () => {
 		// for the redesign: room tiles and their dialog, a line per climate device, phone alerts, labeled
 		// header buttons and bedtime by label, ~1.2MB with them; to 1.235MB for numbers that roll to a new value,
 		// NumberFlow's element (~16KB: it's on screen from the first paint, the header's temperature, so it isn't
-		// loaded on demand), and the phone sheets' drag down to close, ~1.23MB with them)
+		// loaded on demand), and the phone sheets' drag down to close, ~1.23MB with them; to 1.24MB for the rest of
+		// the rolling numbers and the to-do items' edit dialog, ~1.236MB with them)
 		const sizes = [bundlePath, ...(await staticChunks()).map((c) => join(dirname(bundlePath), c))].map(
 			(path) => Bun.file(path).size,
 		);
-		expect(sizes.reduce((a, b) => a + b, 0)).toBeLessThan(1_235_000);
+		expect(sizes.reduce((a, b) => a + b, 0)).toBeLessThan(1_240_000);
 	});
 
 	it('names a bundle by its content', () => {

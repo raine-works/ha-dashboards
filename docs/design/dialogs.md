@@ -32,7 +32,9 @@ rows, are each dialog's own.
 - **Cameras**: the camera list as tiles with the picked one ringed; the live view's controls on
   the overlay's scrim; talkback's quick lines as tonal chips.
 - **To-do**: the items as rows on one surface with hairlines (no box each); the person filters as
-  chips; the add row as the footer.
+  chips; the add row as the footer. Tapping an item opens its own `detail` dialog (done): what it
+  says, when it's due and who it's for, each under a label, then Delete and Save. It used to open
+  in place in the list, with a second row of person chips just above the add row's own.
 - **Daily, Calendar, Weather, Energy, People, Pets, Notifications**: the shared fixes carry most of
   it; each gets a pass for its surfaces (cards in cards), its headings (overlines) and its one
   primary action.
