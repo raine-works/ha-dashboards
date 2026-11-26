@@ -2,9 +2,9 @@
 
 Serves the dashboards bundle on every page (so the cards are there without a
 Lovelace resource), tells the dashboards who the household is, takes their voice
-clips (any signed-in user, not only admins), and drives the wall panels'
-hardware: their status lights, waking them on a doorbell ring, and reloading
-them.
+clips (any signed-in user, not only admins), drives the wall panels'
+hardware (their status lights, waking them on a doorbell ring, reloading them),
+and gives AI assistants its setup tools through Home Assistant's MCP server.
 """
 
 from __future__ import annotations
@@ -21,6 +21,8 @@ from . import websocket_api
 from .announce import async_register_announce
 from .clips import async_register_clip_views, async_start_sweeping
 from .const import CONF_SERVE_BUNDLE, DOMAIN
+from .llm_api import async_register_llm_api
+from .modules import load_module_words
 from .notify import async_register_notify
 from .panels import PanelsController
 from .printer import async_register_printer
@@ -121,6 +123,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: DashboardsConfigEntry) -
             "mobile_app_notification_action", hass.data[f"{DOMAIN}_todo"].mark_done
         )
     )
+    # The setup tools, for assistants through Home Assistant's MCP server
+    words = await hass.async_add_executor_job(load_module_words)
+    entry.async_on_unload(async_register_llm_api(hass, words))
     # Bedtime's switches; the holiday sounds' mute
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True

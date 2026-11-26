@@ -1,0 +1,751 @@
+{
+	"houses": [
+		{
+			"name": "nothing at all",
+			"hass": {
+				"states": {},
+				"entities": {},
+				"devices": {},
+				"areas": {},
+				"services": {},
+				"config": {}
+			},
+			"house": {},
+			"states": {
+				"lighting": "missing",
+				"bedtime": "missing",
+				"security": "missing",
+				"alarm": "missing",
+				"cameras": "missing",
+				"climate": "missing",
+				"thermostat_presets": "missing",
+				"covers": "missing",
+				"fans": "missing",
+				"diffusers": "missing",
+				"weather": "missing",
+				"calendar": "missing",
+				"todo": "missing",
+				"notifications": "on",
+				"people": "missing",
+				"pets": "missing",
+				"music": "missing",
+				"tvs": "missing",
+				"messages": "missing",
+				"printer": "missing",
+				"laundry": "missing",
+				"energy": "on",
+				"daily": "missing",
+				"assist": "on",
+				"holidays": "on",
+				"guest_wifi": "missing"
+			}
+		},
+		{
+			"name": "a little of everything",
+			"hass": {
+				"states": {
+					"light.desk": {
+						"entity_id": "light.desk",
+						"state": "on",
+						"attributes": {}
+					},
+					"lock.front": {
+						"entity_id": "lock.front",
+						"state": "locked",
+						"attributes": {}
+					},
+					"camera.porch": {
+						"entity_id": "camera.porch",
+						"state": "on",
+						"attributes": {}
+					},
+					"climate.hall": {
+						"entity_id": "climate.hall",
+						"state": "heat",
+						"attributes": {}
+					},
+					"input_select.thermostat_preset": {
+						"entity_id": "input_select.thermostat_preset",
+						"state": "home",
+						"attributes": {}
+					},
+					"cover.office": {
+						"entity_id": "cover.office",
+						"state": "open",
+						"attributes": { "device_class": "blind" }
+					},
+					"fan.tower": {
+						"entity_id": "fan.tower",
+						"state": "on",
+						"attributes": {}
+					},
+					"switch.mechanical_power": {
+						"entity_id": "switch.mechanical_power",
+						"state": "on",
+						"attributes": {}
+					},
+					"weather.home": {
+						"entity_id": "weather.home",
+						"state": "sunny",
+						"attributes": {}
+					},
+					"calendar.family": {
+						"entity_id": "calendar.family",
+						"state": "off",
+						"attributes": {}
+					},
+					"todo.chores": {
+						"entity_id": "todo.chores",
+						"state": "2",
+						"attributes": {}
+					},
+					"person.alex": {
+						"entity_id": "person.alex",
+						"state": "home",
+						"attributes": { "device_trackers": ["device_tracker.alex_phone"] }
+					},
+					"person.whiskers": {
+						"entity_id": "person.whiskers",
+						"state": "unknown",
+						"attributes": { "device_trackers": [] }
+					},
+					"sensor.whiskers_weight": {
+						"entity_id": "sensor.whiskers_weight",
+						"state": "4.2",
+						"attributes": {}
+					},
+					"media_player.kitchen": {
+						"entity_id": "media_player.kitchen",
+						"state": "idle",
+						"attributes": { "mass_player_type": "player" }
+					},
+					"media_player.den_tv": {
+						"entity_id": "media_player.den_tv",
+						"state": "off",
+						"attributes": { "device_class": "tv" }
+					},
+					"alarm_control_panel.house": {
+						"entity_id": "alarm_control_panel.house",
+						"state": "disarmed",
+						"attributes": {}
+					},
+					"sensor.daily_brief": {
+						"entity_id": "sensor.daily_brief",
+						"state": "2026-11-26T07:00:00",
+						"attributes": {}
+					}
+				},
+				"entities": {
+					"light.desk": {
+						"entity_id": "light.desk",
+						"labels": ["household_light"],
+						"hidden": false,
+						"area_id": "office"
+					},
+					"switch.office_bedtime": {
+						"entity_id": "switch.office_bedtime",
+						"labels": ["bedtime"],
+						"hidden": false,
+						"area_id": "office"
+					},
+					"switch.mechanical_power": {
+						"entity_id": "switch.mechanical_power",
+						"labels": [],
+						"hidden": false,
+						"platform": "everscent",
+						"device_id": "diffuser"
+					},
+					"notify.kitchen_printer": {
+						"entity_id": "notify.kitchen_printer",
+						"labels": [],
+						"hidden": false,
+						"platform": "escpos_printer",
+						"device_id": "printer"
+					},
+					"media_player.den_tv": {
+						"entity_id": "media_player.den_tv",
+						"labels": [],
+						"hidden": false,
+						"platform": "googletv"
+					},
+					"alarm_control_panel.house": {
+						"entity_id": "alarm_control_panel.house",
+						"labels": [],
+						"hidden": false,
+						"platform": "alarmo"
+					}
+				},
+				"devices": {
+					"diffuser": {
+						"id": "diffuser",
+						"name": "Mechanical",
+						"area_id": null
+					},
+					"printer": { "id": "printer" }
+				},
+				"areas": {
+					"office": {
+						"area_id": "office",
+						"name": "Office",
+						"floor_id": "main"
+					}
+				},
+				"services": {
+					"alarmo": { "arm": {} },
+					"script": { "notify_people": {}, "daily_brief_generate": {} }
+				},
+				"config": { "components": ["assist_pipeline"] }
+			},
+			"house": {},
+			"states": {
+				"lighting": "on",
+				"bedtime": "on",
+				"security": "on",
+				"alarm": "on",
+				"cameras": "on",
+				"climate": "on",
+				"thermostat_presets": "on",
+				"covers": "on",
+				"fans": "on",
+				"diffusers": "on",
+				"weather": "on",
+				"calendar": "on",
+				"todo": "on",
+				"notifications": "on",
+				"people": "on",
+				"pets": "on",
+				"music": "on",
+				"tvs": "on",
+				"messages": "on",
+				"printer": "on",
+				"laundry": "missing",
+				"energy": "on",
+				"daily": "on",
+				"assist": "on",
+				"holidays": "on",
+				"guest_wifi": "missing"
+			}
+		},
+		{
+			"name": "hidden, wrong kinds and missing pieces",
+			"hass": {
+				"states": {
+					"cover.garage": {
+						"entity_id": "cover.garage",
+						"state": "closed",
+						"attributes": { "device_class": "garage" }
+					},
+					"cover.hidden_blind": {
+						"entity_id": "cover.hidden_blind",
+						"state": "open",
+						"attributes": { "device_class": "blind" }
+					},
+					"fan.hidden": {
+						"entity_id": "fan.hidden",
+						"state": "on",
+						"attributes": {}
+					},
+					"switch.other_power": {
+						"entity_id": "switch.other_power",
+						"state": "on",
+						"attributes": {}
+					},
+					"switch.hidden_power": {
+						"entity_id": "switch.hidden_power",
+						"state": "on",
+						"attributes": {}
+					},
+					"person.sam": {
+						"entity_id": "person.sam",
+						"state": "home",
+						"attributes": {}
+					},
+					"media_player.box": {
+						"entity_id": "media_player.box",
+						"state": "off",
+						"attributes": { "device_class": "tv", "mass_player_type": "player" }
+					},
+					"media_player.hidden_tv": {
+						"entity_id": "media_player.hidden_tv",
+						"state": "off",
+						"attributes": { "device_class": "tv" }
+					},
+					"media_player.other_tv": {
+						"entity_id": "media_player.other_tv",
+						"state": "off",
+						"attributes": { "device_class": "tv" }
+					},
+					"media_player.speaker": {
+						"entity_id": "media_player.speaker",
+						"state": "idle",
+						"attributes": { "mass_player_type": null }
+					},
+					"alarm_control_panel.other": {
+						"entity_id": "alarm_control_panel.other",
+						"state": "disarmed",
+						"attributes": {}
+					},
+					"sensor.daily_brief": {
+						"entity_id": "sensor.daily_brief",
+						"state": "unknown",
+						"attributes": {}
+					}
+				},
+				"entities": {
+					"light.indicator": {
+						"entity_id": "light.indicator",
+						"labels": [],
+						"hidden": true
+					},
+					"input_boolean.no_area_bedtime": {
+						"entity_id": "input_boolean.no_area_bedtime",
+						"labels": ["bedtime"],
+						"hidden": false
+					},
+					"switch.hidden_bedtime": {
+						"entity_id": "switch.hidden_bedtime",
+						"labels": ["bedtime"],
+						"hidden": true,
+						"area_id": "den"
+					},
+					"cover.hidden_blind": {
+						"entity_id": "cover.hidden_blind",
+						"labels": [],
+						"hidden": true
+					},
+					"fan.hidden": {
+						"entity_id": "fan.hidden",
+						"labels": [],
+						"hidden": true
+					},
+					"switch.other_power": {
+						"entity_id": "switch.other_power",
+						"labels": [],
+						"hidden": false,
+						"platform": "tplink"
+					},
+					"switch.hidden_power": {
+						"entity_id": "switch.hidden_power",
+						"labels": [],
+						"hidden": true,
+						"platform": "everscent"
+					},
+					"notify.hidden_printer": {
+						"entity_id": "notify.hidden_printer",
+						"labels": [],
+						"hidden": true,
+						"platform": "escpos_printer"
+					},
+					"media_player.hidden_tv": {
+						"entity_id": "media_player.hidden_tv",
+						"labels": [],
+						"hidden": true,
+						"platform": "googletv"
+					},
+					"media_player.other_tv": {
+						"entity_id": "media_player.other_tv",
+						"labels": [],
+						"hidden": false,
+						"platform": "cast"
+					}
+				},
+				"devices": {},
+				"areas": { "den": { "area_id": "den", "name": "Den" } },
+				"services": { "script": {} },
+				"config": { "components": ["light"] }
+			},
+			"house": {},
+			"states": {
+				"lighting": "missing",
+				"bedtime": "missing",
+				"security": "on",
+				"alarm": "missing",
+				"cameras": "missing",
+				"climate": "missing",
+				"thermostat_presets": "missing",
+				"covers": "missing",
+				"fans": "missing",
+				"diffusers": "missing",
+				"weather": "missing",
+				"calendar": "missing",
+				"todo": "missing",
+				"notifications": "on",
+				"people": "missing",
+				"pets": "missing",
+				"music": "on",
+				"tvs": "missing",
+				"messages": "on",
+				"printer": "missing",
+				"laundry": "missing",
+				"energy": "on",
+				"daily": "missing",
+				"assist": "missing",
+				"holidays": "on",
+				"guest_wifi": "missing"
+			}
+		},
+		{
+			"name": "found by device, a group, labeled TVs and settings",
+			"hass": {
+				"states": {
+					"cover.curtains": {
+						"entity_id": "cover.curtains",
+						"state": "open",
+						"attributes": {
+							"device_class": "curtain",
+							"entity_id": ["cover.left", "cover.right"]
+						}
+					},
+					"cover.left": {
+						"entity_id": "cover.left",
+						"state": "open",
+						"attributes": { "device_class": "curtain" }
+					},
+					"cover.right": {
+						"entity_id": "cover.right",
+						"state": "open",
+						"attributes": { "device_class": "curtain" }
+					},
+					"media_player.labeled_tv": {
+						"entity_id": "media_player.labeled_tv",
+						"state": "off",
+						"attributes": { "device_class": "tv" }
+					},
+					"media_player.unlabeled_tv": {
+						"entity_id": "media_player.unlabeled_tv",
+						"state": "off",
+						"attributes": { "device_class": "tv" }
+					},
+					"sensor.washer_machine_state": {
+						"entity_id": "sensor.washer_machine_state",
+						"state": "run",
+						"attributes": {}
+					},
+					"image.guest_wifi": {
+						"entity_id": "image.guest_wifi",
+						"state": "on",
+						"attributes": {}
+					},
+					"weather.other": {
+						"entity_id": "weather.other",
+						"state": "rainy",
+						"attributes": {}
+					}
+				},
+				"entities": {
+					"input_boolean.den_bedtime": {
+						"entity_id": "input_boolean.den_bedtime",
+						"labels": ["bedtime"],
+						"hidden": false,
+						"device_id": "den_switch"
+					},
+					"media_player.labeled_tv": {
+						"entity_id": "media_player.labeled_tv",
+						"labels": ["household_tv"],
+						"hidden": false,
+						"platform": "googletv"
+					},
+					"media_player.unlabeled_tv": {
+						"entity_id": "media_player.unlabeled_tv",
+						"labels": [],
+						"hidden": false,
+						"platform": "googletv"
+					}
+				},
+				"devices": { "den_switch": { "id": "den_switch", "area_id": "den" } },
+				"areas": { "den": { "area_id": "den", "name": "Den" } },
+				"services": { "alarmo": { "arm": {} } }
+			},
+			"house": {
+				"alarm_panel": "alarm_control_panel.configured",
+				"thermostats": ["climate.upstairs"],
+				"weather": "weather.home",
+				"laundry": {
+					"washer": {
+						"machine_state": "sensor.washer_machine_state",
+						"job_state": "sensor.washer_job_state",
+						"time_remaining": "sensor.washer_time_remaining"
+					}
+				},
+				"guest_wifi_qr": "image.guest_wifi",
+				"modules": { "holidays": false, "covers": false, "tvs": "no" }
+			},
+			"states": {
+				"lighting": "missing",
+				"bedtime": "on",
+				"security": "on",
+				"alarm": "on",
+				"cameras": "missing",
+				"climate": "on",
+				"thermostat_presets": "missing",
+				"covers": "off",
+				"fans": "missing",
+				"diffusers": "missing",
+				"weather": "missing",
+				"calendar": "missing",
+				"todo": "missing",
+				"notifications": "on",
+				"people": "missing",
+				"pets": "missing",
+				"music": "missing",
+				"tvs": "on",
+				"messages": "missing",
+				"printer": "missing",
+				"laundry": "on",
+				"energy": "on",
+				"daily": "missing",
+				"assist": "on",
+				"holidays": "off",
+				"guest_wifi": "on"
+			}
+		},
+		{
+			"name": "empty but there",
+			"hass": {
+				"states": {
+					"alarm_control_panel.house": {
+						"entity_id": "alarm_control_panel.house",
+						"state": "disarmed",
+						"attributes": {}
+					}
+				},
+				"entities": {},
+				"services": { "alarmo": {}, "script": { "notify_people": {} } },
+				"config": { "components": [] }
+			},
+			"house": {},
+			"states": {
+				"lighting": "missing",
+				"bedtime": "missing",
+				"security": "missing",
+				"alarm": "on",
+				"cameras": "missing",
+				"climate": "missing",
+				"thermostat_presets": "missing",
+				"covers": "missing",
+				"fans": "missing",
+				"diffusers": "missing",
+				"weather": "missing",
+				"calendar": "missing",
+				"todo": "missing",
+				"notifications": "on",
+				"people": "missing",
+				"pets": "missing",
+				"music": "missing",
+				"tvs": "missing",
+				"messages": "on",
+				"printer": "missing",
+				"laundry": "missing",
+				"energy": "on",
+				"daily": "missing",
+				"assist": "missing",
+				"holidays": "on",
+				"guest_wifi": "missing"
+			}
+		}
+	],
+	"settings": [
+		{
+			"raw": null,
+			"parsed": {
+				"laundry": {},
+				"liveInputs": [],
+				"tts": { "streaming": false },
+				"bedtimeRoutines": {},
+				"modules": {}
+			},
+			"check": { "understood": [], "ignored": [] }
+		},
+		{
+			"raw": "not a mapping",
+			"parsed": {
+				"laundry": {},
+				"liveInputs": [],
+				"tts": { "streaming": false },
+				"bedtimeRoutines": {},
+				"modules": {}
+			},
+			"check": { "understood": [], "ignored": ["(not a mapping)"] }
+		},
+		{
+			"raw": ["a", "list"],
+			"parsed": {
+				"laundry": {},
+				"liveInputs": [],
+				"tts": { "streaming": false },
+				"bedtimeRoutines": {},
+				"modules": {}
+			},
+			"check": { "understood": [], "ignored": ["(not a mapping)"] }
+		},
+		{
+			"raw": {},
+			"parsed": {
+				"laundry": {},
+				"liveInputs": [],
+				"tts": { "streaming": false },
+				"bedtimeRoutines": {},
+				"modules": {}
+			},
+			"check": { "understood": [], "ignored": [] }
+		},
+		{
+			"raw": {
+				"announce_speaker": " media_player.kitchen ",
+				"weather": "weather.home",
+				"alarm_panel": "alarm_control_panel.alarmo",
+				"thermostats": [
+					{ "entity": "climate.main", "name": "Main Floor" },
+					"climate.upstairs",
+					{ "entity": "light.nope" },
+					42
+				],
+				"laundry": {
+					"washer": {
+						"name": "Washer",
+						"machine_state": "sensor.w_machine",
+						"job_state": "sensor.w_job",
+						"time_remaining": "sensor.w_time"
+					},
+					"dryer": {
+						"machine_state": "sensor.d_machine",
+						"job_state": "sensor.d_job"
+					}
+				},
+				"guest_wifi_qr": "image.guest",
+				"live_inputs": [
+					{
+						"name": "Turntable",
+						"uri": "sendspin_source://audio_source/abc",
+						"signal": "binary_sensor.signal"
+					},
+					{ "name": "No uri" },
+					{ "name": "Tape", "uri": "x://tape", "signal": "sensor.wrong_domain" }
+				],
+				"tts": {
+					"engine": "tts.grok",
+					"voice": " eve ",
+					"streaming": true,
+					"fallback": "tts.google"
+				},
+				"birthday_calendar": "calendar.birthdays",
+				"bedtime_routines": {
+					"switch.den_bedtime": {
+						"zone": "Den",
+						"steps": [
+							{
+								"kind": "fan",
+								"text": "Tower fan on",
+								"actions": ["fan.turn_on", 7]
+							},
+							{ "kind": "dance", "text": "Not a kind" },
+							{ "kind": "lights" }
+						]
+					},
+					"input_boolean.nursery_bedtime": { "zone": "Nursery" },
+					"light.not_a_toggle": { "zone": "Nope", "steps": [] },
+					"switch.no_zone": { "steps": [] }
+				},
+				"modules": { "holidays": false, "music": true, "cameras": "no" }
+			},
+			"parsed": {
+				"announceSpeaker": "media_player.kitchen",
+				"weather": "weather.home",
+				"alarmPanel": "alarm_control_panel.alarmo",
+				"thermostats": [
+					{ "entityId": "climate.main", "name": "Main Floor" },
+					{ "entityId": "climate.upstairs" }
+				],
+				"laundry": {
+					"washer": {
+						"name": "Washer",
+						"machineState": "sensor.w_machine",
+						"jobState": "sensor.w_job",
+						"timeRemaining": "sensor.w_time"
+					}
+				},
+				"guestWifiQr": "image.guest",
+				"liveInputs": [
+					{
+						"name": "Turntable",
+						"uri": "sendspin_source://audio_source/abc",
+						"signal": "binary_sensor.signal"
+					},
+					{ "name": "Tape", "uri": "x://tape" }
+				],
+				"tts": {
+					"engine": "tts.grok",
+					"voice": "eve",
+					"streaming": true,
+					"fallback": "tts.google"
+				},
+				"birthdayCalendar": "calendar.birthdays",
+				"bedtimeRoutines": {
+					"switch.den_bedtime": {
+						"zone": "Den",
+						"steps": [
+							{
+								"kind": "fan",
+								"text": "Tower fan on",
+								"actions": ["fan.turn_on"]
+							}
+						]
+					},
+					"input_boolean.nursery_bedtime": { "zone": "Nursery", "steps": [] }
+				},
+				"modules": { "holidays": false, "music": true }
+			},
+			"check": {
+				"understood": [
+					"announce_speaker",
+					"weather",
+					"alarm_panel",
+					"laundry",
+					"guest_wifi_qr",
+					"tts",
+					"birthday_calendar"
+				],
+				"ignored": ["thermostats", "live_inputs", "bedtime_routines", "modules"]
+			}
+		},
+		{
+			"raw": {
+				"announce_speaker": "light.kitchen",
+				"weather": "weather.home\n",
+				"guest_wifi_qr": "Image.Guest",
+				"alarm_panel": "",
+				"thermostats": "climate.main",
+				"laundry": "washer",
+				"live_inputs": { "name": "Turntable" },
+				"tts": { "streaming": "yes", "engine": "tts." },
+				"bedtime_routines": ["switch.den_bedtime"],
+				"modules": ["holidays"],
+				"unknown_setting": true,
+				"nothing": null
+			},
+			"parsed": {
+				"weather": "weather.home",
+				"laundry": {},
+				"liveInputs": [],
+				"tts": { "streaming": false },
+				"bedtimeRoutines": {},
+				"modules": {}
+			},
+			"check": {
+				"understood": ["weather"],
+				"ignored": [
+					"announce_speaker",
+					"guest_wifi_qr",
+					"alarm_panel",
+					"thermostats",
+					"laundry",
+					"live_inputs",
+					"tts",
+					"bedtime_routines",
+					"modules",
+					"unknown_setting"
+				]
+			}
+		}
+	]
+}

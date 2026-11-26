@@ -29,10 +29,10 @@ ha-dashboards/
 │   ├── dashboards/    # @app/dashboards: the cards (src/home, src/wall-panel), one bundle
 │   ├── dashboard-build/ # the Bun build: React Compiler, CSS into the ShadowRoot, chunks
 │   ├── ha-client/     # the tools' websocket client (HA_URL / HA_TOKEN) and house snapshot
-│   ├── mcp/           # the setup MCP server (stdio, no SDK): `bun run mcp`
+│   ├── mcp/           # the setup MCP server run locally (stdio, no SDK): `bun run mcp`; the integration has the same tools
 │   ├── kit/           # @raineworks/ha-dashboards on npm: house.yaml's parser, bedtime routines, the MCP (bundled)
 │   └── demo/          # a made-up house and mock hass: `bun run demo`
-└── scripts/           # house-audit, capability report, brand icons, holiday fixture, Tailwind lint
+└── scripts/           # house-audit, capability report, brand icons, holiday and modules fixtures, Tailwind lint
 ```
 
 ## Build, test, deploy
@@ -169,6 +169,11 @@ module, with its detection tested.
 - `switch.py`, `datetime.py`, `binary_sensor.py`, `sensor.py`: bedtime, the holiday mute, lock
   faults, affirmations
 - `notify.py`, `announce.py`, `todo.py`, `printer.py`, `clips.py`: actions and the clip upload
+- `llm_api.py`, `modules.py`: the setup tools, an LLM API Home Assistant's MCP server serves
+  (administrators only; changes go through Home Assistant's own websocket commands as the caller), and
+  the dashboards' module detection and house settings parser ported to Python, held to the TypeScript by
+  `tests/fixtures/modules.json`: after changing `lib/modules.ts` or `lib/house-config.ts`, run
+  `bun scripts/modules-fixture.ts` ([docs/assistant.md](docs/assistant.md))
 - `push.py`: each household member's phone alerts (push categories `notify_people` skips for them;
   Security always comes through), see [docs/phone-alerts.md](docs/phone-alerts.md)
 

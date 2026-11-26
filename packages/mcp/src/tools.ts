@@ -63,10 +63,17 @@ export function unlabeledLights(snapshot: HouseSnapshot) {
 		.sort((a, b) => `${a.area ?? '~'} ${a.name}`.localeCompare(`${b.area ?? '~'} ${b.name}`));
 }
 
-/** Which keys of a `house` setting the dashboards understood (a wrong shape is quietly ignored). */
-export function checkHouse(yaml: string) {
-	const raw = (Bun.YAML.parse(yaml) ?? {}) as Record<string, unknown>;
-	if (typeof raw !== 'object' || Array.isArray(raw)) return { understood: [], ignored: ['(not a mapping)'] };
+/** Which keys of a `house` setting (YAML) the dashboards understood (a wrong shape is quietly ignored). */
+export const checkHouse = (yaml: string) => checkHouseSettings(Bun.YAML.parse(yaml) ?? {});
+
+/**
+ * Which keys of a parsed `house` setting the dashboards understood. The integration's setup tools
+ * do the same in Python (`modules.py`), checked against this one by tests/fixtures/modules.json.
+ */
+export function checkHouseSettings(parsed: unknown): { understood: string[]; ignored: string[] } {
+	if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed))
+		return { understood: [], ignored: ['(not a mapping)'] };
+	const raw = parsed as Record<string, unknown>;
 	const house = parseHouseConfig(raw);
 	const count = (v: unknown) => (Array.isArray(v) ? v.length : v && typeof v === 'object' ? Object.keys(v).length : 0);
 	const used: Record<string, boolean> = {

@@ -1,0 +1,158 @@
+[
+	{
+		"id": "lighting",
+		"name": "Lighting",
+		"description": "A tile per room by floor (its lights, scenes, dimmers and colors a tap away) and All off",
+		"needs": "Lights labeled \"Household Light\" (household_light) in areas on floors; Stateful Scenes for scenes"
+	},
+	{
+		"id": "bedtime",
+		"name": "Bedtime",
+		"description": "Each room's bedtime toggle and Home Bedtime, asking before lights come on in a room asleep",
+		"needs": "The integration's Bedtime rooms (its options), or input_booleans labeled \"bedtime\" in each room's area with input_boolean.home_bedtime"
+	},
+	{
+		"id": "security",
+		"name": "Security",
+		"description": "Door locks with their contact sensors, garage doors, and every opening left open",
+		"needs": "lock.* entities, garage covers, door/window binary sensors"
+	},
+	{
+		"id": "alarm",
+		"name": "Alarm",
+		"description": "Arm and disarm with a PIN pad, exit and entry countdowns, and the arming check",
+		"needs": "The Alarmo integration (an alarm_control_panel and the alarmo.arm action)"
+	},
+	{
+		"id": "cameras",
+		"name": "Cameras",
+		"description": "Live views (WebRTC), snapshots, smart detections, talkback and recorded clips",
+		"needs": "camera.* entities; UniFi Protect for detections, talkback and clips"
+	},
+	{
+		"id": "climate",
+		"name": "Thermostats",
+		"description": "Each thermostat's setpoint and mode",
+		"needs": "climate.* entities (house.yaml `thermostats` to pick and name them)"
+	},
+	{
+		"id": "thermostat_presets",
+		"name": "Thermostat presets",
+		"description": "A house-wide Home / Away / Sleep preset over the thermostats",
+		"needs": "input_select.thermostat_preset and script.adjust_thermostat_temperature, with the preset automation"
+	},
+	{
+		"id": "covers",
+		"name": "Curtains & blinds",
+		"description": "Every curtain, blind and shade, with positions estimated while they move",
+		"needs": "cover.* entities with device class curtain, blind, shade or shutter"
+	},
+	{
+		"id": "fans",
+		"name": "Fans",
+		"description": "Every fan: speed, oscillation and presets",
+		"needs": "fan.* entities"
+	},
+	{
+		"id": "diffusers",
+		"name": "Scent diffusers",
+		"description": "Whole-home diffusers: oil, fragrance and Quick scent",
+		"needs": "The EverScent integration (raine-works/ha-everscent)"
+	},
+	{
+		"id": "weather",
+		"name": "Weather",
+		"description": "Now in the header; hourly charts, details and the 10-day forecast in its dialog",
+		"needs": "A weather.* entity with forecasts"
+	},
+	{
+		"id": "calendar",
+		"name": "Calendar",
+		"description": "The next event in the header; a month grid and day agenda",
+		"needs": "calendar.* entities"
+	},
+	{
+		"id": "todo",
+		"name": "To-do",
+		"description": "To-do lists with swipes, drag to reorder, due dates and assignment to household members",
+		"needs": "todo.* entities (Local To-do, Shopping list…)"
+	},
+	{
+		"id": "notifications",
+		"name": "Notifications",
+		"description": "Home Assistant's persistent notifications, swiped away",
+		"needs": "Nothing: part of Home Assistant"
+	},
+	{
+		"id": "people",
+		"name": "People",
+		"description": "Who's home in the header; a map of everyone with their phones' batteries",
+		"needs": "person.* entities with a device tracker (the Companion app)"
+	},
+	{
+		"id": "pets",
+		"name": "Pets",
+		"description": "Litter-Robot and Feeder-Robot: visits, weight and food charts, Cycle and Give snack",
+		"needs": "The Litter-Robot integration, with a person.* per pet"
+	},
+	{
+		"id": "music",
+		"name": "Music",
+		"description": "Now playing, browse and search, the queue, speaker groups, live inputs and Party mode",
+		"needs": "The Music Assistant integration"
+	},
+	{
+		"id": "tvs",
+		"name": "TVs",
+		"description": "Power, what's on with its poster, volume, the TV's apps and inputs, and a remote",
+		"needs": "The Raineworks TV integration (raine-works/ha-googletv)"
+	},
+	{
+		"id": "messages",
+		"name": "Messages",
+		"description": "Announce on the speakers (typed or recorded), message phones, print notes",
+		"needs": "Music Assistant speakers, or script.notify_people for phones, or a receipt printer"
+	},
+	{
+		"id": "printer",
+		"name": "Receipt printer",
+		"description": "Print to-do lists and notes",
+		"needs": "An ESC/POS printer (the escpos_printer notify platform)"
+	},
+	{
+		"id": "laundry",
+		"name": "Laundry",
+		"description": "The washer and dryer in the header while they run, and a toast when one is done",
+		"needs": "house.yaml `laundry`: each machine’s machine state, job state and time remaining sensors (SmartThings)"
+	},
+	{
+		"id": "energy",
+		"name": "Energy",
+		"description": "Live draw split by circuit, today / week / month charts, and where it went",
+		"needs": "Home Assistant's Energy settings with a grid meter (and devices for circuits)"
+	},
+	{
+		"id": "daily",
+		"name": "Daily",
+		"description": "The daily brief (weather, today's events, the news), a daily affirmation and a scripture study",
+		"needs": "The daily brief package: sensor.daily_brief and script.daily_brief_generate (an AI task and a conversation agent that can search)"
+	},
+	{
+		"id": "assist",
+		"name": "Assist",
+		"description": "Voice and typed commands through Home Assistant's preferred Assist pipeline, with the glow",
+		"needs": "An Assist pipeline with speech to text (and text to speech for spoken answers)"
+	},
+	{
+		"id": "holidays",
+		"name": "Holidays",
+		"description": "Easter eggs in the days around each holiday and on birthdays: characters, confetti, sounds",
+		"needs": "Nothing (birthdays: a calendar named \"Birthdays\")"
+	},
+	{
+		"id": "guest_wifi",
+		"name": "Guest Wi-Fi",
+		"description": "The guest network's QR code, with its name and password for a laptop, on the wall panels",
+		"needs": "house.yaml `guest_wifi_qr`: an image entity with the QR code (UniFi’s, enabled)"
+	}
+]

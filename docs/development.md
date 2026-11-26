@@ -47,6 +47,12 @@ Copy `custom_components/raineworks_dashboards` into your Home Assistant's `custo
 
 ## Docs
 
+The integration's setup tools (`llm_api.py`) detect the modules in Python (`modules.py`): after changing
+`lib/modules.ts` or `lib/house-config.ts`, `bun scripts/modules-fixture.ts` writes the module words they
+ship (`modules.json`) and the made-up houses `tests/test_modules.py` holds the Python to (a test fails until
+you do, and the Python tests fail until the port says the same). See [Setting up with an
+assistant](assistant.md#how-the-two-stay-the-same).
+
 `docs/reference/` is written from the code: `bun scripts/docs.ts` after changing the modules or the
 integration's options or actions (a test fails until you do).
 
