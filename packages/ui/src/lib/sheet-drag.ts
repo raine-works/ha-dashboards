@@ -53,12 +53,17 @@ export const SHEET_IDLE: SheetDragState = {
 	lastT: 0,
 };
 
-/** The pointer events (and the settle timer) the reducer takes; `t` is a timestamp in ms. */
+/**
+ * The pointer events (and the settle timer) the reducer takes; `t` is a timestamp in ms. `close` is a
+ * close asked for without a drag (a tap outside, the X, Escape, Back): the sheet slides away as it
+ * does when let go past the close point.
+ */
 export type SheetDragAction =
 	| { type: 'down'; x: number; y: number; t: number; height: number }
 	| { type: 'move'; x: number; y: number; t: number }
 	| { type: 'up'; t: number }
 	| { type: 'cancel' }
+	| { type: 'close' }
 	| { type: 'reset' };
 
 /**
@@ -137,6 +142,9 @@ export function sheetDragReducer(state: SheetDragState, action: SheetDragAction)
 			// The browser took the touch (a scroll): a drag under way springs back
 			if (state.phase === 'dragging') return state.dy === 0 ? { ...SHEET_IDLE } : { ...state, phase: 'settling' };
 			return state.phase === 'pending' ? { ...SHEET_IDLE } : state;
+		case 'close':
+			// From wherever it is, a drag under way included: closing wins
+			return state.phase === 'closing' ? state : { ...state, phase: 'closing' };
 		case 'reset':
 			return { ...SHEET_IDLE };
 	}

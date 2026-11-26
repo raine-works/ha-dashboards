@@ -30,8 +30,26 @@ import { dialogHistory, dialogSlug } from './dialog-history';
  */
 export const DialogPortalContainer = React.createContext<HTMLElement | null>(null);
 
+/** A sheet's slide away before it closes: true when it's sliding (it closes itself once out of sight). */
+type SlideOut = () => boolean;
+
+/**
+ * Put a sheet's slide away where its dialog reads it (or take it off, when the sheet's gone). A
+ * module-level helper: the React Compiler skips a hook that writes a ref it was handed.
+ */
+function putSlideOut(holder: { current: SlideOut | null }, slide: SlideOut | null, unless?: SlideOut) {
+	if (unless === undefined || holder.current === unless) holder.current = slide;
+}
+
 interface DialogContextValue {
 	onOpenChange?: (open: boolean) => void;
+	/**
+	 * Close it as the person asked (its X, a tap outside, Escape, Back, the idle timeout): a sheet on
+	 * a phone slides away first, as it does when dragged down, everything else closes at once.
+	 */
+	requestClose?: () => void;
+	/** Where a sheet-shaped `DialogContent` puts its slide away, for `requestClose`. */
+	slideOut?: { current: SlideOut | null };
 	/** The title's id, for the content's aria-labelledby. */
 	titleId?: string;
 }
@@ -173,13 +191,25 @@ const Dialog: React.FC<DialogProps> = ({
 
 	const titleId = useId();
 
+	// A sheet on a phone slides away before it closes (useSheetDrag puts its slide here), so a tap
+	// outside or the X leaves the way a drag down does instead of vanishing
+	const slideOut = useRef<SlideOut | null>(null);
+	const requestClose = () => {
+		if (slideOut.current?.()) return;
+		onOpenChangeRef.current?.(false);
+	};
+	const requestCloseRef = useRef(requestClose);
+	useLayoutEffect(() => {
+		requestCloseRef.current = requestClose;
+	});
+
 	// Its place in the stack (Escape closes only the top one), for as long as it's open
 	useEffect(() => {
 		if (!open || !canClose) return;
 		const token = {};
 		openDialogs.push(token);
 		const onKeyDown = (e: KeyboardEvent) => {
-			if (e.key === 'Escape' && openDialogs[openDialogs.length - 1] === token) onOpenChangeRef.current?.(false);
+			if (e.key === 'Escape' && openDialogs[openDialogs.length - 1] === token) requestCloseRef.current();
 		};
 		window.addEventListener('keydown', onKeyDown);
 		return () => {
@@ -195,7 +225,7 @@ const Dialog: React.FC<DialogProps> = ({
 		let idleTimer: ReturnType<typeof setTimeout> | undefined;
 		const resetIdleTimer = () => {
 			clearTimeout(idleTimer);
-			idleTimer = setTimeout(() => onOpenChangeRef.current?.(false), idleTimeoutMs);
+			idleTimer = setTimeout(() => requestCloseRef.current(), idleTimeoutMs);
 		};
 		for (const type of ACTIVITY_EVENTS) window.addEventListener(type, resetIdleTimer, { passive: true });
 		resetIdleTimer();
@@ -210,7 +240,8 @@ const Dialog: React.FC<DialogProps> = ({
 		if (!open || !canClose || !history) return;
 		return dialogHistory().open(
 			() => dialogSlug(titleText(container, titleId)),
-			() => onOpenChangeRef.current?.(false),
+			// Back has already taken its entry: sliding away first only delays the close
+			() => requestCloseRef.current(),
 		);
 	}, [open, canClose, history, container, titleId]);
 
@@ -221,14 +252,16 @@ const Dialog: React.FC<DialogProps> = ({
 	if (!open) return null;
 
 	const content = (
-		<DialogContext.Provider value={{ onOpenChange, titleId }}>
+		<DialogContext.Provider
+			value={{ onOpenChange, requestClose: canClose ? requestClose : undefined, slideOut, titleId }}
+		>
 			{/* The whole screen behind blurs, Home Assistant's toolbar included (panel extension;
 			    liftAboveChrome), so it's clear a dialog is open; a stacked dialog blurs the one under it */}
 			{/* biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Escape is handled on window above */}
 			<div
 				data-slot="dialog-overlay"
 				className="fixed inset-0 z-50 bg-black/40 [-webkit-backdrop-filter:blur(6px)] [backdrop-filter:blur(6px)]"
-				onClick={() => onOpenChange?.(false)}
+				onClick={() => (canClose ? requestClose() : undefined)}
 			/>
 			{/* A crash inside the dialog shows in a dialog that can still be closed, never blanking the panel */}
 			<ErrorBoundary
@@ -311,9 +344,16 @@ const PHONE = '(width < 40rem)';
  * finger dragging it down, the overlay fading with it, and let go past a quarter of its height (or
  * flicked down) slides away and closes; short of that it springs back. Up and sideways are left to
  * the content, as is anything scrolled. The gesture moves the element directly (no render a frame);
- * `close` is read when it's let go, so a parent's re-render mid-drag changes nothing.
+ * `close` is read when it's let go, so a parent's re-render mid-drag changes nothing. A close asked for
+ * without a drag (`slideOut`, the dialog's `requestClose`: a tap outside, the X, Escape, Back) slides
+ * it away the same way first.
  */
-function useSheetDrag(ref: { current: HTMLElement | null }, enabled: boolean, close: () => void) {
+function useSheetDrag(
+	ref: { current: HTMLElement | null },
+	enabled: boolean,
+	close: () => void,
+	slideOut: { current: SlideOut | null } | undefined,
+) {
 	const closeRef = useRef(close);
 	useLayoutEffect(() => {
 		closeRef.current = close;
@@ -408,6 +448,18 @@ function useSheetDrag(ref: { current: HTMLElement | null }, enabled: boolean, cl
 			const touch = e.touches[0];
 			if (touch && e.cancelable && sheetHoldsTouch(state, touch.clientX, touch.clientY)) e.preventDefault();
 		};
+		// Closed another way (a tap outside, the X, Escape, Back): slide away as a drag let go would.
+		// Off a phone the dialog isn't a sheet, and with reduced motion there's no slide: it closes at once
+		const slideAway = () => {
+			if (!phone.matches || reducedMotion.matches) return false;
+			if (state.phase !== 'closing') {
+				dispatch({ type: 'close' });
+				settle();
+			}
+			return true;
+		};
+		if (slideOut) putSlideOut(slideOut, slideAway);
+
 		const onClickCapture = (e: MouseEvent) => {
 			// A keyboard's click (no pointer, `detail` 0) is always the person's own
 			if (!dragged || e.detail === 0) return;
@@ -424,6 +476,7 @@ function useSheetDrag(ref: { current: HTMLElement | null }, enabled: boolean, cl
 		sheet.addEventListener('click', onClickCapture, true);
 		return () => {
 			clearTimeout(timer);
+			if (slideOut) putSlideOut(slideOut, null, slideAway);
 			sheet.removeEventListener('pointerdown', onPointerDown);
 			sheet.removeEventListener('pointermove', onPointerMove);
 			sheet.removeEventListener('pointerup', onPointerUp);
@@ -433,7 +486,7 @@ function useSheetDrag(ref: { current: HTMLElement | null }, enabled: boolean, cl
 			state = SHEET_IDLE;
 			paint();
 		};
-	}, [enabled]);
+	}, [enabled, slideOut]);
 }
 
 /** A div's attributes, its close button and its size. */
@@ -493,12 +546,12 @@ const CLOSE_BUTTON =
  * flow, so it lines up with what's beside it and with the content's edge.
  */
 const DialogClose: React.FC<{ className?: string }> = ({ className }) => {
-	const { onOpenChange } = React.useContext(DialogContext);
+	const { requestClose } = React.useContext(DialogContext);
 	return (
 		<button
 			type="button"
 			data-slot="dialog-close"
-			onClick={() => onOpenChange?.(false)}
+			onClick={() => requestClose?.()}
 			className={cn(CLOSE_BUTTON, className)}
 		>
 			<XIcon />
@@ -510,7 +563,7 @@ const DialogClose: React.FC<{ className?: string }> = ({ className }) => {
 /** The dialog's box (`role="dialog"`), sized by `size`, labelled by its `DialogTitle`. */
 const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
 	({ className, children, showCloseButton = true, size = 'default', onKeyDown, ...props }, ref) => {
-		const { onOpenChange, titleId } = React.useContext(DialogContext);
+		const { onOpenChange, requestClose, slideOut, titleId } = React.useContext(DialogContext);
 		const localRef = useRef<HTMLDivElement | null>(null);
 		const setRef = (el: HTMLDivElement | null) => {
 			localRef.current = el;
@@ -519,7 +572,7 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
 		};
 		useDialogFocus(localRef);
 		const sheetShaped = size === 'sheet' || size === 'detail';
-		useSheetDrag(localRef, sheetShaped && !!onOpenChange, () => onOpenChange?.(false));
+		useSheetDrag(localRef, sheetShaped && !!onOpenChange, () => onOpenChange?.(false), slideOut);
 		// A dialog that lays itself out as a flex column sizes its own rows (a scroller that shrinks);
 		// the others were grid rows, which never shrink, so on phones they keep their content height
 		const ownLayout =
@@ -569,7 +622,7 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
 					<button
 						type="button"
 						data-slot="dialog-close"
-						onClick={() => onOpenChange(false)}
+						onClick={() => requestClose?.()}
 						className={cn(
 							'absolute top-3 right-3 z-10 max-sm:top-[max(--spacing(3),calc(env(safe-area-inset-top)-var(--panel-top)))]',
 							CLOSE_BUTTON,

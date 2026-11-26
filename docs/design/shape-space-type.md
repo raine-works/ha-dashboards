@@ -158,6 +158,7 @@ Fills first, then hairlines, shadows only for what floats.
 | Dialog out | 150ms | `cubic-bezier(0.3, 0, 1, 1)` |
 | Sheet | 320ms | `cubic-bezier(0.32, 0.72, 0, 1)` (already in theme.css) |
 | A sheet dragged down, let go | 320ms, sliding away or back | the sheet's curve (`lib/sheet-drag.ts`) |
+| A sheet closed otherwise (a tap outside, its X, Back) | 320ms, sliding away | the sheet's curve (`lib/sheet-drag.ts`) |
 | A swipe settling | 450ms | `ease-spring` (already in theme.css) |
 | A number changing (`NumberFlow`) | 900ms roll | NumberFlow's own |
 
