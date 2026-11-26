@@ -5,6 +5,7 @@ import {
 	discoverDiffusers,
 	formatScentLeft,
 	getDiffuserView,
+	PRESS_SEEN_WITHIN_MS,
 	QUICK_SCENT_DEFAULT_S,
 	quickScentUntil,
 } from '../diffusers';
@@ -96,6 +97,24 @@ describe('quickScentUntil', () => {
 		expect(quickScentUntil(diffuser, noDuration)).toBe(Date.parse(pressed) + QUICK_SCENT_DEFAULT_S * 1000);
 		expect(quickScentUntil(diffuser, states())).toBeNull();
 	});
+
+	it("times a press seen arriving from its arrival, on this device's clock", () => {
+		const running = states({ [`button.${P}_quick_scent`]: pressed });
+		// This device's clock is 2s behind Home Assistant's: the press arrives at what it calls 19:59:58
+		const at = Date.parse(pressed) - 2_000;
+		expect(quickScentUntil(diffuser, running, { pressed, at })).toBe(at + 20_000);
+		// …and 3s ahead
+		expect(quickScentUntil(diffuser, running, { pressed, at: at + 5_000 })).toBe(at + 25_000);
+	});
+
+	it("times from Home Assistant's clock a press it saw an earlier one of, or one too far apart to be the same", () => {
+		const running = states({ [`button.${P}_quick_scent`]: pressed });
+		const earlier = { pressed: '2026-11-01T19:00:00.000Z', at: Date.parse(pressed) };
+		expect(quickScentUntil(diffuser, running, earlier)).toBe(Date.parse(pressed) + 20_000);
+		const farApart = { pressed, at: Date.parse(pressed) + PRESS_SEEN_WITHIN_MS + 1 };
+		expect(quickScentUntil(diffuser, running, farApart)).toBe(Date.parse(pressed) + 20_000);
+		expect(quickScentUntil(diffuser, running, null)).toBe(Date.parse(pressed) + 20_000);
+	});
 });
 
 describe('formatScentLeft', () => {
@@ -137,6 +156,15 @@ describe('getDiffuserView', () => {
 			label: 'On · Quick scent',
 		});
 		expect(getDiffuserView(diffuser, running, pressed + 20_000).quickScenting).toBe(false);
+	});
+
+	it("ends a quick scent seen arriving by this device's clock", () => {
+		const iso = '2026-11-01T20:00:00.000Z';
+		const running = states({ [`button.${P}_quick_scent`]: iso });
+		// Seen 2s "before" it was pressed: this device's clock is behind; it still runs its full 20s
+		const seen = { pressed: iso, at: Date.parse(iso) - 2_000 };
+		expect(getDiffuserView(diffuser, running, seen.at + 19_000, seen).quickScenting).toBe(true);
+		expect(getDiffuserView(diffuser, running, seen.at + 20_000, seen).quickScenting).toBe(false);
 	});
 
 	it('is off, or offline when the cloud loses it', () => {
