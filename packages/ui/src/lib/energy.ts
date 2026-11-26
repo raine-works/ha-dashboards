@@ -430,13 +430,31 @@ export function hourlyTotals(model: EnergyModel, rows: StatisticRows): number[] 
 
 // ── Formatting ──────────────────────────────────────────────────────────────────────────────────
 
-/** "426 W", "1.2 kW", "12 kW". */
+/** A power as `formatWatts` writes it, split for a number drawn on its own (`NumberFlow`). */
+export interface WattsParts {
+	/** The number, rounded as it's written (426, 1.2, 12). */
+	value: number;
+	/** Its decimals: 1 for kilowatts under 10, else 0. */
+	decimals: number;
+	/** "W" or "kW". */
+	unit: 'W' | 'kW';
+}
+
+/** A power split as it's written: watts under 1 kW, kilowatts (one decimal under 10) above. */
+export function wattsParts(watts: number): WattsParts {
+	const w = Math.abs(watts) < 0.5 ? 0 : watts;
+	if (Math.abs(w) < 1000) return { value: Math.round(w), decimals: 0, unit: 'W' };
+	const kw = w / 1000;
+	return Math.abs(kw) < 10
+		? { value: Math.round(kw * 10) / 10, decimals: 1, unit: 'kW' }
+		: { value: Math.round(kw), decimals: 0, unit: 'kW' };
+}
+
+/** "426 W", "1.2 kW", "12 kW" ("—" for none). */
 export function formatWatts(watts?: number): string {
 	if (watts === undefined) return '—';
-	const w = Math.abs(watts) < 0.5 ? 0 : watts;
-	if (Math.abs(w) < 1000) return `${Math.round(w)} W`;
-	const kw = w / 1000;
-	return `${Math.abs(kw) < 10 ? kw.toFixed(1) : Math.round(kw)} kW`;
+	const { value, decimals, unit } = wattsParts(watts);
+	return `${value.toFixed(decimals)} ${unit}`;
 }
 
 /** "0.25 kWh", "8.2 kWh", "364 kWh". */

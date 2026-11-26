@@ -41,6 +41,7 @@ import {
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
+	NumberFlow,
 } from '../ui';
 import type { MapZone } from './PeopleMap';
 
@@ -63,7 +64,8 @@ const Battery: React.FC<{ battery: PersonBattery }> = ({ battery }) => {
 	return (
 		<span className={cn('flex items-center gap-1.5 text-sm tabular-nums', tone)}>
 			<Icon className="size-4" />
-			{level}%{/* The charging icon says it on small screens, where the label would wrap */}
+			<NumberFlow value={level} suffix="%" />
+			{/* The charging icon says it on small screens, where the label would wrap */}
 			{charging && <span className="max-lg:hidden">· {battery.full ? 'Full' : 'Charging'}</span>}
 		</span>
 	);

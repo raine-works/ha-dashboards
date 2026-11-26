@@ -135,3 +135,14 @@ export const NumberFlowClock: React.FC<NumberFlowClockProps> = ({ seconds, trend
 		</span>
 	);
 };
+
+/**
+ * A temperature in whole degrees ("58°"), rolling to each new reading; an em dash when there's none
+ * (`formatDegrees`).
+ */
+export const Degrees: React.FC<{ value: number | null | undefined; className?: string }> = ({ value, className }) =>
+	value == null || !Number.isFinite(value) ? (
+		<span className={className}>—</span>
+	) : (
+		<NumberFlow value={Math.round(value)} suffix="°" className={className} />
+	);

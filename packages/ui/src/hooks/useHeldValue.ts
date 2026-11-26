@@ -66,5 +66,7 @@ export function useHeldValue(reported: number, settled: (held: number, reported:
 		commit: hold.commit,
 		/** Whether a set value is still on its way. */
 		pending: !!hold.held?.committed,
+		/** Whether it's being dragged (its readout follows the finger, so it shouldn't animate). */
+		dragging: !!hold.held && !hold.held.committed,
 	};
 }

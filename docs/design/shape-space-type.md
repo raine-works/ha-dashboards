@@ -164,6 +164,8 @@ Fills first, then hairlines, shadows only for what floats.
 - Only `transform` and `opacity` (the panels are slow); never `corner-shape`, blur or shadow spread.
 - Ambient motion only for alerts and what's playing; one or two things moving on a screen at most.
   A number rolls when it changes because someone changed it or it's news (a setpoint, the
-  temperature, a count), never once a second at the edge of the screen: the header's timer
-  counts in plain digits, the Timer dialog's clock rolls.
+  temperature, a count), never steadily at the edge of the screen: the header's timer and live
+  power count in plain digits, the Timer dialog's clock rolls. A countdown that's an alert (the
+  alarm's exit and entry delay) rolls where the eye already is. See
+  [NumberFlow](components.md#numberflow).
 - `prefers-reduced-motion`: no movement or scaling; opacity fades at 100ms; spinners stay.

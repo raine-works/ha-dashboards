@@ -23,6 +23,7 @@ import {
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
+	NumberFlow,
 	Slider,
 	Switch,
 } from '../ui';
@@ -129,7 +130,8 @@ export const FanRow: React.FC<{ fan: Fan; className?: string }> = ({ fan, classN
 							/>
 							{/* Room for "100%", so the slider never shifts as the speed changes */}
 							<span className="min-w-[4ch] shrink-0 text-right font-light text-2xl tabular-nums leading-none">
-								{percentage}
+								{/* Rolls as the fan reports a new speed; follows the finger as is while the slider's dragged */}
+								<NumberFlow value={percentage} animated={!speed.dragging} />
 								<span className="text-muted-foreground text-sm">%</span>
 							</span>
 						</div>

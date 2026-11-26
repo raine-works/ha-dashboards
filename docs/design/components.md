@@ -129,14 +129,34 @@ focus trap doesn't work inside the card's ShadowRoot, and it's no longer maintai
 
 ### NumberFlow
 
-A number that changes in place (a thermostat's setpoint, the outside temperature, a count badge,
-the Timer dialog's clock) rolls to its new value like a mechanical counter: `NumberFlow` (a value,
-`Intl.NumberFormat` options, a prefix or suffix) and `NumberFlowClock` (seconds as "3:05"), on
-NumberFlow's framework-free `<number-flow>` element. Its React wrapper isn't used: under
-preact/compat it hands the element a JSON string where it expects an object. The element is
-labelled with the whole value for screen readers and keeps still under reduced motion. Not for a
-readout that changes as you drag (a slider's percentage), or anything that would roll every second
-on a panel's edge.
+A number that changes in place rolls to its new value like a mechanical counter: `NumberFlow` (a
+value, `Intl.NumberFormat` options, a prefix or suffix), `NumberFlowClock` (seconds as "3:05") and
+`Degrees` (a temperature, "—" for none), on NumberFlow's framework-free `<number-flow>` element. Its
+React wrapper isn't used: under preact/compat it hands the element a JSON string where it expects an
+object. The element is labelled with the whole value for screen readers and keeps still under
+reduced motion.
+
+Where it rolls:
+
+| What | Where |
+| :--- | :--- |
+| Temperatures | The header's, the Weather dialog's and the Daily brief's; a thermostat's setpoint |
+| Counts | `CountBadge`, Music's "playing" count, All off (n), the To-do filters' open counts and "n selected", the keypad's system check (ready/total), a pet's visits today |
+| Levels | A pet's food and water, a person's phone battery, a curtain's position and a fan's speed (in their dialogs) |
+| Power | The Energy dialog's Using now and Always on |
+| Countdowns | The alarm's exit and entry delay, the Timer dialog's clock |
+
+Where it doesn't:
+
+- **A readout that follows a finger**: a slider's percentage (volume, a theme's corners), and a
+  curtain's or fan's while it's dragged (`animated={false}`); a curtain's while it moves, too, a new
+  estimate every 100ms.
+- **Steady motion at a panel's edge**: the header's timer and live power (a new reading every few
+  seconds), the panel's clock.
+- **What plays**: a track's or clip's position, a recording's length: they count every second and
+  follow the seek bar.
+- **Numbers in words or in lists that don't change in place**: status lines ("1 on", "69° inside"),
+  the forecast, chart axes and tooltips.
 
 ### Also kept
 

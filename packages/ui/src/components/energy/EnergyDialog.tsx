@@ -21,6 +21,7 @@ import {
 	runningCircuits,
 	type StatisticRows,
 	UNTRACKED,
+	wattsParts,
 } from '../../lib/energy';
 import {
 	Button,
@@ -32,11 +33,28 @@ import {
 	DialogHeader,
 	DialogTitle,
 	EmptyState,
+	NumberFlow,
 	ToggleGroup,
 	ToggleGroupItem,
 } from '../ui';
 import { fillFor, OTHER_FILL, UNTRACKED_FILL } from './fills';
 import { useEnergyHistory, useEnergyModel, useHouseWatts, useLivePower, usePowerHistory } from './useEnergy';
+
+/**
+ * A live power as `formatWatts` writes it ("426 W", "1.2 kW"), its number rolling as the reading
+ * changes (`NumberFlow`); "—" when there's none.
+ */
+const Watts: React.FC<{ watts: number | undefined }> = ({ watts }) => {
+	if (watts === undefined) return <>{formatWatts(undefined)}</>;
+	const { value, decimals, unit } = wattsParts(watts);
+	return (
+		<NumberFlow
+			value={value}
+			format={{ minimumFractionDigits: decimals, maximumFractionDigits: decimals }}
+			suffix={` ${unit}`}
+		/>
+	);
+};
 
 // Recharts (shadcn's charts) is ~430KB, so the charts load when the dialog first opens, in a chunk
 // of their own; every other page load skips it
@@ -87,7 +105,9 @@ const NowCard: React.FC<{
 			<div className="flex items-end justify-between gap-3">
 				<div className="flex flex-col">
 					<span className="font-semibold text-muted-foreground text-xs uppercase tracking-wide">Using now</span>
-					<span className="font-light text-5xl tabular-nums leading-tight tracking-tight">{formatWatts(total)}</span>
+					<span className="font-light text-5xl tabular-nums leading-tight tracking-tight">
+						<Watts watts={total} />
+					</span>
 				</div>
 				{baseLoad !== undefined && (
 					<div className="flex min-w-0 flex-col items-end text-right">
@@ -95,7 +115,9 @@ const NowCard: React.FC<{
 							<Gauge className="size-3.5" />
 							Always on
 						</span>
-						<span className="font-semibold">{formatWatts(baseLoad)}</span>
+						<span className="font-semibold tabular-nums">
+							<Watts watts={baseLoad} />
+						</span>
 						<span className="text-muted-foreground text-xs">≈ {formatKwh(monthlyKwh(baseLoad))} a month</span>
 					</div>
 				)}

@@ -27,6 +27,7 @@ import {
 	seriesId,
 	sumChange,
 	UNTRACKED,
+	wattsParts,
 } from '../energy';
 
 const power = (entity_id: string, state: string, unit = 'W'): HassEntity =>
@@ -309,6 +310,7 @@ describe('formatting', () => {
 		expect(formatWatts(12_400)).toBe('12 kW');
 		expect(formatWatts(0.2)).toBe('0 W');
 		expect(formatWatts(undefined)).toBe('—');
+		expect(formatWatts(2000)).toBe('2.0 kW');
 		expect(formatKwh(0.254)).toBe('0.25 kWh');
 		expect(formatKwh(8.24)).toBe('8.2 kWh');
 		expect(formatKwh(1364.4, false)).toBe('1,364');
@@ -328,5 +330,17 @@ describe('formatting', () => {
 		expect(formatBucket(new Date(2026, 9, 24), 'month')).toBe('24');
 		expect(describeBucket(new Date(2026, 9, 24, 15), 'today')).toBe('3 PM – 4 PM');
 		expect(describeBucket(new Date(2026, 9, 20), 'week')).toBe('Tuesday, Oct 20');
+	});
+});
+
+describe('wattsParts', () => {
+	it('splits a power as formatWatts writes it, for a number that rolls on its own', () => {
+		expect(wattsParts(426.03)).toEqual({ value: 426, decimals: 0, unit: 'W' });
+		expect(wattsParts(1234)).toEqual({ value: 1.2, decimals: 1, unit: 'kW' });
+		expect(wattsParts(9960)).toEqual({ value: 10, decimals: 1, unit: 'kW' });
+		expect(wattsParts(12_400)).toEqual({ value: 12, decimals: 0, unit: 'kW' });
+		expect(wattsParts(0.2)).toEqual({ value: 0, decimals: 0, unit: 'W' });
+		// Exporting (solar) is negative
+		expect(wattsParts(-1500)).toEqual({ value: -1.5, decimals: 1, unit: 'kW' });
 	});
 });
