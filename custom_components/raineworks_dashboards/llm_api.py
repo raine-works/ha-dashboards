@@ -27,6 +27,7 @@ from typing import Any, override
 from homeassistant.auth.models import User
 from homeassistant.components.websocket_api import ActiveConnection
 from homeassistant.components.websocket_api.http import WebSocketAdapter
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import (
@@ -41,7 +42,14 @@ from homeassistant.util.json import json_loads
 import probatio
 import yaml
 
-from .const import CONF_HOUSE, CONF_HOUSEHOLD_GROUP, DOMAIN
+from .const import (
+    CONF_DEVICE,
+    CONF_HOUSE,
+    CONF_HOUSEHOLD_GROUP,
+    DOMAIN,
+    SUBENTRY_WALL_PANEL,
+)
+from .hardware import device_hardware
 from .household import household
 from .modules import (
     HOUSEHOLD_LIGHT_LABEL,
@@ -50,18 +58,22 @@ from .modules import (
     module_states,
     parse_house_config,
 )
+from .themes import CONF_THEME, DEFAULT_THEME, KEEP_HA_THEME
 
 _LOGGER = logging.getLogger(__name__)
 
 LLM_API_ID = f"{DOMAIN}_setup"
 LLM_API_NAME = "Raineworks Dashboards setup"
 API_PROMPT = (
-    "Tools to set up Raineworks Dashboards on this Home Assistant: start with "
-    "integration_status, then capability_report for what this house has and what "
-    "each missing feature needs. Lights show on the dashboards once labeled "
-    '"Household Light" and in an area on a floor (find_unlabeled_lights, '
-    "list_floors). label_household_lights and create_dashboard change Home "
-    "Assistant: say what they'll do and wait for the user to agree first."
+    "Tools to set up Raineworks Dashboards on this Home Assistant, which replace "
+    "its own interface: start with integration_status, then capability_report for "
+    "what this house has and what each missing feature needs. Lights show on the "
+    'dashboards once labeled "Household Light" and in an area on a floor '
+    "(find_unlabeled_lights, list_floors). For the whole takeover: a Home "
+    "dashboard (create_dashboard), made the default (set_default_dashboard), the "
+    "house theme (set_house_theme), and a wall panel per tablet "
+    "(find_wall_panel_devices, add_wall_panel). Every tool that changes Home "
+    "Assistant says so: say what it will do and wait for the user to agree first."
 )
 
 # A command run as the caller should answer quickly; a stuck one never blocks a tool
@@ -77,10 +89,16 @@ _LABELS = llm.ToolAnnotations(
 _CREATES = llm.ToolAnnotations(
     read_only=False, destructive=False, idempotent=False, open_world=False
 )
+# Setting the same value again changes nothing more
+_SETS = llm.ToolAnnotations(
+    read_only=False, destructive=False, idempotent=True, open_world=False
+)
 
 # Indicators and status LEDs are lights too, but not room lights
 _INDICATOR = re.compile(r"\b(led|indicator|status|night ?light|backlight)\b", re.I)
 _URL_PATH = re.compile(r"[a-z0-9]+(-[a-z0-9]+)+")
+# Home Assistant's own Overview dashboard, outside the dashboards list
+OVERVIEW = "lovelace"
 _CARD_TYPE = re.compile(r"custom:[\w-]+")
 
 
@@ -132,9 +150,38 @@ def snapshot(hass: HomeAssistant) -> dict[str, Any]:
     }
 
 
-def _options(hass: HomeAssistant) -> dict[str, Any]:
+def _entry(hass: HomeAssistant) -> ConfigEntry | None:
     entries = hass.config_entries.async_loaded_entries(DOMAIN)
-    return dict(entries[0].options) if entries else {}
+    return entries[0] if entries else None
+
+
+def _options(hass: HomeAssistant) -> dict[str, Any]:
+    entry = _entry(hass)
+    return dict(entry.options) if entry else {}
+
+
+def house_themes(hass: HomeAssistant) -> list[dict[str, str]]:
+    """The themes the house can have: the presets, then the house's own custom ones."""
+    themes = hass.data.get(f"{DOMAIN}_themes")
+    if themes is None:
+        return []
+    return [
+        {"id": t["id"], "name": t["name"]}
+        for t in [
+            *themes.presets,
+            *(t for t in themes.custom if t.get("owner") is None),
+        ]
+    ]
+
+
+def _wall_panels(entry: ConfigEntry | None) -> list[Any]:
+    if entry is None:
+        return []
+    return [
+        sub
+        for sub in entry.subentries.values()
+        if sub.subentry_type == SUBENTRY_WALL_PANEL
+    ]
 
 
 def _household(hass: HomeAssistant) -> list[str]:
@@ -296,12 +343,29 @@ async def _integration_status(hass: HomeAssistant, user: User, _: dict) -> Any:
                 "custom_cards": cards,
             }
         )
+    devices = dr.async_get(hass)
+    theme = _options(hass).get(CONF_THEME, DEFAULT_THEME)
     return {
         "version": str(integration.version),
         "state": entries[0].state.value if entries else "not set up",
         "household": _household(hass),
         "house_settings": _options(hass).get(CONF_HOUSE) or {},
         "dashboards": dashboards,
+        # Everyone's landing page, unless they picked their own in their profile
+        "default_dashboard": await _default_dashboard(hass, user),
+        "house_theme": "keep" if theme == KEEP_HA_THEME else theme,
+        "themes": house_themes(hass),
+        "wall_panels": [
+            {
+                "name": sub.title,
+                "device": (
+                    (dev.name_by_user or dev.name)
+                    if (dev := devices.async_get(sub.data.get(CONF_DEVICE) or ""))
+                    else None
+                ),
+            }
+            for sub in _wall_panels(_entry(hass))
+        ],
         "cards": {
             "custom:home-dashboard": "Desktops and phones",
             "custom:wall-panel-dashboard": "A wall tablet (name, floor, timer)",
@@ -392,30 +456,42 @@ async def _label_household_lights(
     }
 
 
-async def _create_dashboard(
-    hass: HomeAssistant, user: User, args: dict[str, Any]
-) -> Any:
-    url_path = args["url_path"]
+def _card(args: dict[str, Any], wall_panel: bool) -> dict[str, Any]:
+    """The card a dashboard hosts, from the tool's arguments."""
+    if not wall_panel:
+        return {"type": "custom:home-dashboard"}
+    card: dict[str, Any] = {"type": "custom:wall-panel-dashboard"}
+    card |= {k: args[k] for k in ("name", "floor") if args.get(k)}
+    if args.get("timer"):
+        card["timer"] = True
+    return card
+
+
+async def _save_dashboard(
+    hass: HomeAssistant,
+    user: User,
+    title: str,
+    url_path: str,
+    card: dict[str, Any],
+) -> None:
+    """A new dashboard hosting one card, through Home Assistant's own commands.
+
+    Raises:
+        HomeAssistantError: The url_path isn't one, or is taken.
+    """
     if not _URL_PATH.fullmatch(url_path):
         raise HomeAssistantError(
             "url_path must be lowercase words joined by hyphens, "
             "with at least one hyphen"
         )
-    wall_panel = args["card"] == "wall_panel"
-    card: dict[str, Any] = {
-        "type": "custom:wall-panel-dashboard" if wall_panel else "custom:home-dashboard"
-    }
-    if wall_panel:
-        card |= {k: args[k] for k in ("name", "floor") if args.get(k)}
-        if args.get("timer"):
-            card["timer"] = True
+    wall_panel = card["type"] == "custom:wall-panel-dashboard"
     await run_command(
         hass,
         user,
         {
             "type": "lovelace/dashboards/create",
             "url_path": url_path,
-            "title": args["title"],
+            "title": title,
             "mode": "storage",
             "icon": "mdi:tablet" if wall_panel else "mdi:home",
             "show_in_sidebar": True,
@@ -431,15 +507,165 @@ async def _create_dashboard(
             "config": dashboard_config(card),
         },
     )
+
+
+async def _create_dashboard(
+    hass: HomeAssistant, user: User, args: dict[str, Any]
+) -> Any:
+    wall_panel = args["card"] == "wall_panel"
+    card = _card(args, wall_panel)
+    url_path = args["url_path"]
+    await _save_dashboard(hass, user, args["title"], url_path, card)
     return {
         "created": f"/{url_path}/home",
         "card": card,
         "next": (
-            "Point the tablet at this dashboard, then add it on the integration's "
-            "page (Add wall panel) for its status light and wake."
+            "Point the tablet at this dashboard; add_wall_panel registers its "
+            "device for its status light and wake."
             if wall_panel
             else None
         ),
+    }
+
+
+async def _default_dashboard(hass: HomeAssistant, user: User) -> str | None:
+    """Everyone's default dashboard (Home Assistant's own setting), if one is set."""
+    result = await run_command(
+        hass, user, {"type": "frontend/get_system_data", "key": "core"}
+    )
+    core = (result or {}).get("value") or {}
+    return core.get("default_panel")
+
+
+async def _set_default_dashboard(
+    hass: HomeAssistant, user: User, args: dict[str, Any]
+) -> Any:
+    url_path = args["url_path"]
+    dashboards = await run_command(hass, user, {"type": "lovelace/dashboards/list"})
+    # Home Assistant's own Overview isn't in the list, and is how a takeover is undone
+    known = {OVERVIEW, *(d["url_path"] for d in dashboards)}
+    if url_path not in known:
+        raise HomeAssistantError(
+            f"There's no dashboard at {url_path}: integration_status lists them"
+        )
+    result = await run_command(
+        hass, user, {"type": "frontend/get_system_data", "key": "core"}
+    )
+    core = (result or {}).get("value") or {}
+    await run_command(
+        hass,
+        user,
+        {
+            "type": "frontend/set_system_data",
+            "key": "core",
+            "value": {**core, "default_panel": url_path},
+        },
+    )
+    return {
+        "default_dashboard": url_path,
+        "previous": core.get("default_panel"),
+        "note": "Anyone who picked their own default dashboard in their profile "
+        "keeps it.",
+    }
+
+
+async def _set_house_theme(
+    hass: HomeAssistant, user: User, args: dict[str, Any]
+) -> Any:
+    entry = _entry(hass)
+    if entry is None:
+        raise HomeAssistantError("The integration isn't set up")
+    theme = args["theme"]
+    ids = [t["id"] for t in house_themes(hass)]
+    if theme != "keep" and theme not in ids:
+        raise HomeAssistantError(
+            f"No theme {theme!r}: one of {', '.join(ids)}, or keep "
+            "(Home Assistant's own)"
+        )
+    previous = entry.options.get(CONF_THEME, DEFAULT_THEME)
+    value = KEEP_HA_THEME if theme == "keep" else theme
+    # The options change reloads the entry, which makes it Home Assistant's default
+    hass.config_entries.async_update_entry(
+        entry, options={**entry.options, CONF_THEME: value}
+    )
+    return {
+        "house_theme": theme,
+        "previous": "keep" if previous == KEEP_HA_THEME else previous,
+        "note": "Home Assistant's own pages and the dashboards follow it for anyone "
+        "who hasn't picked a theme of their own.",
+    }
+
+
+async def _find_wall_panel_devices(hass: HomeAssistant, user: User, _: dict) -> Any:
+    registered = {sub.data.get(CONF_DEVICE) for sub in _wall_panels(_entry(hass))}
+    areas = ar.async_get(hass)
+    found = []
+    for device in dr.async_get(hass).devices.values():
+        if device.disabled:
+            continue
+        hardware = device_hardware(hass, device.id)
+        # A tablet wakes or restarts; a light alone is a bulb, not a status light
+        if not (hardware.wake or hardware.reload):
+            continue
+        area = areas.async_get_area(device.area_id) if device.area_id else None
+        found.append(
+            {
+                "device_id": device.id,
+                "name": device.name_by_user or device.name,
+                "manufacturer": device.manufacturer,
+                "model": device.model,
+                "area": area.name if area else None,
+                "status_light": hardware.status_light,
+                "wake": hardware.wake,
+                "reload": hardware.reload,
+                "registered": device.id in registered,
+            }
+        )
+    return {"devices": sorted(found, key=lambda d: (d["name"] or "").casefold())}
+
+
+async def _add_wall_panel(hass: HomeAssistant, user: User, args: dict[str, Any]) -> Any:
+    entry = _entry(hass)
+    if entry is None:
+        raise HomeAssistantError("The integration isn't set up")
+    device_id = args.get("device_id")
+    if device_id:
+        if dr.async_get(hass).async_get(device_id) is None:
+            raise HomeAssistantError(
+                f"No device {device_id}: find_wall_panel_devices lists them"
+            )
+        if any(sub.data.get(CONF_DEVICE) == device_id for sub in _wall_panels(entry)):
+            raise HomeAssistantError("That device is a wall panel already")
+    name = args["name"].strip()
+    card = _card({**args, "name": name}, wall_panel=True)
+    url_path = args["url_path"]
+    await _save_dashboard(hass, user, args.get("title") or name, url_path, card)
+    registered = False
+    if device_id:
+        flows = hass.config_entries.subentries
+        result = await flows.async_init(
+            (entry.entry_id, SUBENTRY_WALL_PANEL), context={"source": "user"}
+        )
+        result = await flows.async_configure(
+            result["flow_id"], {"name": name, CONF_DEVICE: device_id}
+        )
+        registered = result["type"] == "create_entry"
+    hardware = device_hardware(hass, device_id) if device_id else None
+    return {
+        "dashboard": f"/{url_path}/home",
+        "card": card,
+        "registered": registered,
+        "hardware": (
+            {
+                "status_light": hardware.status_light,
+                "wake": hardware.wake,
+                "reload": hardware.reload,
+            }
+            if hardware
+            else None
+        ),
+        "next": "Open the dashboard on the tablet, signed in as the user the "
+        "panels share, in its kiosk browser.",
     }
 
 
@@ -541,6 +767,89 @@ SPECS: tuple[_Spec, ...] = (
             ): str,
             probatio.Optional(
                 "timer", description="wall_panel: a countdown timer in the header"
+            ): bool,
+        },
+    ),
+    _Spec(
+        name="set_default_dashboard",
+        title="Set the default dashboard",
+        description=(
+            "Makes a dashboard everyone's default, the page Home Assistant opens on "
+            "(anyone who picked their own in their profile keeps it): the Home "
+            "dashboard, for the dashboards to replace Home Assistant's own. Takes a "
+            "url_path from integration_status, or lovelace (Home Assistant's own "
+            "Overview, to put it back). Changes Home Assistant: confirm with the user "
+            "first."
+        ),
+        run=_set_default_dashboard,
+        annotations=_SETS,
+        parameters={
+            probatio.Required(
+                "url_path",
+                description="A dashboard's url_path (dashboard-home), or lovelace",
+            ): str
+        },
+    ),
+    _Spec(
+        name="set_house_theme",
+        title="Set the house theme",
+        description=(
+            "The house's theme: the dashboards' and Home Assistant's own pages', for "
+            "anyone who hasn't picked one of their own. One of integration_status's "
+            "themes by id, or keep (Home Assistant's own theme). Changes Home "
+            "Assistant: confirm with the user first."
+        ),
+        run=_set_house_theme,
+        annotations=_SETS,
+        parameters={
+            probatio.Required(
+                "theme", description="A theme id from integration_status, or keep"
+            ): str
+        },
+    ),
+    _Spec(
+        name="find_wall_panel_devices",
+        title="Wall panel devices",
+        description=(
+            "Devices that look like wall tablets the integration can drive: a wake "
+            "(screen) button or switch, or a restart button, and the status light if "
+            "it has one (a ROAMiQ panel, Fully Kiosk Browser), and whether each is "
+            "registered already. A tablet with none of them still runs a wall panel "
+            "dashboard."
+        ),
+        run=_find_wall_panel_devices,
+        annotations=_READ_ONLY,
+    ),
+    _Spec(
+        name="add_wall_panel",
+        title="Add a wall panel",
+        description=(
+            "A wall tablet end to end: its dashboard (the wall panel card, with its "
+            "name, floor and optional timer), and with a device_id from "
+            "find_wall_panel_devices, the device registered so its status light "
+            "follows the alarm and doors and a doorbell ring wakes its screen. "
+            "Changes Home Assistant: confirm with the user first."
+        ),
+        run=_add_wall_panel,
+        annotations=_CREATES,
+        parameters={
+            probatio.Required(
+                "name", description='Its name ("Kitchen wall panel")'
+            ): str,
+            probatio.Required(
+                "url_path", description="Its dashboard's URL, with a hyphen"
+            ): str,
+            probatio.Optional(
+                "title", description="Its dashboard's name in the sidebar"
+            ): str,
+            probatio.Optional(
+                "device_id", description="The tablet, from find_wall_panel_devices"
+            ): str,
+            probatio.Optional(
+                "floor", description="A floor_id from list_floors: its lights first"
+            ): str,
+            probatio.Optional(
+                "timer", description="A countdown timer in the header"
             ): bool,
         },
     ),
