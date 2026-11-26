@@ -7,6 +7,7 @@
  */
 import React from 'preact/compat';
 import { createRoot } from 'preact/compat/client';
+import { PanelAlerts } from '../components/alerts/PanelAlerts';
 import { AssistOverlay } from '../components/assist/AssistOverlay';
 import { BundleUpdates } from '../components/layout/BundleUpdates';
 import { ConnectionBanner } from '../components/layout/ConnectionBanner';
@@ -31,8 +32,9 @@ import { themeCss, themeEffects } from '../themes/css';
 import { isNight, nightCss } from '../themes/night';
 import type { DashboardTheme } from '../themes/tokens';
 import type { HomeAssistant } from '../types/homeassistant';
-import { hidePageScrollbar, hideToolbar, keepSidebarHidden } from './chrome';
+import { hidePageScrollbar, hideToolbar, keepSidebarHidden, toolbarBottom } from './chrome';
 import { ensurePanelFonts } from './fonts';
+import { isPageHost, joinPage, type PageCard } from './page-host';
 
 type PreactRoot = ReturnType<typeof createRoot>;
 
@@ -41,6 +43,47 @@ export interface PanelComponentProps {
 	/** The card's Lovelace YAML config, as `setConfig` received it (`{}` when there's none). */
 	config: Record<string, unknown>;
 }
+
+/** A card's size in Home Assistant's sections view (its `getGridOptions()`; 12 columns a section). */
+export interface CardGridOptions {
+	columns?: number | 'full';
+	rows?: number | 'auto';
+	min_columns?: number;
+	min_rows?: number;
+}
+
+/**
+ * A section card: one part of a dashboard, placed by Home Assistant's own layout (its sections view,
+ * or any other) among any other cards, instead of a whole page.
+ */
+export interface SectionCardOptions {
+	/** Its name in Home Assistant's card picker ("Raineworks Lighting"). */
+	name: string;
+	/** What it shows, under the name in the card picker. */
+	description: string;
+	/** Its size in the sections view. */
+	grid?: CardGridOptions;
+	/** A new card's YAML when it's picked (`getStubConfig()`), beside its `type`. */
+	stub?: Record<string, unknown>;
+}
+
+/** Home Assistant's card picker list (`window.customCards`). */
+interface CustomCardEntry {
+	type: string;
+	name: string;
+	description: string;
+	preview?: boolean;
+	documentationURL?: string;
+}
+
+declare global {
+	interface Window {
+		customCards?: CustomCardEntry[];
+	}
+}
+
+/** Where a card's options are documented, for the card picker's link. */
+const CARDS_DOCS = 'https://github.com/raine-works/ha-dashboards/blob/master/docs/cards.md';
 
 /** How {@link definePanelElement} builds a card: its tag, component, styles and behaviour. */
 export interface PanelElementOptions {
@@ -80,6 +123,13 @@ export interface PanelElementOptions {
 	 * `name` option, else this name (`true`: "Wall panel").
 	 */
 	wallPanel?: string | boolean;
+	/**
+	 * A section card, not a whole page: it's as tall as its content in the flow of Home Assistant's
+	 * page (nothing fitted, the toolbar and sidebar left alone), transparent on the view's background,
+	 * its breakpoints follow its own width (`[data-card]`, theme.css), it's listed in Home Assistant's
+	 * card picker, and the page's alerts and overlays come from whichever card hosts them (page-host.ts).
+	 */
+	card?: SectionCardOptions;
 }
 
 const panelStyles = (key: string) => globalThis.__panelStyles?.[key] ?? '';
@@ -101,6 +151,7 @@ export function definePanelElement({
 	fillViewport = false,
 	hideChrome = false,
 	wallPanel = false,
+	card,
 }: PanelElementOptions) {
 	class PanelElement extends HTMLElement {
 		private _root: PreactRoot | null = null;
@@ -122,6 +173,20 @@ export function definePanelElement({
 		private _showPageScrollbar: (() => void) | null = null;
 		/** The connection the household was last asked over (asked again after a reconnect). */
 		private _householdFor: unknown = null;
+		/** This card on the page: whether it mounts the page's overlays (page-host.ts). */
+		private _page: PageCard = {
+			priority: card ? 0 : 1,
+			onHostChange: () => {
+				this._renderedScheme = null;
+				this._render();
+			},
+		};
+		private _leavePage: (() => void) | null = null;
+
+		/** A new card's YAML, beside its `type`, when Home Assistant's card picker adds one. */
+		static getStubConfig() {
+			return { ...card?.stub };
+		}
 		public config: Record<string, unknown> = {};
 
 		setConfig(config: Record<string, unknown>) {
@@ -152,6 +217,8 @@ export function definePanelElement({
 				this._themeEl.id = `${tag}-theme`;
 				shadow.appendChild(this._themeEl);
 
+				// A section card: content height, on the view's background (theme.css's :host([data-card-mode]))
+				if (card) this.dataset.cardMode = '';
 				this._mountPoint = document.createElement('div');
 				this._mountPoint.style.cssText = 'width:100%;height:100%;display:flex;flex-direction:column';
 				// Wall panels: every control a size up for fingers (the `touch:` variant in theme.css)
@@ -166,8 +233,9 @@ export function definePanelElement({
 			this._render();
 			// Before measuring the space above the element, which the toolbar took
 			if (hideChrome && !this._showToolbar) this._showToolbar = hideToolbar(this);
-			// No scrollbar on the page while the dashboard is on it
-			this._showPageScrollbar ??= hidePageScrollbar();
+			// No scrollbar on the page while the dashboard is on it (a section card leaves the page as it is)
+			if (!card) this._showPageScrollbar ??= hidePageScrollbar();
+			this._leavePage ??= joinPage(this._page);
 			// A custom theme saved, or the house theme changed: draw with it
 			this._stopCatalog ??= subscribeThemeCatalog(() => {
 				this._themeId = '';
@@ -192,6 +260,8 @@ export function definePanelElement({
 			this._showToolbar = null;
 			this._showPageScrollbar?.();
 			this._showPageScrollbar = null;
+			this._leavePage?.();
+			this._leavePage = null;
 		}
 
 		/**
@@ -203,9 +273,12 @@ export function definePanelElement({
 			let frame = 0;
 			const media = typeof fillViewport === 'string' ? window.matchMedia(fillViewport) : null;
 			const measure = () => {
-				// The toolbar is fixed, so the element's page offset is its height (also while scrolled)
-				const top = Math.max(0, Math.round(this.getBoundingClientRect().top + window.scrollY));
-				const fits = fillViewport !== false && (!media || media.matches);
+				// The toolbar is fixed, so a page's offset is its height (also while scrolled); a section card
+				// sits further down the page, so it asks the toolbar
+				const top = card
+					? toolbarBottom(this)
+					: Math.max(0, Math.round(this.getBoundingClientRect().top + window.scrollY));
+				const fits = !card && fillViewport !== false && (!media || media.matches);
 				const height = fits ? `${Math.max(0, window.innerHeight - top)}px` : '';
 				// Write only on a change, so the checks below cost a layout read and nothing more
 				if (this.style.getPropertyValue('--panel-top') !== `${top}px`)
@@ -254,6 +327,9 @@ export function definePanelElement({
 			this._applyNight();
 			if (scheme === this._renderedScheme) return;
 			this._renderedScheme = scheme;
+			// What the page needs once (the banner, the update toast, the Assist glow, the TV-audio confirm;
+			// a section card's alerts too), from one card however many are on it
+			const host = isPageHost(this._page);
 
 			this._root.render(
 				<React.StrictMode>
@@ -262,14 +338,27 @@ export function definePanelElement({
 							<DialogPortalContainer.Provider value={this._mountPoint}>
 								<HassProvider store={this._store}>
 									{/* A crash anywhere still leaves a message and Retry (and retries on its own), never a blank panel */}
-									<ErrorBoundary name="The dashboard" variant="page">
-										<Component config={this.config} />
+									<ErrorBoundary name={card ? card.name : 'The dashboard'} variant={card ? 'inline' : 'page'}>
+										{card ? (
+											// The breakpoints inside follow this width (theme.css); dialogs portal outside it
+											<div data-card className="@container/card w-full">
+												<Component config={this.config} />
+											</div>
+										) : (
+											<Component config={this.config} />
+										)}
 									</ErrorBoundary>
-									<ConnectionBanner />
-									<BundleUpdates />
-									<AssistOverlay />
-									{/* Asks before music cuts off a soundbar playing its TV's sound (any control can ask) */}
-									<TvAudioConfirm />
+									{host && (
+										<>
+											<ConnectionBanner />
+											<BundleUpdates />
+											<AssistOverlay />
+											{/* Asks before music cuts off a soundbar playing its TV's sound (any control can ask) */}
+											<TvAudioConfirm />
+											{/* A page's own layout mounts its alerts; section cards share one host's */}
+											{card && <PanelAlerts />}
+										</>
+									)}
 								</HassProvider>
 							</DialogPortalContainer.Provider>
 						</WallPanelContext.Provider>
@@ -327,6 +416,24 @@ export function definePanelElement({
 		getCardSize() {
 			return cardSize;
 		}
+
+		/** Its size in Home Assistant's sections view. */
+		getGridOptions() {
+			return card?.grid ?? { columns: 'full', rows: 'auto' };
+		}
+	}
+
+	// A section card appears in Home Assistant's card picker (once, however often the bundle loads)
+	if (card && typeof window !== 'undefined') {
+		window.customCards ??= [];
+		if (!window.customCards.some((c) => c.type === tag))
+			window.customCards.push({
+				type: tag,
+				name: card.name,
+				description: card.description,
+				preview: true,
+				documentationURL: CARDS_DOCS,
+			});
 	}
 
 	// A constructor can only be defined once, so every extra name gets its own subclass

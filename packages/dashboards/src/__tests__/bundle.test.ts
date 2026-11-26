@@ -27,6 +27,10 @@ describe('the dashboards bundle', () => {
 		for (const tag of ['home-dashboard', 'wall-panel-dashboard']) {
 			expect(text).toContain(`tag:"${tag}"`);
 		}
+		// The section cards, for Home Assistant's sections view and its card picker
+		for (const tag of ['header', 'lighting', 'security', 'climate', 'music', 'cameras'])
+			expect(text).toContain(`tag:"raineworks-${tag}"`);
+		expect(text).toContain('window.customCards');
 		// Former tags still work
 		for (const tag of ['kitchen-dashboard', 'basement-dashboard', 'hallway-dashboard', 'kitchen-wall-panel'])
 			expect(text).toContain(tag);
@@ -36,6 +40,12 @@ describe('the dashboards bundle', () => {
 		const text = await Bun.file(bundlePath).text();
 		expect(text.startsWith('(globalThis.__panelStyles??={})["dashboards"]=')).toBe(true);
 		expect(text).toContain(':host(home-dashboard)');
+	});
+
+	it("follows a section card's own width inside it, and the screen's everywhere else", async () => {
+		const text = await Bun.file(bundlePath).text();
+		expect(text).toMatch(/@container card \(width\s*<\s*64rem\)\s*\{\.max-lg\\\\:[\w-]+:where\(\[data-card\] \*\)/);
+		expect(text).toMatch(/\.max-lg\\\\:[\w-]+:not\(:where\(\[data-card\] \*\)\)/);
 	});
 
 	// What every page loads: the bundle and the chunks it imports statically (code it shares with a
@@ -106,11 +116,13 @@ describe('the dashboards bundle', () => {
 		// header buttons and bedtime by label, ~1.2MB with them; to 1.235MB for numbers that roll to a new value,
 		// NumberFlow's element (~16KB: it's on screen from the first paint, the header's temperature, so it isn't
 		// loaded on demand), and the phone sheets' drag down to close, ~1.23MB with them; to 1.24MB for the rest of
-		// the rolling numbers and the to-do items' edit dialog, ~1.236MB with them)
+		// the rolling numbers and the to-do items' edit dialog, ~1.236MB with them; to 1.28MB for the section cards:
+		// ~6KB of cards, and ~32KB of breakpoints written twice, as media queries and as container queries for
+		// a card's own width, which compress to ~2KB (~3KB more brotli in all), ~1.275MB with them)
 		const sizes = [bundlePath, ...(await staticChunks()).map((c) => join(dirname(bundlePath), c))].map(
 			(path) => Bun.file(path).size,
 		);
-		expect(sizes.reduce((a, b) => a + b, 0)).toBeLessThan(1_240_000);
+		expect(sizes.reduce((a, b) => a + b, 0)).toBeLessThan(1_280_000);
 	});
 
 	it('names a bundle by its content', () => {

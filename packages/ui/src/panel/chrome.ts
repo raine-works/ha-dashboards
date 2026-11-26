@@ -28,6 +28,15 @@ export function closestAcrossShadow(el: Element, tag: string): Element | null {
 	return null;
 }
 
+/**
+ * Where Home Assistant's toolbar ends (px from the window's top): a section card sits in the flow of
+ * the page, so its own top isn't the toolbar's height. 0 without one (a kiosk, a page outside a dashboard).
+ */
+export function toolbarBottom(card: Element): number {
+	const header = closestAcrossShadow(card, 'hui-root')?.shadowRoot?.querySelector('.header');
+	return header ? Math.max(0, Math.round(header.getBoundingClientRect().bottom)) : 0;
+}
+
 // Cards hiding each hui-root's toolbar: a card reconnecting (or a second one) shares the style, which
 // goes only once the last of them shows the toolbar again
 const toolbarUsers = new WeakMap<ShadowRoot, number>();

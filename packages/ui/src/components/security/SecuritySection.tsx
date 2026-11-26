@@ -54,6 +54,8 @@ export interface SecuritySectionProps {
 	compact?: boolean;
 	/** The Cameras card's View all (the Home dashboard's Cameras view on phones); the camera viewer without it. */
 	onViewCameras?: () => void;
+	/** The Cameras card at its foot (default); a dashboard with a Cameras card of its own leaves it out. */
+	cameras?: boolean;
 }
 
 const GARAGE_LABELS: Record<GarageStatus, string> = {
@@ -106,7 +108,11 @@ function usePending<T extends string>() {
 }
 
 /** Alarm, door locks (with contact sensors), garage bays and camera snapshots, discovered from Home Assistant. */
-const SecuritySectionContent: React.FC<SecuritySectionProps> = ({ compact: compactProp, onViewCameras }) => {
+const SecuritySectionContent: React.FC<SecuritySectionProps> = ({
+	compact: compactProp,
+	onViewCameras,
+	cameras = true,
+}) => {
 	const { callService, getHass } = useHassApi();
 	const smallPanel = useMediaQuery(COMPACT_PANEL_QUERY);
 	const compact = compactProp ?? smallPanel;
@@ -398,9 +404,11 @@ const SecuritySectionContent: React.FC<SecuritySectionProps> = ({ compact: compa
 					</SectionGroup>
 				)}
 
-				<ModuleGate id="cameras">
-					<CamerasCard compact={compact} onViewAll={onViewCameras} />
-				</ModuleGate>
+				{cameras && (
+					<ModuleGate id="cameras">
+						<CamerasCard compact={compact} onViewAll={onViewCameras} />
+					</ModuleGate>
+				)}
 			</div>
 		</section>
 	);
@@ -408,3 +416,5 @@ const SecuritySectionContent: React.FC<SecuritySectionProps> = ({ compact: compa
 
 /** Alarm, door locks and garage bays; a crash here leaves the rest of the panel working. */
 export const SecuritySection = withErrorBoundary(SecuritySectionContent, 'Security');
+
+export { CamerasCard } from './CamerasCard';

@@ -77,6 +77,10 @@ the way when it doesn't:
 3. **Label your lights.** Give room lights the label `household_light` (*Household Light*) so the
    lighting section lists them. Indicator LEDs and other non-room lights stay unlabeled.
 
+Or lay out your own: each part (the header, Lighting, Security, Climate, Music, Cameras) is also a card
+in Home Assistant's card picker, to arrange in its sections view among any other cards
+([section cards](docs/cards.md#section-cards-your-own-layout)).
+
 ### Wall panels
 
 Add a dashboard per tablet with the wall panel card, then register the tablet on the integration's

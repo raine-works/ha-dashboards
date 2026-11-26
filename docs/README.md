@@ -3,7 +3,7 @@
 | Guide | |
 | :--- | :--- |
 | [Installation](installation.md) | The integration, your first dashboard, labeling lights |
-| [The cards](cards.md) | `custom:home-dashboard` and `custom:wall-panel-dashboard`, their options, and the `house` settings |
+| [The cards](cards.md) | `custom:home-dashboard` and `custom:wall-panel-dashboard`, the section cards for your own layout, their options, and the `house` settings |
 | [Themes](themes.md) | Picking a theme, the house theme, a theme for one dashboard |
 | [Phone alerts](phone-alerts.md) | Which pushes each household member gets, and sending a push in a category |
 | [Wall panels](wall-panels.md) | Tablets on the wall: their hardware, the status light, a shared user |

@@ -1,6 +1,8 @@
 # The cards
 
-Both cards are whole dashboards: put one in a `panel: true` view, alone.
+Two cards are whole dashboards: put one in a `panel: true` view, alone. The [section
+cards](#section-cards-your-own-layout) are the same parts one at a time, to arrange in Home Assistant's
+own sections view among any other cards.
 
 ## `custom:home-dashboard`
 
@@ -53,6 +55,58 @@ For a tablet on the wall. See [Wall panels](wall-panels.md).
 | `color_scheme` | `dark` (default), `light`, `auto` | |
 | `theme` | a theme id | This panel in that theme ([Themes](themes.md)) |
 | `house` | see below | |
+
+## Section cards: your own layout
+
+Each part of the dashboards is also a card of its own, for a dashboard you lay out yourself in Home
+Assistant's **sections** view (or any view), beside any other card. Edit a dashboard → **Add card** →
+**By card**, and search for *Raineworks*; Home Assistant shows each with a live preview.
+
+| Card | | Options |
+| :--- | :--- | :--- |
+| `custom:raineworks-header` | The clock, weather, who's home and what the house is doing, with the daily brief, messages, to-dos and TVs a tap away: the wall panels' header where the card is about 1000px wide or more (a section spanning the view), the phone's narrower | |
+| `custom:raineworks-lighting` | Every light and scene by floor and room | `title` (default Lighting); `floor`: a floor id whose rooms come first (without one, every floor, top first) |
+| `custom:raineworks-security` | The alarm, locks with their doors, garage doors and the cameras | `cameras: false` leaves the cameras out (beside a Cameras card) |
+| `custom:raineworks-climate` | Thermostats, scent diffusers, curtains and blinds, and fans | |
+| `custom:raineworks-music` | Music Assistant: now playing, browse and search, the queue and speaker groups | |
+| `custom:raineworks-cameras` | Every camera's snapshot, each opening its live view and clips | |
+
+Every one also takes `color_scheme`, `theme` and `house`, as the whole dashboards do.
+
+```yaml
+type: sections
+max_columns: 3
+sections:
+  - type: grid
+    column_span: 3
+    cards:
+      - type: custom:raineworks-header
+  - type: grid
+    cards:
+      - type: custom:raineworks-lighting
+        floor: main_floor
+  - type: grid
+    cards:
+      - type: custom:raineworks-security
+        cameras: false
+      - type: custom:raineworks-cameras
+  - type: grid
+    cards:
+      - type: custom:raineworks-climate
+      - type: weather-forecast # any of Home Assistant's own cards, in between
+        entity: weather.home
+```
+
+- **They fit their column.** A card lays itself out for its own width, not the screen's: Lighting in a
+  phone-wide column on a desktop shows its rooms two across, as on a phone. Dialogs still open for the
+  screen (centered on a desktop, a sheet from the bottom on a phone).
+- **Home Assistant's own chrome stays**: its toolbar, sidebar and page scrolling, unlike the whole
+  dashboards, and each card is as tall as its content.
+- **Once per page**: the toasts (a door opened, the doorbell, the alarm), the doorbell's live view, the
+  Assist glow and the connection banner come from one card, whichever is first on the page, however many
+  there are.
+- **A part this house hasn't** says so instead of showing nothing ("Music needs the Music Assistant
+  integration"), as does one turned off in the house settings.
 
 ## The `house` settings
 
