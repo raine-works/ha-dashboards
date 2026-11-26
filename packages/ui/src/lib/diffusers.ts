@@ -100,14 +100,41 @@ const known = (entity: HassEntity | undefined) =>
 	entity && !isUnavailable(entity.state) && entity.state !== '' ? entity.state : null;
 
 /**
- * When the quick scent last pressed ends (epoch ms), or null when it was never pressed. The
- * button's state is when it was pressed; it runs for the duration entity's seconds.
+ * A quick scent's press as this page saw it arrive: the button's state (when it was pressed, on Home
+ * Assistant's clock) and when it arrived (epoch ms, on this device's clock).
  */
-export function quickScentUntil(d: Diffuser, states: Record<string, HassEntity | undefined>): number | null {
-	const pressed = Date.parse(known(states[d.quickScent]) ?? '');
+export interface PressSeen {
+	/** The button's state: the press's time, as Home Assistant wrote it. */
+	pressed: string;
+	/** When this page saw it, by `Date.now()`. */
+	at: number;
+}
+
+/**
+ * How far this device's clock may be from Home Assistant's for a press seen arriving to be timed from
+ * its arrival: further apart, it isn't the press that just happened (or the clocks are hopeless).
+ */
+export const PRESS_SEEN_WITHIN_MS = 15_000;
+
+/**
+ * When the quick scent last pressed ends (epoch ms, on this device's clock), or null when it was
+ * never pressed. The button's state is when it was pressed, by Home Assistant's clock; it runs for
+ * the duration entity's seconds. A press `seen` arriving while the page was open is timed from its
+ * arrival instead: a phone or panel whose clock is two seconds behind Home Assistant's would
+ * otherwise count a 30-second scent down from 32.
+ */
+export function quickScentUntil(
+	d: Diffuser,
+	states: Record<string, HassEntity | undefined>,
+	seen?: PressSeen | null,
+): number | null {
+	const state = known(states[d.quickScent]);
+	const pressed = Date.parse(state ?? '');
 	if (!Number.isFinite(pressed)) return null;
 	const seconds = Number(known(states[d.quickScentDuration]));
-	return pressed + (Number.isFinite(seconds) && seconds > 0 ? seconds : QUICK_SCENT_DEFAULT_S) * 1000;
+	const length = (Number.isFinite(seconds) && seconds > 0 ? seconds : QUICK_SCENT_DEFAULT_S) * 1000;
+	const live = seen != null && seen.pressed === state && Math.abs(seen.at - pressed) <= PRESS_SEEN_WITHIN_MS;
+	return (live ? seen.at : pressed) + length;
 }
 
 /** A running quick scent's time left on its button: "24s left", "1:30 left" (whole seconds, rounded up). */
@@ -138,17 +165,18 @@ export interface DiffuserView {
 	label: string;
 }
 
-/** What a diffuser row shows, at `now` (epoch ms). */
+/** What a diffuser row shows, at `now` (epoch ms); `seen`: its last quick scent's press arriving (`quickScentUntil`). */
 export function getDiffuserView(
 	d: Diffuser,
 	states: Record<string, HassEntity | undefined>,
 	now: number,
+	seen?: PressSeen | null,
 ): DiffuserView {
 	const power = known(states[d.power]);
 	const offline = power == null || states[d.online]?.state === 'off';
 	const status: DiffuserView['status'] = offline ? 'offline' : power === 'on' ? 'on' : 'off';
 	const scenting = status === 'on' && states[d.fan]?.state === 'on';
-	const until = quickScentUntil(d, states);
+	const until = quickScentUntil(d, states, seen);
 	const quickScenting = status !== 'offline' && until != null && now < until;
 	const concentration = known(states[d.concentration]);
 	const label =

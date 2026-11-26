@@ -6,7 +6,7 @@
 
 import { Check, CheckCheck, GripVertical, ListTodo, Loader2, Plus, Trash2, Undo2, Users, X } from 'lucide-react';
 import type React from 'preact/compat';
-import { memo, useEffect, useRef, useState } from 'preact/compat';
+import { memo, useEffect, useId, useRef, useState } from 'preact/compat';
 import { useHassApi, useHassSelector } from '../../context/HassContext';
 import { useStableCallbacks } from '../../hooks/useStableCallbacks';
 import { todoAssigneeAction } from '../../lib/household';
@@ -48,6 +48,7 @@ import {
 	Dialog,
 	DialogContent,
 	DialogDescription,
+	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 	EmptyState,
@@ -149,80 +150,159 @@ const AssigneePicker: React.FC<{
 };
 
 /**
- * Summary, plus the due date and who it's for when the list has them, for a new or edited item.
- * `defaultAssignee` presets a new item (the person the list is filtered to).
+ * A new item, on the dialog's bottom edge: who it's for (when the list has assignment), its summary
+ * and due date, and Add. `defaultAssignee` presets it (the person the list is filtered to). Editing
+ * an item is a dialog of its own (`EditItemDialog`).
  */
 const ItemForm: React.FC<{
 	list: TodoList;
 	people: PersonView[];
-	initial?: TodoItem;
 	defaultAssignee?: string;
 	onSubmit: (summary: string, due: Due | null, assignee: string | undefined) => void;
-	onCancel?: () => void;
 	className?: string;
-}> = ({ list, people, initial, defaultAssignee, onSubmit, onCancel, className }) => {
-	const [summary, setSummary] = useState(initial?.summary ?? '');
-	const [assignee, setAssignee] = useState(initial ? parseAssignee(initial.description).assignee : defaultAssignee);
+}> = ({ list, people, defaultAssignee, onSubmit, className }) => {
+	const [summary, setSummary] = useState('');
+	const [assignee, setAssignee] = useState(defaultAssignee);
 	const canAssign = people.length > 0 && todoSupports(list, TODO_FEATURE.SET_DESCRIPTION);
-	// Follow the filter while adding
+	// Follow the filter
 	useEffect(() => {
-		if (!initial) setAssignee(defaultAssignee);
+		setAssignee(defaultAssignee);
 	}, [defaultAssignee]);
-	const [due, setDue] = useState<Due | null>(() => dueOf(initial?.due));
-	const input = useRef<HTMLInputElement>(null);
+	const [due, setDue] = useState<Due | null>(null);
 	const withTime = todoSupports(list, TODO_FEATURE.SET_DUE_DATETIME);
 	const hasDue = withTime || todoSupports(list, TODO_FEATURE.SET_DUE_DATE);
-
-	useEffect(() => {
-		if (initial) input.current?.focus();
-	}, [initial]);
 
 	const submit = (e: Event) => {
 		e.preventDefault();
 		if (!summary.trim()) return;
 		onSubmit(summary.trim(), due, assignee);
-		if (!initial) {
-			setSummary('');
-			setDue(null);
-			setAssignee(defaultAssignee);
-		}
+		setSummary('');
+		setDue(null);
+		setAssignee(defaultAssignee);
 	};
 
-	const picker = canAssign && <AssigneePicker people={people} value={assignee} onChange={setAssignee} />;
 	return (
 		<form onSubmit={submit} className={cn('flex flex-wrap items-center gap-2', className)}>
-			{/* Adding (at the dialog's bottom edge), who it's for sits above the text box; editing, under it */}
-			{!initial && picker}
+			{/* Who it's for sits above the text box */}
+			{canAssign && <AssigneePicker people={people} value={assignee} onChange={setAssignee} />}
 			<Input
-				ref={input}
 				value={summary}
 				onInput={(e) => setSummary((e.target as HTMLInputElement).value)}
-				onKeyDown={(e) => e.key === 'Escape' && onCancel?.()}
 				placeholder={`Add to ${list.name}…`}
-				aria-label={initial ? 'Item' : `New item for ${list.name}`}
-				enterKeyHint={initial ? 'done' : 'enter'}
+				aria-label={`New item for ${list.name}`}
+				enterKeyHint="enter"
 				className="h-12 min-w-40 flex-1 text-base max-sm:basis-full md:text-base"
 			/>
-			{/* On phones the text box has its row to itself, the due date and buttons sharing the one under it */}
+			{/* On phones the text box has its row to itself, the due date and Add sharing the one under it */}
 			{hasDue && (
 				<DueDatePicker value={due} onChange={setDue} withTime={withTime} className="max-sm:max-w-none max-sm:flex-1" />
 			)}
-			{initial ? (
-				<>
-					<Button type="submit" size="icon-xl" aria-label="Save" disabled={!summary.trim()}>
-						<Check />
-					</Button>
-					<Button type="button" variant="outline" size="icon-xl" aria-label="Cancel" onClick={onCancel}>
-						<X />
-					</Button>
-				</>
-			) : (
-				<Button type="submit" size="xl" disabled={!summary.trim()} className="max-sm:flex-1">
-					<Plus />
-					Add
-				</Button>
+			<Button type="submit" size="xl" disabled={!summary.trim()} className="max-sm:flex-1">
+				<Plus />
+				Add
+			</Button>
+		</form>
+	);
+};
+
+/** One field of the edit dialog: its label as an overline, then the control. */
+const Field: React.FC<{ label: string; htmlFor?: string; children: React.ReactNode }> = ({
+	label,
+	htmlFor,
+	children,
+}) => (
+	<div className="flex min-w-0 flex-col gap-2">
+		<label htmlFor={htmlFor} className="text-muted-foreground text-overline uppercase">
+			{label}
+		</label>
+		{children}
+	</div>
+);
+
+/**
+ * An item's edit dialog (`detail`: a sheet from the bottom on phones, dragged down to close): what it
+ * says, when it's due and who it's for, each under its own label, then Delete and Save. Opened by
+ * tapping the item; closing it any other way (Escape, the X, a tap outside, Back) leaves the item as
+ * it was. Its fields start from the item, afresh each time it opens.
+ */
+const EditItemDialog: React.FC<{
+	list: TodoList;
+	people: PersonView[];
+	/** The item being edited (null: closed). */
+	item: TodoItem | null;
+	onSave: (item: TodoItem, summary: string, due: Due | null, assignee: string | undefined) => void;
+	onDelete: (item: TodoItem) => void;
+	onClose: () => void;
+}> = ({ list, people, item, onSave, onDelete, onClose }) => (
+	<Dialog open={!!item} onOpenChange={(open) => !open && onClose()}>
+		<DialogContent size="detail">
+			<DialogHeader>
+				<DialogTitle>Edit Item</DialogTitle>
+				<DialogDescription>{list.name}</DialogDescription>
+			</DialogHeader>
+			{item && (
+				<EditItemFields key={item.uid} list={list} people={people} item={item} onSave={onSave} onDelete={onDelete} />
 			)}
-			{initial && picker}
+		</DialogContent>
+	</Dialog>
+);
+
+const EditItemFields: React.FC<{
+	list: TodoList;
+	people: PersonView[];
+	item: TodoItem;
+	onSave: (item: TodoItem, summary: string, due: Due | null, assignee: string | undefined) => void;
+	onDelete: (item: TodoItem) => void;
+}> = ({ list, people, item, onSave, onDelete }) => {
+	const [summary, setSummary] = useState(item.summary);
+	const [due, setDue] = useState<Due | null>(() => dueOf(item.due));
+	const [assignee, setAssignee] = useState(parseAssignee(item.description).assignee);
+	const canAssign = people.length > 0 && todoSupports(list, TODO_FEATURE.SET_DESCRIPTION);
+	const withTime = todoSupports(list, TODO_FEATURE.SET_DUE_DATETIME);
+	const hasDue = withTime || todoSupports(list, TODO_FEATURE.SET_DUE_DATE);
+	const canDelete = todoSupports(list, TODO_FEATURE.DELETE);
+	const id = useId();
+
+	const submit = (e: Event) => {
+		e.preventDefault();
+		if (summary.trim()) onSave(item, summary.trim(), due, assignee);
+	};
+
+	return (
+		<form onSubmit={submit} className="contents">
+			<div className="flex min-w-0 flex-col gap-4">
+				<Field label="Item" htmlFor={`${id}-summary`}>
+					<Input
+						id={`${id}-summary`}
+						value={summary}
+						onInput={(e) => setSummary((e.target as HTMLInputElement).value)}
+						enterKeyHint="done"
+						className="h-12 text-base md:text-base"
+					/>
+				</Field>
+				{hasDue && (
+					<Field label="Due">
+						<DueDatePicker value={due} onChange={setDue} withTime={withTime} className="max-w-none self-start" />
+					</Field>
+				)}
+				{canAssign && (
+					<Field label="For">
+						<AssigneePicker people={people} value={assignee} onChange={setAssignee} />
+					</Field>
+				)}
+			</div>
+			<DialogFooter>
+				{canDelete && (
+					<Button type="button" variant="outline" size="xl" onClick={() => onDelete(item)} className="sm:mr-auto">
+						<Trash2 />
+						Delete
+					</Button>
+				)}
+				<Button type="submit" size="xl" disabled={!summary.trim()}>
+					<Check />
+					Save
+				</Button>
+			</DialogFooter>
 		</form>
 	);
 };
@@ -233,9 +313,8 @@ type RowHandlers = {
 	/** Held: starts selecting, with this item. */
 	longPress: (uid: string) => void;
 	toggle: (item: TodoItem) => void;
+	/** Tapped: opens its edit dialog (or, while selecting, picks it). */
 	edit: (uid: string) => void;
-	save: (item: TodoItem, summary: string, due: Due | null, assignee: string | undefined) => void;
-	cancel: () => void;
 	remove: (item: TodoItem) => void;
 	startDrag: (uid: string, e: React.PointerEvent<HTMLElement>) => void;
 	moveDrag: (uid: string, y: number) => void;
@@ -248,7 +327,7 @@ type RowHandlers = {
 const NO_PEOPLE: PersonView[] = [];
 
 /**
- * An item (`memo`): its props are its own (selected, edited, dragged, how far it's slid) plus stable
+ * An item (`memo`): its props are its own (selected, dragged, how far it's slid) plus stable
  * handlers, so a change to one item, or a drag, re-renders only the rows it touches.
  */
 const TodoRow = memo(
@@ -256,7 +335,6 @@ const TodoRow = memo(
 		list,
 		people,
 		item,
-		editing,
 		selected,
 		focused,
 		reorder,
@@ -267,7 +345,6 @@ const TodoRow = memo(
 		list: TodoList;
 		people: PersonView[];
 		item: TodoItem;
-		editing: boolean;
 		selected: boolean;
 		/** Highlighted (opened from a notification). */
 		focused: boolean;
@@ -280,19 +357,6 @@ const TodoRow = memo(
 		handlers: RowHandlers;
 	}) => {
 		const done = item.status === 'completed';
-		if (editing) {
-			return (
-				<li data-uid={item.uid} className="shrink-0 rounded-lg border bg-card p-2">
-					<ItemForm
-						list={list}
-						people={people}
-						initial={item}
-						onSubmit={(summary, due, assignee) => handlers.save(item, summary, due, assignee)}
-						onCancel={handlers.cancel}
-					/>
-				</li>
-			);
-		}
 		const { assignee, note } = parseAssignee(item.description);
 		const person = matchAssignee(assignee, people);
 		const canEdit = todoSupports(list, TODO_FEATURE.UPDATE);
@@ -880,8 +944,6 @@ const TodoListView: React.FC<{
 		toggle,
 		// While selecting, a tap on a row picks it, as on a phone's own lists
 		edit: (uid) => (picked.length > 0 ? toggleSelected(uid) : setEditing(uid)),
-		save,
-		cancel: () => setEditing(null),
 		remove: (item) => remove([item]),
 		startDrag,
 		moveDrag,
@@ -889,13 +951,27 @@ const TodoListView: React.FC<{
 		step,
 	});
 	const rowPeople = canAssign ? people : NO_PEOPLE;
+	// The item being edited, as it is now (gone, deleted elsewhere: the dialog closes)
+	const editingItem = (editing && shown.find((item) => item.uid === editing)) || null;
+	const editDialog = (
+		<EditItemDialog
+			list={list}
+			people={rowPeople}
+			item={editingItem}
+			onSave={save}
+			onDelete={(item) => {
+				setEditing(null);
+				remove([item]);
+			}}
+			onClose={() => setEditing(null)}
+		/>
+	);
 	const row = (item: TodoItem, index: number) => (
 		<TodoRow
 			key={item.uid}
 			list={list}
 			people={rowPeople}
 			item={item}
-			editing={editing === item.uid}
 			selected={selected.includes(item.uid)}
 			focused={focused === item.uid}
 			reorder={reorder}
@@ -1040,6 +1116,7 @@ const TodoListView: React.FC<{
 					{status}
 					{empty}
 					<ul className="flex flex-col gap-2">{completed.map(row)}</ul>
+					{editDialog}
 				</section>
 			);
 		}
@@ -1058,6 +1135,7 @@ const TodoListView: React.FC<{
 				</div>
 				{/* On phones, across the dialog's full width like every dialog's bottom buttons */}
 				{bulkBar || (clear && <div className="mt-auto flex shrink-0 justify-end max-sm:*:flex-1">{clear}</div>)}
+				{editDialog}
 			</div>
 		);
 	}
@@ -1141,6 +1219,7 @@ const TodoListView: React.FC<{
 					className="mt-auto shrink-0"
 				/>
 			)}
+			{editDialog}
 		</div>
 	);
 };

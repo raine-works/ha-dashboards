@@ -7,7 +7,7 @@
 
 import { Loader2, SprayCan } from 'lucide-react';
 import type React from 'preact/compat';
-import { useEffect, useState } from 'preact/compat';
+import { useEffect, useLayoutEffect, useState } from 'preact/compat';
 import { useHassApi, useHassSelector } from '../../context/HassContext';
 import { useBusy } from '../../hooks/useBusy';
 import {
@@ -17,6 +17,7 @@ import {
 	discoverDiffusers,
 	formatScentLeft,
 	getDiffuserView,
+	type PressSeen,
 	quickScentUntil,
 } from '../../lib/diffusers';
 import { pickStates } from '../../lib/hass-store';
@@ -47,8 +48,17 @@ export const DiffuserRow: React.FC<{ diffuser: Diffuser; className?: string }> =
 	const states = useHassSelector((hass) => pickStates(hass?.states, (id) => ids.has(id)), {
 		watch: (id) => ids.has(id),
 	});
+	// A press that arrives while the row is shown (its button's state moving on from the one it mounted
+	// with) is timed from its arrival on this device's clock, not Home Assistant's (`quickScentUntil`).
+	// Before paint, so the countdown never shows the other clock's reading first
+	const pressed = states[diffuser.quickScent]?.state;
+	const [mountedWith] = useState(pressed);
+	const [seen, setSeen] = useState<PressSeen | null>(null);
+	useLayoutEffect(() => {
+		if (pressed && pressed !== mountedWith) setSeen({ pressed, at: Date.now() });
+	}, [pressed]);
 	// Re-read at the quick scent's end: one timer at the deadline, not a ticking clock
-	const until = quickScentUntil(diffuser, states);
+	const until = quickScentUntil(diffuser, states, seen);
 	const [now, setNow] = useState(() => Date.now());
 	useEffect(() => {
 		if (until == null) return;
@@ -58,7 +68,7 @@ export const DiffuserRow: React.FC<{ diffuser: Diffuser; className?: string }> =
 		const timer = setTimeout(() => setNow(Date.now()), left + 50);
 		return () => clearTimeout(timer);
 	}, [until]);
-	const view = getDiffuserView(diffuser, states, now);
+	const view = getDiffuserView(diffuser, states, now, seen);
 	const on = view.status === 'on';
 	const busy = useBusy();
 	const { name } = diffuser;
