@@ -1,8 +1,9 @@
 # The cards
 
-Two cards are whole dashboards: put one in a `panel: true` view, alone. The [section
-cards](#section-cards-your-own-layout) are the same parts one at a time, to arrange in Home Assistant's
-own sections view among any other cards.
+The dashboards are made to replace Home Assistant's own interface, and the two cards below are whole
+dashboards: put one in a `panel: true` view, alone. For a house that only wants a part of them, the
+[section cards](#section-cards-your-own-layout) are the same parts one at a time, to place among its own
+cards.
 
 ## `custom:home-dashboard`
 
@@ -58,8 +59,8 @@ For a tablet on the wall. See [Wall panels](wall-panels.md).
 
 ## Section cards: your own layout
 
-Each part of the dashboards is also a card of its own, for a dashboard you lay out yourself in Home
-Assistant's **sections** view (or any view), beside any other card. Edit a dashboard → **Add card** →
+The whole dashboards above are the way to use them; for a dashboard of your own that only wants some
+parts, each part is also a card, for Home Assistant's **sections** view (or any view), beside any other card. Edit a dashboard → **Add card** →
 **By card**, and search for *Raineworks*; Home Assistant shows each with a live preview.
 
 | Card | | Options |
@@ -102,6 +103,8 @@ sections:
   screen (centered on a desktop, a sheet from the bottom on a phone).
 - **Home Assistant's own chrome stays**: its toolbar, sidebar and page scrolling, unlike the whole
   dashboards, and each card is as tall as its content.
+- **Light on the page**: every card on it shares one parsed stylesheet, so the CSS is parsed and kept
+  once however many cards there are.
 - **Once per page**: the toasts (a door opened, the doorbell, the alarm), the doorbell's live view, the
   Assist glow and the connection banner come from one card, whichever is first on the page, however many
   there are.

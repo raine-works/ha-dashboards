@@ -35,6 +35,7 @@ import type { HomeAssistant } from '../types/homeassistant';
 import { hidePageScrollbar, hideToolbar, keepSidebarHidden, toolbarBottom } from './chrome';
 import { ensurePanelFonts } from './fonts';
 import { isPageHost, joinPage, type PageCard } from './page-host';
+import { canAdoptStyles, sharedStyleSheet } from './styles';
 
 type PreactRoot = ReturnType<typeof createRoot>;
 
@@ -159,6 +160,10 @@ export function definePanelElement({
 		private _styleEl: HTMLStyleElement | null = null;
 		/** The active theme's tokens (themes/css.ts), after the compiled styles */
 		private _themeEl: HTMLStyleElement | null = null;
+		/** The theme's tokens where the compiled CSS is a shared sheet (styles.ts): adopted after it. */
+		private _themeSheet: CSSStyleSheet | null = null;
+		/** The shared compiled sheet is adopted (it waits for the bundle's CSS, should the element upgrade first). */
+		private _adopted = false;
 		private _themeId = '';
 		// The theme's effects (edges, glow), the glow left out at night
 		private _effects = '';
@@ -210,12 +215,17 @@ export function definePanelElement({
 			if (!this.shadowRoot) {
 				const shadow = this.attachShadow({ mode: 'open' });
 
-				this._styleEl = document.createElement('style');
-				this._styleEl.id = `${tag}-styles`;
-				shadow.appendChild(this._styleEl);
-				this._themeEl = document.createElement('style');
-				this._themeEl.id = `${tag}-theme`;
-				shadow.appendChild(this._themeEl);
+				// The compiled CSS parsed once for every card on the page; a <style> copy each where a browser
+				// can't share one
+				if (canAdoptStyles(shadow)) this._themeSheet = new CSSStyleSheet();
+				else {
+					this._styleEl = document.createElement('style');
+					this._styleEl.id = `${tag}-styles`;
+					shadow.appendChild(this._styleEl);
+					this._themeEl = document.createElement('style');
+					this._themeEl.id = `${tag}-theme`;
+					shadow.appendChild(this._themeEl);
+				}
 
 				// A section card: content height, on the view's background (theme.css's :host([data-card-mode]))
 				if (card) this.dataset.cardMode = '';
@@ -315,7 +325,13 @@ export function definePanelElement({
 		private _render() {
 			if (!this._root || !this._mountPoint) return;
 			// Styles load with the bundle; re-check in case the element upgraded first
-			if (this._styleEl && !this._styleEl.textContent) this._styleEl.textContent = panelStyles(stylesKey);
+			if (this._themeSheet && !this._adopted && this.shadowRoot) {
+				const css = panelStyles(stylesKey);
+				if (css) {
+					this.shadowRoot.adoptedStyleSheets = [sharedStyleSheet(stylesKey, css), this._themeSheet];
+					this._adopted = true;
+				}
+			} else if (this._styleEl && !this._styleEl.textContent) this._styleEl.textContent = panelStyles(stylesKey);
 
 			// Theme tokens and the dark: variant key off this class (re-resolved as the HA mode changes,
 			// which the Home dashboard's Appearance picker sets)
@@ -369,9 +385,11 @@ export function definePanelElement({
 
 		/** The theme's tokens and effects on this card, rewritten only when the theme changes. */
 		private _applyTheme(theme: DashboardTheme) {
-			if (!this._themeEl || !this._mountPoint || theme.id === this._themeId) return;
+			if ((!this._themeEl && !this._themeSheet) || !this._mountPoint || theme.id === this._themeId) return;
 			this._themeId = theme.id;
-			this._themeEl.textContent = `${themeCss(theme)}\n${nightCss()}`;
+			const css = `${themeCss(theme)}\n${nightCss()}`;
+			if (this._themeSheet) this._themeSheet.replaceSync(css);
+			else if (this._themeEl) this._themeEl.textContent = css;
 			this._effects = themeEffects(theme);
 			this._applyNight(true);
 		}
