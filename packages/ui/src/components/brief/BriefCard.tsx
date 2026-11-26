@@ -16,7 +16,7 @@ import { Card, CardAction, CardHeader, CardTitle } from '../ui';
 export const BriefCard: React.FC<{
 	/** A Lucide icon, or one of the panel's own (`Icons.tsx`). */
 	icon: React.ComponentType<{ className?: string }>;
-	/** The icon's color: both shades for a raw accent (`text-sky-600 dark:text-sky-400`). */
+	/** The icon's color, a theme token (`text-foreground`, `text-chart-4`), never a raw palette class. */
 	tone: string;
 	title: string;
 	/** A short detail at the header's right ("2 events", the lesson's dates). */

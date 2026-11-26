@@ -32,7 +32,7 @@ export const CamerasView: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
 						<ChevronLeft />
 					</Button>
 				)}
-				<Cctv className="size-6 shrink-0 text-violet-600 dark:text-violet-400" />
+				<Cctv className="size-6 shrink-0 text-muted-foreground" />
 				<div className="min-w-0">
 					<h2 className="truncate font-semibold text-lg leading-tight">Cameras</h2>
 					<p className="truncate text-muted-foreground text-sm">Tap a camera for live view and talkback</p>

@@ -102,7 +102,7 @@ const METER_GAINS = [0.45, 0.7, 0.82, 0.6, 0.4];
 
 /** While it listens: bars rising and falling with the voice (dots in a quiet room). */
 const VoiceMeter: React.FC = () => (
-	<span aria-hidden className="assist-meter text-violet-600 dark:text-violet-300">
+	<span aria-hidden className="assist-meter text-primary">
 		{METER_GAINS.map((gain, i) => (
 			<span key={gain} style={{ '--gain': gain, '--i': i } as React.CSSProperties} />
 		))}
