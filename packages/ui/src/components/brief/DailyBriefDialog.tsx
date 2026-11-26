@@ -68,6 +68,7 @@ import {
 	Button,
 	Card,
 	ChipRow,
+	Degrees,
 	Dialog,
 	DialogClose,
 	DialogContent,
@@ -144,7 +145,9 @@ const WeatherSection: React.FC<{ weather?: BriefWeather }> = ({ weather }) => {
 			<div className="flex min-w-0 items-center gap-3">
 				<WeatherIcon condition={weather.condition} className="size-10 shrink-0" />
 				<div className="flex min-w-0 flex-col gap-1">
-					<span className="font-semibold text-3xl tabular-nums leading-none">{formatDegrees(weather.temperature)}</span>
+					<span className="font-semibold text-3xl tabular-nums leading-none">
+						<Degrees value={weather.temperature} />
+					</span>
 					<span className="truncate text-muted-foreground text-sm">{formatWeatherCondition(weather.condition)}</span>
 				</div>
 			</div>

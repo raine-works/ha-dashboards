@@ -41,6 +41,7 @@ import {
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
+	NumberFlow,
 	Progress,
 	toast,
 } from '../ui';
@@ -94,7 +95,9 @@ const Meter: React.FC<{ label: string; value: number | null; tone: Tone }> = ({ 
 	<div className="flex flex-col gap-1.5">
 		<div className="flex items-center justify-between text-sm">
 			<span className="text-muted-foreground">{label}</span>
-			<span className="font-medium tabular-nums">{value == null ? '—' : `${Math.round(value)}%`}</span>
+			<span className="font-medium tabular-nums">
+				{value == null ? '—' : <NumberFlow value={Math.round(value)} suffix="%" />}
+			</span>
 		</div>
 		<Progress value={value ?? 0} variant={progressVariant(tone)} />
 	</div>
@@ -124,7 +127,9 @@ const PetTile: React.FC<{ pet: PetView; color: string }> = ({ pet, color }) => (
 			</span>
 		</div>
 		<div className="flex shrink-0 flex-col items-end">
-			<span className="font-semibold text-3xl tabular-nums leading-none">{pet.visitsToday ?? '—'}</span>
+			<span className="font-semibold text-3xl tabular-nums leading-none">
+				{pet.visitsToday == null ? '—' : <NumberFlow value={pet.visitsToday} />}
+			</span>
 			<span className="text-muted-foreground text-xs">{pet.visitsToday === 1 ? 'visit today' : 'visits today'}</span>
 		</div>
 	</div>

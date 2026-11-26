@@ -27,6 +27,7 @@ import { HolidayDayMark } from '../holiday/HolidayEgg';
 import {
 	ChartCard,
 	ChartStatus,
+	Degrees,
 	Dialog,
 	DialogContent,
 	DialogDescription,
@@ -192,7 +193,7 @@ export const WeatherDialog: React.FC<WeatherDialogProps> = ({ isOpen, onClose, e
 						<div className="flex shrink-0 items-center gap-4">
 							<WeatherIcon condition={condition} night={night} className="size-16" />
 							<span className="font-light text-6xl tabular-nums leading-none tracking-tight">
-								{formatDegrees(a.temperature as number | undefined)}
+								<Degrees value={a.temperature as number | undefined} />
 							</span>
 							<div className="flex min-w-0 flex-col">
 								<span className="truncate font-semibold text-lg">

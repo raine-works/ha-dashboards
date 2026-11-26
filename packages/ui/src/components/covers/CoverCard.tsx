@@ -26,7 +26,17 @@ import { isUnavailable } from '../../lib/values';
 import type { HassEntity } from '../../types/homeassistant';
 import { IconCurtains } from '../Icons';
 import { SectionGroup } from '../layout/Section';
-import { Button, DeviceRow, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Slider } from '../ui';
+import {
+	Button,
+	DeviceRow,
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	NumberFlow,
+	Slider,
+} from '../ui';
 
 // cover supported_features bits
 const SUPPORT_SET_POSITION = 4;
@@ -250,7 +260,8 @@ export const CoverRow: React.FC<{ cover: WindowCover; battery?: number; classNam
 						/>
 						{/* Room for "100%", so the slider never shifts as the position changes */}
 						<span className="min-w-[4ch] shrink-0 text-right font-light text-2xl tabular-nums leading-none">
-							{position}
+							{/* Rolls to a position it reports; counts plainly while dragged or moving (a new estimate every 100ms) */}
+							<NumberFlow value={position} animated={dragging === null && !motion} />
 							<span className="text-muted-foreground text-sm">%</span>
 						</span>
 					</div>

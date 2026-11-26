@@ -15,9 +15,8 @@ import { countdownBeep, findAlarmPanel } from '../../lib/security';
 import { nameList } from '../../lib/text';
 import { playBeeps, unlockAudio } from '../../lib/tones';
 import { cn } from '../../lib/utils';
-import { formatDuration } from '../../lib/wav';
 import type { HassEntity } from '../../types/homeassistant';
-import { Button, Progress, StatusTile, type StatusTone } from '../ui';
+import { Button, NumberFlowClock, Progress, StatusTile, type StatusTone } from '../ui';
 import { KeypadModal } from './KeypadModal';
 
 // How long to show "Arming..." while waiting for Alarmo to acknowledge the request
@@ -127,7 +126,8 @@ const AlarmCountdown: React.FC<{ endsAt: number; totalSec: number; pending: bool
 	return (
 		<div className="flex items-center gap-4">
 			<span className={cn('font-semibold text-figure tabular-nums', pending && 'text-destructive')}>
-				{formatDuration(secondsLeft)}
+				{/* An alert, where the eye already is: its digits roll down (a clock split in three) */}
+				<NumberFlowClock seconds={secondsLeft} trend={-1} />
 			</span>
 			<Progress value={(secondsLeft / totalSec) * 100} variant={pending ? 'destructive' : 'default'} />
 		</div>
