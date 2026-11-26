@@ -60,6 +60,12 @@ something Home Assistant doesn't have yet; [Modules](reference/modules.md) says 
 needs. Settings discovery can't work out (the speaker that announces, the voice, the laundry's
 sensors) are in the integration's options: see [Integration options](reference/options.md).
 
+## Or let an assistant do it
+
+Once the integration is added, an AI assistant can do steps 2 to 4 with you: list what your house has
+and what's missing, label your lights, create the dashboards. It connects through Home Assistant's own
+MCP server; see [Setting up with an assistant](assistant.md).
+
 ## Optional companions
 
 - [Warden](https://github.com/raine-works/ha-warden): pick a Warden group as the household (who the

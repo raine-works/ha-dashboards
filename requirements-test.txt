@@ -3,4 +3,13 @@
 # requires (the integration depends on it to serve the bundle).
 pytest-homeassistant-custom-component==0.13.375
 home-assistant-frontend==20260930.5
+# Home Assistant's MCP server (the setup tools' tests reach them through it) and the
+# conversation integration every LLM tool call goes through, at the versions that
+# Home Assistant version's mcp_server and conversation integrations require
+mcp==1.28.1
+aiohttp_sse==2.2.0
+anyio==4.14.2
+gazetteer-matcher==1.1.0
+hassil==3.12.1
+home-assistant-intents==2026.10.6
 ruff==0.17.6
