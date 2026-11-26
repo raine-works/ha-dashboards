@@ -23,6 +23,7 @@ export * from './empty-state';
 export * from './input';
 export * from './markdown';
 export * from './month-swiper';
+export * from './number-flow';
 export * from './popover';
 export * from './progress';
 export * from './separator';

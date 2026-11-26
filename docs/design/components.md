@@ -110,7 +110,7 @@ Three sizes, one anatomy (`ui/dialog.tsx` keeps its history, focus trap and idle
 
 | Size | Width | For |
 | :--- | :--- | :--- |
-| `detail` | 480px; a bottom sheet on phones | A room, a device, a confirmation, a picker |
+| `detail` | 480px; a bottom sheet on phones, dragged down to close | A room, a device, a confirmation, a picker |
 | `workspace` | Most of the screen | Music, cameras, to-do, calendar, energy |
 | `fullscreen` | The screen | Party mode, a camera full screen |
 
@@ -118,10 +118,30 @@ Anatomy: a header (icon tile, title, one line, Close); the content; a footer wit
 action on the right (on phones, full width at the bottom), secondary on the left. Rarely more than
 three regions; a long list collapses to a summary with "Show all".
 
+On a phone, `detail` (and the older `sheet`) is shadcn's Drawer, after Vaul: a handle on top, and
+the sheet follows a finger dragging it down, the backdrop fading with it. Let go past a quarter of
+its height, or flicked down, it slides away and closes; short of that it springs back. Up and
+sideways stay the content's (a scroll, a slider, a swiped row), as does a drag that starts on a
+field, a slider or the wheel picker, or on anything marked `data-sheet-no-drag`, or while what's
+under the finger is scrolled down. Vaul itself isn't used: it's built on Radix's Dialog, whose
+focus trap doesn't work inside the card's ShadowRoot, and it's no longer maintained; the gesture is
+`lib/sheet-drag.ts`, tested on its own, and `useSheetDrag` in `ui/dialog.tsx` moves the sheet.
+
+### NumberFlow
+
+A number that changes in place (a thermostat's setpoint, the outside temperature, a count badge,
+the Timer dialog's clock) rolls to its new value like a mechanical counter: `NumberFlow` (a value,
+`Intl.NumberFormat` options, a prefix or suffix) and `NumberFlowClock` (seconds as "3:05"), on
+NumberFlow's framework-free `<number-flow>` element. Its React wrapper isn't used: under
+preact/compat it hands the element a JSON string where it expects an object. The element is
+labelled with the whole value for screen readers and keeps still under reduced motion. Not for a
+readout that changes as you drag (a slider's percentage), or anything that would roll every second
+on a panel's edge.
+
 ### Also kept
 
 `Slider`, `Switch`, `Tabs` / `ToggleGroup` (segmented choices), `Avatar`, `CountBadge` (the one
-badge), `ChipRow`, `SwipeRow`, `StableLabel`, `ConfirmButton`, `EmptyState`, `WheelPicker`,
+badge; its count rolls), `ChipRow`, `SwipeRow`, `StableLabel`, `ConfirmButton`, `EmptyState`, `WheelPicker`,
 `MonthSwiper`: their behavior is sound; they take the new tokens.
 
 ## Retired

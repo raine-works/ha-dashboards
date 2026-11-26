@@ -66,6 +66,7 @@ import {
 	Button,
 	type ButtonProps,
 	CountBadge,
+	NumberFlow,
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
@@ -257,7 +258,9 @@ export const WeatherSummary: React.FC<{ showCondition?: boolean; className?: str
 			>
 				<WeatherIcon condition={condition} night={sun?.state === 'below_horizon'} className="size-5" />
 				{/* Room for three digits, so the temperature changing never shifts the header */}
-				<span className="min-w-[3.5ch] font-semibold tabular-nums">{Math.round(temp)}°</span>
+				<span className="min-w-[3.5ch] font-semibold tabular-nums">
+					<NumberFlow value={Math.round(temp)} suffix="°" />
+				</span>
 				{showCondition && (
 					<span className="whitespace-nowrap text-muted-foreground text-sm max-xl:hidden">
 						{formatWeatherCondition(condition)}

@@ -33,6 +33,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 	EmptyState,
+	NumberFlow,
 	ToggleGroup,
 	ToggleGroupItem,
 } from '../ui';
@@ -53,17 +54,47 @@ const HVAC_MODES = [
 export const presetChoices = (options: string[] | undefined): string[] =>
 	(options ?? ['home', 'away', 'sleep']).filter((option) => option !== OVERRIDE_PRESET);
 
+/** A thermostat's target (`targetOf`): off, a range in Auto, one setpoint, or none it reports. */
+export type Target =
+	| { kind: 'off' }
+	| { kind: 'range'; low: number; high: number }
+	| { kind: 'single'; value: number }
+	| { kind: 'none' };
+
+/** A thermostat's target as the stepper shows it, in whole degrees (`formatTarget` writes it). */
+export function targetOf(entity: HassEntity): Target {
+	const { temperature, target_temp_low: low, target_temp_high: high } = entity.attributes;
+	if (entity.state === 'off') return { kind: 'off' };
+	if (entity.state === 'heat_cool' && low != null && high != null)
+		return { kind: 'range', low: Math.round(Number(low)), high: Math.round(Number(high)) };
+	if (temperature != null) return { kind: 'single', value: Math.round(Number(temperature)) };
+	return { kind: 'none' };
+}
+
 /**
  * A thermostat's target as the stepper shows it: "Off", a range ("68°–74°") in Auto, one setpoint
  * ("70°"), or "--" when it reports none.
  */
 export function formatTarget(entity: HassEntity): string {
-	const { temperature, target_temp_low: low, target_temp_high: high } = entity.attributes;
-	if (entity.state === 'off') return 'Off';
-	if (entity.state === 'heat_cool' && low != null && high != null) return `${Math.round(low)}°–${Math.round(high)}°`;
-	if (temperature != null) return `${Math.round(temperature)}°`;
+	const target = targetOf(entity);
+	if (target.kind === 'off') return 'Off';
+	if (target.kind === 'range') return `${target.low}°–${target.high}°`;
+	if (target.kind === 'single') return `${target.value}°`;
 	return '--';
 }
+
+/** The stepper's target, its degrees rolling to each new setpoint (`NumberFlow`); "Off" and "--" as words. */
+const TargetValue: React.FC<{ entity: HassEntity }> = ({ entity }) => {
+	const target = targetOf(entity);
+	if (target.kind === 'range')
+		return (
+			<>
+				<NumberFlow value={target.low} suffix="°" />–<NumberFlow value={target.high} suffix="°" />
+			</>
+		);
+	if (target.kind === 'single') return <NumberFlow value={target.value} suffix="°" />;
+	return <>{formatTarget(entity)}</>;
+};
 
 /**
  * A thermostat's status line: the temperature inside, the humidity and what it's doing ("Heating"),
@@ -156,7 +187,7 @@ const ZoneControl: React.FC<{ entityId: string; name: string }> = ({ entityId, n
 								adjusting > 0 && 'animate-pulse',
 							)}
 						>
-							{formatTarget(shown)}
+							<TargetValue entity={shown} />
 						</span>
 						<Button
 							variant="secondary"

@@ -103,11 +103,13 @@ describe('the dashboards bundle', () => {
 		// history entries, so Back closes them; to 1.3MB for swiping notifications away and a swiped row's
 		// spring back; down to 1.2MB once Leaflet's JS loaded with the People map, ~1.14MB then; to 1.21MB
 		// for the redesign: room tiles and their dialog, a line per climate device, phone alerts, labeled
-		// header buttons and bedtime by label, ~1.2MB with them)
+		// header buttons and bedtime by label, ~1.2MB with them; to 1.235MB for numbers that roll to a new value,
+		// NumberFlow's element (~16KB: it's on screen from the first paint, the header's temperature, so it isn't
+		// loaded on demand), and the phone sheets' drag down to close, ~1.23MB with them)
 		const sizes = [bundlePath, ...(await staticChunks()).map((c) => join(dirname(bundlePath), c))].map(
 			(path) => Bun.file(path).size,
 		);
-		expect(sizes.reduce((a, b) => a + b, 0)).toBeLessThan(1_210_000);
+		expect(sizes.reduce((a, b) => a + b, 0)).toBeLessThan(1_235_000);
 	});
 
 	it('names a bundle by its content', () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { dayKey, formatClock, pad2, startOfDay } from '../time';
+import { clockParts, dayKey, formatClock, pad2, startOfDay } from '../time';
 
 describe('time helpers', () => {
 	it('pads, keys and starts local days', () => {
@@ -18,5 +18,14 @@ describe('time helpers', () => {
 			'0:00',
 			'0:00',
 		]);
+	});
+
+	it('splits seconds into the numbers a clock shows', () => {
+		expect(clockParts(7.9)).toEqual({ hours: 0, minutes: 0, seconds: 7 });
+		// Under an hour, the minutes are every minute (75:00 is never shown: an hour is 1:15:00)
+		expect(clockParts(185)).toEqual({ hours: 0, minutes: 3, seconds: 5 });
+		expect(clockParts(3729)).toEqual({ hours: 1, minutes: 2, seconds: 9 });
+		expect(clockParts(-5)).toEqual({ hours: 0, minutes: 0, seconds: 0 });
+		expect(clockParts(Number.NaN)).toEqual({ hours: 0, minutes: 0, seconds: 0 });
 	});
 });
