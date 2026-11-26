@@ -143,6 +143,34 @@ async def test_capability_report(
         )
 
 
+@pytest.mark.parametrize(
+    ("tool", "arg"),
+    [("capability_report", "house_yaml"), ("check_house_settings", "yaml")],
+)
+@pytest.mark.parametrize(
+    "tag", ["!include {secret}", "!env_var RAINEWORKS_TEST_SECRET", "!secret token"]
+)
+async def test_yaml_tags_never_reach_files_or_the_environment(
+    hass: HomeAssistant,
+    entry,
+    hass_admin_user: User,
+    tmp_path,
+    monkeypatch: pytest.MonkeyPatch,
+    tool: str,
+    arg: str,
+    tag: str,
+) -> None:
+    """An assistant's YAML is plain data: Home Assistant's config tags are refused."""
+    secret = tmp_path / "secrets.yaml"
+    secret.write_text("token: hunter2-not-for-assistants\n")
+    monkeypatch.setenv("RAINEWORKS_TEST_SECRET", "hunter2-not-for-assistants")
+    api = await llm.async_get_api(hass, LLM_API_ID, _context(hass_admin_user))
+    text = f"weather: {tag.format(secret=secret)}\n"
+    with pytest.raises(HomeAssistantError, match="valid YAML") as err:
+        await api.async_call_tool(llm.ToolInput(tool_name=tool, tool_args={arg: text}))
+    assert "hunter2" not in str(err.value)
+
+
 async def test_list_floors(hass: HomeAssistant, entry, hass_admin_user: User) -> None:
     """Floors with their areas, and the areas on no floor."""
     floor = fr.async_get(hass).async_create("Main floor", level=1)

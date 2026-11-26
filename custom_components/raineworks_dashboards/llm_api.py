@@ -38,8 +38,8 @@ from homeassistant.helpers import (
 )
 from homeassistant.loader import async_get_integration
 from homeassistant.util.json import json_loads
-from homeassistant.util.yaml import parse_yaml
 import probatio
+import yaml
 
 from .const import CONF_HOUSE, CONF_HOUSEHOLD_GROUP, DOMAIN
 from .household import household
@@ -143,12 +143,22 @@ def _household(hass: HomeAssistant) -> list[str]:
 
 
 def _yaml(text: str | None) -> Any:
-    """A card's settings as Home Assistant reads YAML (``no`` is false)."""
+    """A card's settings, written by an assistant, as plain data.
+
+    PyYAML's SafeLoader, never Home Assistant's config loader: that one honours
+    `!include`, `!env_var` and `!secret`, which would read files (in the event
+    loop) and the environment for text a model wrote. SafeLoader knows none of
+    them, and still reads `no` as false, as Home Assistant reads a card's YAML.
+
+    Raises:
+        HomeAssistantError: It isn't YAML, or uses a tag (refused, not followed).
+    """
     if not text or not text.strip():
         return None
     try:
-        return parse_yaml(text)
-    except HomeAssistantError as err:
+        return yaml.load(text, Loader=yaml.SafeLoader)
+    except yaml.YAMLError as err:
+        # The parser's own message: the assistant's text, never a file's
         raise HomeAssistantError(f"That isn't valid YAML: {err}") from err
 
 
