@@ -6,6 +6,7 @@ import json
 from typing import Any
 
 from homeassistant.auth.models import User
+from homeassistant.components import frontend
 from homeassistant.core import Context, HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import (
@@ -69,10 +70,20 @@ async def test_the_tools_come_and_go_with_the_integration(
         "label_household_lights",
         "create_dashboard",
         "check_house_settings",
+        "set_default_dashboard",
+        "set_house_theme",
+        "find_wall_panel_devices",
+        "add_wall_panel",
     }
-    # Only the two that change Home Assistant say they do
+    # Only those that change Home Assistant say they do
     writes = {name for name, tool in tools.items() if not tool.annotations.read_only}
-    assert writes == {"label_household_lights", "create_dashboard"}
+    assert writes == {
+        "label_household_lights",
+        "create_dashboard",
+        "set_default_dashboard",
+        "set_house_theme",
+        "add_wall_panel",
+    }
     assert "integration_status" in instance.api_prompt
 
     assert await hass.config_entries.async_unload(entry.entry_id)
@@ -368,3 +379,188 @@ async def test_through_home_assistants_mcp_server(
             "understood": ["weather"],
             "ignored": [],
         }
+
+
+async def _call_error(
+    hass: HomeAssistant, user: User, tool: str, args: dict[str, Any]
+) -> str:
+    api = await llm.async_get_api(hass, LLM_API_ID, _context(user))
+    with pytest.raises(HomeAssistantError) as err:
+        await api.async_call_tool(llm.ToolInput(tool_name=tool, tool_args=args))
+    return str(err.value)
+
+
+async def test_making_a_dashboard_everyones_default(
+    hass: HomeAssistant, entry, hass_admin_user: User
+) -> None:
+    """Home Assistant's own default dashboard setting, kept with its other settings."""
+    await _call(
+        hass,
+        hass_admin_user,
+        "create_dashboard",
+        {"title": "Home", "url_path": "dashboard-home", "card": "home"},
+    )
+    store = await frontend.async_system_store(hass)
+    await store.async_set_item("core", {"other": "kept"})
+    assert (await _call(hass, hass_admin_user, "integration_status"))[
+        "default_dashboard"
+    ] is None
+
+    result = await _call(
+        hass, hass_admin_user, "set_default_dashboard", {"url_path": "dashboard-home"}
+    )
+    assert result["default_dashboard"] == "dashboard-home"
+    store = await frontend.async_system_store(hass)
+    assert store.data["core"] == {"other": "kept", "default_panel": "dashboard-home"}
+    status = await _call(hass, hass_admin_user, "integration_status")
+    assert status["default_dashboard"] == "dashboard-home"
+
+    error = await _call_error(
+        hass, hass_admin_user, "set_default_dashboard", {"url_path": "dashboard-nope"}
+    )
+    assert "no dashboard" in error
+
+
+async def test_setting_the_house_theme(
+    hass: HomeAssistant, entry, hass_admin_user: User
+) -> None:
+    """One of the integration's themes, or Home Assistant's own; nothing else."""
+    status = await _call(hass, hass_admin_user, "integration_status")
+    assert status["house_theme"] == "raineworks"
+    ids = [t["id"] for t in status["themes"]]
+    assert "raineworks" in ids and "violet" in ids
+
+    result = await _call(hass, hass_admin_user, "set_house_theme", {"theme": "violet"})
+    assert result == {
+        "house_theme": "violet",
+        "previous": "raineworks",
+        "note": result["note"],
+    }
+    await hass.async_block_till_done()
+    assert entry.options["theme"] == "violet"
+    # The entry reloaded with it: the tools are there again, and say so
+    status = await _call(hass, hass_admin_user, "integration_status")
+    assert status["house_theme"] == "violet"
+
+    await _call(hass, hass_admin_user, "set_house_theme", {"theme": "keep"})
+    await hass.async_block_till_done()
+    assert entry.options["theme"] == ""
+
+    error = await _call_error(
+        hass, hass_admin_user, "set_house_theme", {"theme": "neon"}
+    )
+    assert "No theme 'neon'" in error
+
+
+@pytest.fixture
+def tablet(hass: HomeAssistant, entry) -> str:
+    """A wall tablet: a status LED, a wake button and a restart button."""
+    device = dr.async_get(hass).async_get_or_create(
+        config_entry_id=entry.entry_id,
+        identifiers={("test", "tablet")},
+        name="Kitchen tablet",
+        manufacturer="ROAMiQ",
+    )
+    entities = er.async_get(hass)
+    for domain, key, name, device_class in (
+        ("light", "led", "LED", None),
+        ("button", "wake", "Wake screen", None),
+        ("button", "reload", "Reload", "restart"),
+    ):
+        entities.async_get_or_create(
+            domain,
+            "test",
+            key,
+            device_id=device.id,
+            original_name=name,
+            original_device_class=device_class,
+        )
+    # A smart bulb: one light and nothing else, which is no tablet
+    bulb = dr.async_get(hass).async_get_or_create(
+        config_entry_id=entry.entry_id, identifiers={("test", "bulb")}, name="Bulb"
+    )
+    entities.async_get_or_create("light", "test", "bulb", device_id=bulb.id)
+    return device.id
+
+
+async def test_finding_and_adding_a_wall_panel(
+    hass: HomeAssistant, entry, hass_admin_user: User, tablet: str
+) -> None:
+    """The tablet found, then its dashboard made and the device registered at once."""
+    (found,) = (await _call(hass, hass_admin_user, "find_wall_panel_devices"))[
+        "devices"
+    ]
+    assert found["device_id"] == tablet
+    assert found["name"] == "Kitchen tablet"
+    assert found["status_light"] and found["wake"] and found["reload"]
+    assert found["registered"] is False
+
+    added = await _call(
+        hass,
+        hass_admin_user,
+        "add_wall_panel",
+        {
+            "name": " Kitchen wall panel ",
+            "url_path": "dashboard-kitchen",
+            "device_id": tablet,
+            "floor": "main",
+            "timer": True,
+        },
+    )
+    assert added["dashboard"] == "/dashboard-kitchen/home"
+    assert added["registered"] is True
+    assert added["card"] == {
+        "type": "custom:wall-panel-dashboard",
+        "name": "Kitchen wall panel",
+        "floor": "main",
+        "timer": True,
+    }
+    await hass.async_block_till_done()
+    (subentry,) = entry.subentries.values()
+    assert subentry.title == "Kitchen wall panel"
+    assert subentry.data["device_id"] == tablet
+    config = (
+        await hass.data["lovelace"].dashboards["dashboard-kitchen"].async_load(False)
+    )
+    assert config["views"][0]["cards"] == [added["card"]]
+
+    status = await _call(hass, hass_admin_user, "integration_status")
+    assert status["wall_panels"] == [
+        {"name": "Kitchen wall panel", "device": "Kitchen tablet"}
+    ]
+    (found,) = (await _call(hass, hass_admin_user, "find_wall_panel_devices"))[
+        "devices"
+    ]
+    assert found["registered"] is True
+
+    # Once only, and only real devices
+    error = await _call_error(
+        hass,
+        hass_admin_user,
+        "add_wall_panel",
+        {"name": "Again", "url_path": "dashboard-again", "device_id": tablet},
+    )
+    assert "already" in error
+    error = await _call_error(
+        hass,
+        hass_admin_user,
+        "add_wall_panel",
+        {"name": "Ghost", "url_path": "dashboard-ghost", "device_id": "nope"},
+    )
+    assert "No device" in error
+
+
+async def test_a_wall_panel_without_a_device(
+    hass: HomeAssistant, entry, hass_admin_user: User
+) -> None:
+    """A plain tablet: its dashboard, and nothing registered."""
+    added = await _call(
+        hass,
+        hass_admin_user,
+        "add_wall_panel",
+        {"name": "Hall tablet", "url_path": "dashboard-hall"},
+    )
+    assert added["registered"] is False
+    assert added["hardware"] is None
+    assert not entry.subentries
+    assert "dashboard-hall" in hass.data["lovelace"].dashboards

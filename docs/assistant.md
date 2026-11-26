@@ -8,19 +8,30 @@ Marketplace upgrades them too.
 
 ## What it can do
 
+From an empty dashboard list to Home Assistant's whole interface replaced: the Home dashboard as
+everyone's landing page, the house theme on every page, a wall panel on each tablet, and the lights in
+their rooms.
+
 | Tool | Changes Home Assistant | |
 | :--- | :---: | :--- |
-| `integration_status` | | The integration's version, the household, its house settings, and each dashboard with the custom cards it uses |
+| `integration_status` | | The integration's version, the household, its house settings, each dashboard with the custom cards it uses, the default dashboard, the house theme and the themes to pick from, and the wall panels |
 | `capability_report` | | Which features your house has, and what each missing one needs |
 | `list_floors` | | Floors and their areas (a wall panel's `floor`, rooms without a floor) |
 | `find_unlabeled_lights` | | Lights the lighting section doesn't list yet, with likely indicators flagged |
 | `check_house_settings` | | Which `house` settings the dashboards understood |
+| `find_wall_panel_devices` | | Tablets the integration can drive (a wake or screen control, a restart button, a status light), and which are wall panels already |
 | `label_household_lights` | yes | Labels lights "Household Light" |
 | `create_dashboard` | yes | Creates a dashboard with the Home or wall panel card |
+| `set_default_dashboard` | yes | Makes a dashboard everyone's default, the page Home Assistant opens on (anyone who picked their own in their profile keeps it) |
+| `set_house_theme` | yes | The house theme, for the dashboards and Home Assistant's own pages, for anyone without one of their own |
+| `add_wall_panel` | yes | A tablet end to end: its dashboard, and its device registered for its status light and wake on the doorbell |
 
 The assistant is told to ask you before anything that changes Home Assistant. Only an administrator can use
-the tools: they read the registries, and the two that change things go through Home Assistant's own
-commands, as you, with the checks its own UI makes.
+the tools: they read the registries, and the ones that change things go through Home Assistant's own
+commands or the integration's own settings, as you, with the checks its own UI makes.
+
+A tablet still needs signing in as the user the panels share, and its kiosk browser pointed at its
+dashboard: that's done on the tablet ([Wall panels](wall-panels.md)).
 
 ## Connecting an assistant
 
@@ -58,8 +69,8 @@ Keep the token in an environment variable, as here, so a config file you commit 
 An assistant that can sign in with OAuth can use Home Assistant's own login instead of a token: see
 Home Assistant's [MCP Server documentation](https://www.home-assistant.io/integrations/mcp_server/).
 
-Then ask something like "Set up Raineworks Dashboards on my Home Assistant": it starts from
-`integration_status` and works through what's missing.
+Then ask something like "Set up Raineworks Dashboards on my Home Assistant and make it my whole
+interface": it starts from `integration_status` and works through what's missing.
 
 The MCP server's own address, `/api/mcp`, serves every LLM API it's set to expose (all of them, by
 default), the setup tools among them as **Raineworks Dashboards setup**. The same tools also show up
