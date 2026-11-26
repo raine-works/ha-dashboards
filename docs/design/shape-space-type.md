@@ -157,8 +157,13 @@ Fills first, then hairlines, shadows only for what floats.
 | Dialog or popover in | 200ms (scale from 0.96 + fade) | the same |
 | Dialog out | 150ms | `cubic-bezier(0.3, 0, 1, 1)` |
 | Sheet | 320ms | `cubic-bezier(0.32, 0.72, 0, 1)` (already in theme.css) |
+| A sheet dragged down, let go | 320ms, sliding away or back | the sheet's curve (`lib/sheet-drag.ts`) |
 | A swipe settling | 450ms | `ease-spring` (already in theme.css) |
+| A number changing (`NumberFlow`) | 900ms roll | NumberFlow's own |
 
 - Only `transform` and `opacity` (the panels are slow); never `corner-shape`, blur or shadow spread.
 - Ambient motion only for alerts and what's playing; one or two things moving on a screen at most.
+  A number rolls when it changes because someone changed it or it's news (a setpoint, the
+  temperature, a count), never once a second at the edge of the screen: the header's timer
+  counts in plain digits, the Timer dialog's clock rolls.
 - `prefers-reduced-motion`: no movement or scaling; opacity fades at 100ms; spinners stay.

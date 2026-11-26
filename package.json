@@ -21,6 +21,7 @@
 		"jsqr": "1.4.0",
 		"leaflet": "1.9.4",
 		"lucide-react": "1.58.0",
+		"number-flow": "0.6.2",
 		"preact": "10.29.8",
 		"recharts": "3.10.1",
 		"sonner": "2.0.8",

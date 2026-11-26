@@ -2,13 +2,22 @@
  * shadcn/ui's Dialog (new-york v4), ported to Preact without Radix: portalled into the panel's mount
  * point, modal (focus moved in and trapped, the page behind locked), stacked (Escape closes the top
  * one), closed by Back (`dialog-history.ts`) and after a while idle, with the panel's sizes and a
- * crash kept inside the dialog.
+ * crash kept inside the dialog. On a phone its sheet sizes are shadcn's Drawer: a handle on top, and
+ * dragged down to close as Vaul's is (`useSheetDrag`, the gesture in `lib/sheet-drag.ts`).
  *
  * @module
  */
 
 import { XIcon } from 'lucide-react';
 import React, { createPortal, useEffect, useId, useLayoutEffect, useRef, useSyncExternalStore } from 'preact/compat';
+import {
+	SHEET_EASE,
+	SHEET_IDLE,
+	SHEET_SETTLE_MS,
+	type SheetDragAction,
+	sheetDragReducer,
+	sheetHoldsTouch,
+} from '../../lib/sheet-drag';
 import { cn } from '../../lib/utils';
 import { ErrorBoundary } from '../layout/ErrorBoundary';
 import { dialogHistory, dialogSlug } from './dialog-history';
@@ -276,6 +285,157 @@ function trapTab(e: KeyboardEvent, el: HTMLElement | null) {
 	}
 }
 
+// Where a drag down never starts: what takes a vertical touch itself (a field, a slider, the wheel
+// picker), and anything marked `data-sheet-no-drag`
+const NO_SHEET_DRAG =
+	'input, textarea, select, [contenteditable=""], [contenteditable="true"], [data-slot="slider"], [data-slot="wheel-picker"], [data-sheet-no-drag]';
+
+/**
+ * Whether a drag down from `target` moves the sheet: not from what takes the touch itself, and not
+ * while it, or anything it's in, is scrolled down (dragging down scrolls back up first, as in Vaul).
+ */
+function dragsSheet(target: EventTarget | null, sheet: HTMLElement): boolean {
+	if (!(target instanceof Element) || target.closest(NO_SHEET_DRAG)) return false;
+	for (let node: Element | null = target; node; node = node.parentElement) {
+		if (node.scrollTop > 0) return false;
+		if (node === sheet) return true;
+	}
+	return false;
+}
+
+// Tailwind's max-sm: where the sheet sizes rise from the bottom edge
+const PHONE = '(width < 40rem)';
+
+/**
+ * Panel extension, after Vaul (shadcn's Drawer): on a phone, a `sheet` or `detail` dialog follows a
+ * finger dragging it down, the overlay fading with it, and let go past a quarter of its height (or
+ * flicked down) slides away and closes; short of that it springs back. Up and sideways are left to
+ * the content, as is anything scrolled. The gesture moves the element directly (no render a frame);
+ * `close` is read when it's let go, so a parent's re-render mid-drag changes nothing.
+ */
+function useSheetDrag(ref: { current: HTMLElement | null }, enabled: boolean, close: () => void) {
+	const closeRef = useRef(close);
+	useLayoutEffect(() => {
+		closeRef.current = close;
+	});
+
+	useEffect(() => {
+		const sheet = ref.current;
+		if (!sheet || !enabled) return;
+		const phone = window.matchMedia(PHONE);
+		const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+		// The dialog's overlay, rendered just before it
+		const before = sheet.previousElementSibling;
+		const overlay = before instanceof HTMLElement && before.dataset.slot === 'dialog-overlay' ? before : null;
+		let state = SHEET_IDLE;
+		// A drag just ended: the click that follows isn't a tap on what it started on
+		let dragged = false;
+		let timer: ReturnType<typeof setTimeout> | undefined;
+
+		const paint = () => {
+			const { phase, dy, height } = state;
+			const ms = reducedMotion.matches ? 0 : SHEET_SETTLE_MS;
+			const transition =
+				phase === 'dragging'
+					? 'none'
+					: phase === 'idle'
+						? ''
+						: `transform ${ms}ms ${SHEET_EASE}, opacity ${ms}ms ${SHEET_EASE}`;
+			sheet.style.transition = transition;
+			sheet.style.transform =
+				phase === 'closing' ? 'translateY(100%)' : phase === 'dragging' && dy !== 0 ? `translateY(${dy}px)` : '';
+			if (!overlay) return;
+			overlay.style.transition = transition;
+			overlay.style.opacity =
+				phase === 'closing' ? '0' : phase === 'dragging' && dy > 0 ? String(Math.max(0, 1 - dy / height)) : '';
+		};
+
+		const dispatch = (action: SheetDragAction) => {
+			state = sheetDragReducer(state, action);
+		};
+
+		// Let go: slide away and close, or spring back and rest
+		const settle = () => {
+			paint();
+			clearTimeout(timer);
+			if (state.phase === 'closing')
+				timer = setTimeout(() => {
+					closeRef.current();
+					// Still here after a moment (its parent kept it open): back into place
+					timer = setTimeout(() => {
+						dispatch({ type: 'reset' });
+						paint();
+					}, 100);
+				}, SHEET_SETTLE_MS);
+			else if (state.phase === 'settling')
+				timer = setTimeout(() => {
+					dispatch({ type: 'reset' });
+					paint();
+				}, SHEET_SETTLE_MS);
+		};
+
+		const onPointerDown = (e: PointerEvent) => {
+			dragged = false;
+			if (!phone.matches || (e.pointerType === 'mouse' && e.button !== 0)) return;
+			if (state.phase === 'closing' || !dragsSheet(e.target, sheet)) return;
+			clearTimeout(timer);
+			dispatch({ type: 'down', x: e.clientX, y: e.clientY, t: e.timeStamp, height: sheet.offsetHeight });
+		};
+		const onPointerMove = (e: PointerEvent) => {
+			if (state.phase !== 'pending' && state.phase !== 'dragging') return;
+			const was = state.phase;
+			dispatch({ type: 'move', x: e.clientX, y: e.clientY, t: e.timeStamp });
+			if (state.phase !== 'dragging') return;
+			// Now a drag: the sheet keeps the pointer (a mouse dragged below the screen's edge)
+			if (was === 'pending') {
+				dragged = true;
+				if (!sheet.hasPointerCapture(e.pointerId)) sheet.setPointerCapture(e.pointerId);
+			}
+			paint();
+		};
+		const onPointerUp = (e: PointerEvent) => {
+			if (state.phase !== 'pending' && state.phase !== 'dragging') return;
+			dispatch({ type: 'up', t: e.timeStamp });
+			settle();
+		};
+		const onPointerCancel = () => {
+			if (state.phase !== 'pending' && state.phase !== 'dragging') return;
+			dispatch({ type: 'cancel' });
+			settle();
+		};
+		// A touch heading down from the top would otherwise scroll (or bounce) the page: the sheet keeps it
+		const onTouchMove = (e: TouchEvent) => {
+			const touch = e.touches[0];
+			if (touch && e.cancelable && sheetHoldsTouch(state, touch.clientX, touch.clientY)) e.preventDefault();
+		};
+		const onClickCapture = (e: MouseEvent) => {
+			// A keyboard's click (no pointer, `detail` 0) is always the person's own
+			if (!dragged || e.detail === 0) return;
+			dragged = false;
+			e.stopPropagation();
+			e.preventDefault();
+		};
+
+		sheet.addEventListener('pointerdown', onPointerDown);
+		sheet.addEventListener('pointermove', onPointerMove);
+		sheet.addEventListener('pointerup', onPointerUp);
+		sheet.addEventListener('pointercancel', onPointerCancel);
+		sheet.addEventListener('touchmove', onTouchMove, { passive: false });
+		sheet.addEventListener('click', onClickCapture, true);
+		return () => {
+			clearTimeout(timer);
+			sheet.removeEventListener('pointerdown', onPointerDown);
+			sheet.removeEventListener('pointermove', onPointerMove);
+			sheet.removeEventListener('pointerup', onPointerUp);
+			sheet.removeEventListener('pointercancel', onPointerCancel);
+			sheet.removeEventListener('touchmove', onTouchMove);
+			sheet.removeEventListener('click', onClickCapture, true);
+			state = SHEET_IDLE;
+			paint();
+		};
+	}, [enabled]);
+}
+
 /** A div's attributes, its close button and its size. */
 export interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement> {
 	/** The X in the top corner (default: true; shown only when the dialog can close). */
@@ -293,6 +453,7 @@ export interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement>
 	 * rounded corners, a flex column (Party mode). `detail`: the design's dialog for a room, a device,
 	 * a confirmation or a picker (docs/design/components.md): 480px wide with its corners and
 	 * padding, the sheet's shape on phones; it replaces `default` and `sheet` as the overhaul lands.
+	 * On a phone, `sheet` and `detail` are shadcn's Drawer: a handle on top, dragged down to close.
 	 */
 	size?: 'default' | 'workspace' | 'sheet' | 'compact' | 'fullscreen' | 'detail';
 }
@@ -304,9 +465,14 @@ const COMPACT = 'sm:max-w-sm';
 const FULLSCREEN =
 	'translate-none top-(--panel-top) left-0 flex h-(--panel-height) max-h-none w-screen max-w-none flex-col rounded-none border-0 sm:max-w-none';
 
-// The sheet size's phone shape, applied after the phone's full-screen classes so it overrides their top and height
+// The sheet size's phone shape, applied after the phone's full-screen classes so it overrides their top and height;
+// its top padding clears the drawer handle (it's clear of the notch: it rises from the bottom)
 const SHEET =
-	'max-sm:top-auto max-sm:max-h-[calc(var(--panel-height)-2rem)] max-sm:animate-sheet-in max-sm:rounded-t-2xl max-sm:border-t';
+	'max-sm:top-auto max-sm:max-h-[calc(var(--panel-height)-2rem)] max-sm:animate-sheet-in max-sm:rounded-t-2xl max-sm:border-t max-sm:pt-7';
+
+// shadcn's Drawer handle, on a sheet-shaped dialog on a phone: it can be dragged down
+const SHEET_HANDLE =
+	'pointer-events-none absolute inset-x-0 top-2.5 mx-auto h-1.5 w-12 rounded-full bg-muted sm:hidden';
 
 // The detail size (docs/design/components.md): a room, a device, a confirmation, a picker. 480px wide
 // with the design's dialog corners and padding; on phones the sheet's shape, from the bottom edge
@@ -352,6 +518,8 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
 			else if (ref) ref.current = el;
 		};
 		useDialogFocus(localRef);
+		const sheetShaped = size === 'sheet' || size === 'detail';
+		useSheetDrag(localRef, sheetShaped && !!onOpenChange, () => onOpenChange?.(false));
 		// A dialog that lays itself out as a flex column sizes its own rows (a scroller that shrinks);
 		// the others were grid rows, which never shrink, so on phones they keep their content height
 		const ownLayout =
@@ -395,6 +563,7 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
 				)}
 				{...props}
 			>
+				{sheetShaped && onOpenChange && <div aria-hidden data-slot="drawer-handle" className={SHEET_HANDLE} />}
 				{children}
 				{showCloseButton && onOpenChange && (
 					<button

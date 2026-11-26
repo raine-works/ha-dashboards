@@ -10,6 +10,7 @@ import {
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
+	NumberFlowClock,
 	Progress,
 	toast,
 } from '@app/ui/components';
@@ -172,7 +173,8 @@ export const PanelTimerDialog: React.FC<PanelTimerDialogProps> = ({ timer, isOpe
 				<div
 					className={`text-center font-mono font-semibold text-6xl tabular-nums ${timer.active ? '' : 'text-muted-foreground'}`}
 				>
-					{formatClock(timer.seconds)}
+					{/* Its digits roll down as it counts (a clock split in three, so 0:00 → 0:59 rolls down too) */}
+					<NumberFlowClock seconds={timer.seconds} trend={timer.running ? -1 : undefined} />
 				</div>
 				<Progress value={timer.progress} />
 			</div>
@@ -217,6 +219,7 @@ export const PanelTimerAction: React.FC = () => {
 				title="Timer"
 			>
 				<Timer />
+				{/* Plain digits: a roll every second in the header would be constant motion at the edge of the eye */}
 				{timer.active && <span className="font-mono tabular-nums">{formatClock(timer.seconds)}</span>}
 			</Button>
 			<PanelTimerDialog timer={timer} isOpen={isOpen} onClose={() => setIsOpen(false)} />

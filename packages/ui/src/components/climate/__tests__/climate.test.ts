@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import type { HassEntity } from '../../../types/homeassistant';
-import { formatStatus, formatTarget, formatZoneLine, presetChoices } from '../ClimateSection';
+import { formatStatus, formatTarget, formatZoneLine, presetChoices, targetOf } from '../ClimateSection';
 
 const climate = (state: string, attributes: HassEntity['attributes']): HassEntity => ({
 	entity_id: 'climate.test',
@@ -24,6 +24,22 @@ describe('ClimateSection formatters', () => {
 	it('shows Off when the zone is off and -- when no setpoint is known', () => {
 		expect(formatTarget(climate('off', { temperature: 70 }))).toBe('Off');
 		expect(formatTarget(climate('cool', { temperature: null }))).toBe('--');
+	});
+
+	it('gives the stepper whole degrees to roll between', () => {
+		expect(targetOf(climate('heat', { temperature: 69.6 }))).toEqual({ kind: 'single', value: 70 });
+		expect(targetOf(climate('heat_cool', { target_temp_low: 66.5, target_temp_high: 74.2 }))).toEqual({
+			kind: 'range',
+			low: 67,
+			high: 74,
+		});
+		// Auto without both ends falls back to the one setpoint it reports
+		expect(targetOf(climate('heat_cool', { temperature: 71, target_temp_low: 66 }))).toEqual({
+			kind: 'single',
+			value: 71,
+		});
+		expect(targetOf(climate('off', { temperature: 70 }))).toEqual({ kind: 'off' });
+		expect(targetOf(climate('cool', {}))).toEqual({ kind: 'none' });
 	});
 
 	it('summarizes current temperature, humidity and activity', () => {
