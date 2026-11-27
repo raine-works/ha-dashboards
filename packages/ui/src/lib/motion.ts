@@ -1,8 +1,8 @@
 /**
  * How much the dashboards move: `full`, or `reduced`, which draws them as a device asking for less
  * motion does (no rolling numbers, nothing spinning, pulsing or drifting; dialogs open and close
- * without sliding). For hardware that struggles: the number rolls, the main cost of a light changing,
- * restyle their digits every frame of the roll.
+ * without sliding). For hardware that struggles: a number that rolls (a setpoint, a temperature, a
+ * countdown) restyles its digits every frame of the roll, and what spins or pulses repaints all the time.
  *
  * A card's `motion` option wins, then the integration's Animations option (General), else `full`.
  * Whatever they say, a device's own reduce-motion setting always gets less motion. definePanelElement

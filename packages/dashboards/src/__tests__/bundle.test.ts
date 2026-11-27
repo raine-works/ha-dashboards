@@ -55,6 +55,8 @@ describe('the dashboards bundle', () => {
 		expect(text).toContain(':where([data-motion=reduced]) .motion-reduce\\\\:animate-none');
 		expect(text).toContain(':where([data-motion=reduced]) :is(.animate-pulse,.animate-ping)');
 		expect(text).toContain(':where([data-motion=reduced]) .assist-card[data-phase] .assist-orb:after');
+		// A theme's effects and the motion setting sit on the same mount point
+		expect(text).toContain(':where([data-motion=reduced]) :is([data-effects] *)');
 		// :is() can't hold a pseudo-element: a browser drops the whole rule
 		expect(text).not.toMatch(/:is\([^)]*:(?:before|after)\b/);
 	});
