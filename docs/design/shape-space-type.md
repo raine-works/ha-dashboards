@@ -25,7 +25,7 @@ is why it beats clip-path masks.
 
 | Where | Squircles? |
 | :--- | :--- |
-| Chrome, Edge, Android WebView (the wall panels, the Android app) | Yes, from Chromium 139, Aug 2025 ([web.dev](https://web.dev/blog/web-platform-08-2025)), if the WebView is that recent. The ROAMiQ panels' isn't (Nov 2026): rounded corners |
+| Chrome, Edge, Android WebView (the wall panels, the Android app) | Yes, from Chromium 139, Aug 2025 ([web.dev](https://web.dev/blog/web-platform-08-2025)), if the WebView is that recent: the wall panels require it ([wall panels](../wall-panels.md#the-browser-android-system-webview)). Older: rounded corners |
 | Safari, the iOS app (WKWebView) | Not as of Safari 26: rounded corners |
 | Firefox | Not reliably: rounded corners |
 
@@ -40,7 +40,7 @@ is why it beats clip-path masks.
   on an uncapped one.
 - **No clip-path or mask fallback**: it cuts off shadows, borders and focus rings and needs script
   on every resize.
-- **Check the panels' WebView version** before relying on it there.
+- **The wall panels need WebView 139 or later**; check a panel's version before blaming the CSS ([how](../wall-panels.md#the-browser-android-system-webview)).
 - `@supports` and `corner-shape` work inside the Shadow DOM; nothing here needs `@property`.
 - A squircle at the same radius looks slightly larger; trim about 10% only if a shape looks bloated.
 - **Nested shapes:** inner radius = outer radius − padding, never under 6px.
