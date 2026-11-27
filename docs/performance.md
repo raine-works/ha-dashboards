@@ -34,10 +34,13 @@ Medians of three runs each, Home Assistant 2026.10.4, Chromium 158 headless (Pla
   a store and re-render only the parts whose own entities changed ([Real time and
   resilience](../AGENTS.md#real-time-and-resilience)), so those changes cost them less than they cost Home
   Assistant's Home, and a fraction of what they cost a dashboard that shows every entity.
-- **What a light changing costs is mostly the numbers rolling.** A count or a temperature that changes
-  rolls its digits to the new value (NumberFlow, [components](design/components.md#numberflow)), and that
-  restyles its digits every frame for about 0.9 s: about 60 ms of the main thread for each change, spread
-  over the roll. With reduced motion on (the system setting), nothing rolls and a toggle costs 16 ms/s.
+- **What a light changing costs is mostly the numbers rolling.** In these runs a count or a temperature
+  that changed rolled its digits to the new value (NumberFlow, [components](design/components.md#numberflow)),
+  and that restyles its digits every frame for about 0.9 s: about 60 ms of the main thread for each change,
+  spread over the roll. With reduced motion on (the system setting), nothing rolls and a toggle costs
+  16 ms/s. Since then counts (All off (n), the badges) change without rolling, and reduced motion can be
+  set for a device that struggles without its system setting: a card's `motion: reduced`, or the
+  integration's Animations option for the house ([Cards](cards.md)).
 - **Home Assistant's Home draws first** because it draws less: it's a summary of areas whose first
   paint is a heading, where the dashboards' first paint is the whole house, every light and control,
   laid out. The auto-generated dashboard, every entity as a card, is the slowest on every measure.
