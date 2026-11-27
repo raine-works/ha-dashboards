@@ -29,7 +29,7 @@ ha-dashboards/
 │   ├── dashboards/    # @app/dashboards: the cards (src/home, src/wall-panel, src/sections), one bundle
 │   ├── dashboard-build/ # the Bun build: React Compiler, CSS into the ShadowRoot, chunks
 │   ├── ha-client/     # the tools' websocket client (HA_URL / HA_TOKEN) and house snapshot
-│   ├── mcp/           # the setup MCP server run locally (stdio, no SDK): `bun run mcp`; the integration has the same tools
+│   ├── mcp/           # the setup MCP server run locally (stdio, no SDK): `bun run mcp`; the integration has its tools and more
 │   ├── kit/           # @raineworks/ha-dashboards on npm: house.yaml's parser, bedtime routines, the MCP (bundled)
 │   └── demo/          # a made-up house and mock hass: `bun run demo`
 └── scripts/           # house-audit, capability report, brand icons, holiday and modules fixtures, Tailwind lint
