@@ -79,6 +79,10 @@ def due_label(due: str | None) -> str:
 
 
 def first_name(hass: HomeAssistant, person: str | None) -> str:
+    """The first word of a person entity's name.
+
+    "" when there's no person, or no state for that entity id.
+    """
     state = hass.states.get(person) if person else None
     return state.name.split(" ")[0] if state else ""
 
