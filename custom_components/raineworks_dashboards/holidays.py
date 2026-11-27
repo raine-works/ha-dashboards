@@ -36,6 +36,13 @@ def easter_sunday(year: int) -> date:
 
 @dataclass(frozen=True, slots=True)
 class Holiday:
+    """A holiday on the dashboards' calendar.
+
+    `id` names it (as lib/holidays.ts and HOLIDAY_SOUNDS do), `lead_days` is how
+    many days before its first day its lead-up starts, and `days` gives the days it
+    falls on in a given year, in order (the last is its main day).
+    """
+
     id: str
     lead_days: int
     # Its days in a year, in order (the last is the main day)

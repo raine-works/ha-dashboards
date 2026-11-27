@@ -68,6 +68,12 @@ def phone_actions(hass: HomeAssistant, people: list[str]) -> list[str]:
 
 
 def household_of(hass: HomeAssistant) -> list[str]:
+    """The household's person entity ids, from the integration's household group.
+
+    The group is the first loaded config entry's household group option; with no
+    entry, or no group (or one that's gone), the household is every person with a
+    device tracker, as `household()` decides.
+    """
     entries = hass.config_entries.async_loaded_entries(DOMAIN)
     group = entries[0].options.get(CONF_HOUSEHOLD_GROUP) if entries else None
     return household(hass, group)[0]
