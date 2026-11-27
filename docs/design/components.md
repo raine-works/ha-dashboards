@@ -167,7 +167,7 @@ Where it doesn't:
 ### Also kept
 
 `Slider`, `Switch`, `Tabs` / `ToggleGroup` (segmented choices), `Avatar`, `CountBadge` (the one
-badge; its count rolls), `ChipRow`, `SwipeRow`, `StableLabel`, `ConfirmButton`, `EmptyState`, `WheelPicker`,
+badge; its count changes without rolling), `ChipRow`, `SwipeRow`, `StableLabel`, `ConfirmButton`, `EmptyState`, `WheelPicker`,
 `MonthSwiper`: their behavior is sound; they take the new tokens.
 
 ## Retired
