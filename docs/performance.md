@@ -8,12 +8,14 @@ battery, so the time a page spends on updates it doesn't show matters as much as
 ## Results
 
 Medians of three runs each, Home Assistant 2026.10.4, Chromium 158 headless (Playwright 1.63), on a
-4-core 2.3 GHz Xeon with 16 GB. Absolute numbers depend on the machine; compare the rows with each other.
+4-core 2.3 GHz Xeon with 16 GB, with the dashboards at full motion (the default). Absolute numbers depend
+on the machine; compare the rows with each other. The dashboards' unseen sensor updates were measured
+before counts stopped rolling, which those updates never reach.
 
 | Dashboard | Largest paint | JavaScript (transferred) | Heap after load | Idle | Unseen sensor updates | A light toggling | Both together |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Raineworks Home (1440×900) | 368 ms | 1549 KB | 16.1 MB | 2.1 ms/s | 6.8 ms/s | 73.0 ms/s | 77.2 ms/s |
-| Raineworks wall panel (1280×800) | 392 ms | 1549 KB | 16.2 MB | 2.2 ms/s | 6.6 ms/s | 80.7 ms/s | 81.7 ms/s |
+| Raineworks Home (1440×900) | 364 ms | 1550 KB | 16.1 MB | 2.1 ms/s | 6.8 ms/s | 15.5 ms/s | 20.4 ms/s |
+| Raineworks wall panel (1280×800) | 364 ms | 1550 KB | 16.1 MB | 2.4 ms/s | 6.6 ms/s | 17.0 ms/s | 20.1 ms/s |
 | Home Assistant's Home | 40 ms | 1647 KB | 15.6 MB | 0.1 ms/s | 10.9 ms/s | 4.9 ms/s | 11.5 ms/s |
 | Home Assistant auto-generated | 1036 ms | 2011 KB | 25.0 MB | 79.4 ms/s | 105.3 ms/s | 98.9 ms/s | 111.9 ms/s |
 
@@ -34,13 +36,16 @@ Medians of three runs each, Home Assistant 2026.10.4, Chromium 158 headless (Pla
   a store and re-render only the parts whose own entities changed ([Real time and
   resilience](../AGENTS.md#real-time-and-resilience)), so those changes cost them less than they cost Home
   Assistant's Home, and a fraction of what they cost a dashboard that shows every entity.
-- **What a light changing costs is mostly the numbers rolling.** In these runs a count or a temperature
-  that changed rolled its digits to the new value (NumberFlow, [components](design/components.md#numberflow)),
-  and that restyles its digits every frame for about 0.9 s: about 60 ms of the main thread for each change,
-  spread over the roll. With reduced motion on (the system setting), nothing rolls and a toggle costs
-  16 ms/s. Since then counts (All off (n), the badges) change without rolling, and reduced motion can be
-  set for a device that struggles without its system setting: a card's `motion: reduced`, or the
-  integration's Animations option for the house ([Cards](cards.md)).
+- **A light changing costs the dashboards more than Home Assistant's Home**, because more changes on
+  screen: the light's row, its room, its color and the All off count, against Home Assistant's area
+  summary. It used to cost about four times this: a count that changed rolled its digits to the new
+  value (NumberFlow), restyling them every frame of the 0.9 s roll, about 60 ms of the main thread for
+  each change (73 ms/s on the Home card, 81 on the wall panel). Counts now just change; the numbers
+  people adjust or watch (a setpoint, a temperature, a countdown) still roll
+  ([components](design/components.md#numberflow)).
+- **A device that struggles can move less**: the integration's Animations option for the house, or a
+  card's `motion: reduced` for one dashboard ([Cards](cards.md)), draws the dashboards as for a device
+  set to reduce motion: nothing rolls, spins or pulses, and dialogs don't slide.
 - **Home Assistant's Home draws first** because it draws less: it's a summary of areas whose first
   paint is a heading, where the dashboards' first paint is the whole house, every light and control,
   laid out. The auto-generated dashboard, every entity as a card, is the slowest on every measure.
