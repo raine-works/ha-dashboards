@@ -2,6 +2,8 @@
 
 You need Home Assistant 2026.11 or later, whose Home Assistant Marketplace installs it (on 2026.10,
 HACS, the Marketplace before it was built in, does the same).
+An Android wall panel or phone needs Android System WebView 139 or later to draw everything as
+designed ([wall panels](wall-panels.md#the-browser-android-system-webview)).
 
 ## 1. The integration
 

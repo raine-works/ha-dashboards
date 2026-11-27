@@ -3,6 +3,7 @@
 A wall panel is a tablet showing `custom:wall-panel-dashboard`: Lighting, Security and Climate under
 the header, sized for fingers, its own floor's lights first, always dark. Any tablet that runs a
 browser works: a dedicated panel, an old Android tablet in Fully Kiosk Browser, the Companion app.
+On Android, its WebView must be **139 or later** ([below](#the-browser-android-system-webview)).
 
 ## A dashboard per panel
 
@@ -54,3 +55,51 @@ allowed no panels on Home Assistant's loading screen.
 
 The layout is made for 1280×800 (15") and 960×600 (10.5") screens, and anything between; nothing
 scrolls the page, and each column scrolls under its title when it's full.
+
+## The browser: Android System WebView
+
+On an Android panel the dashboard runs in **Android System WebView** (the panel's app, Fully Kiosk
+Browser and the Companion app all use it), so the WebView's version decides how it draws, not the
+app's.
+
+| WebView (Chromium) | What you get |
+| :--- | :--- |
+| **139 or later** (required) | Everything as designed: squircle corners, numbers that roll |
+| 138 and earlier | Works, but corners are plain rounded (small tiles look like pills) and rolling numbers can draw wrong (a temperature's degree sign over its last digit) |
+
+Squircles need CSS `corner-shape`, new in Chromium 139 ([shape, space and
+type](design/shape-space-type.md#squircles)). Tested on WebView 158 (good) and 124 (both problems).
+
+**Check it:** Settings → Apps → ⋮ → **Show system** → **Android System WebView**: the version is at
+the bottom. Or, over USB debugging:
+
+```sh
+adb shell "dumpsys webviewupdate | grep 'Current WebView'"
+```
+
+**Update it:** through the Play Store where the tablet has it. Many wall panels aren't Play Protect
+certified, so the Play Store and Chrome won't run on them, and their WebView never updates by itself.
+On one of those, install a newer one from a computer:
+
+1. Check the panel can take Google's WebView: its package must be `com.google.android.webview`
+   (the AOSP `com.android.webview` can't be replaced this way). Get the Android version and CPU too:
+
+   ```sh
+   adb shell "getprop ro.build.version.release; getprop ro.product.cpu.abi; dumpsys webviewupdate | grep -i package"
+   ```
+
+2. Download the latest **stable** Android System WebView from
+   [APKMirror](https://www.apkmirror.com/apk/google-inc/android-system-webview/): a plain APK (not a
+   bundle) for the panel's CPU (`arm64-v8a` takes the *arm64-v8a + armeabi-v7a* variant) and
+   Android version, never a beta.
+3. Install it and restart the panel:
+
+   ```sh
+   adb install -r -d <the file>.apk
+   adb reboot
+   ```
+
+   If the panel's own app doesn't come back after the restart, start it from its app icon.
+
+Do this for each panel: identical panels can ship with different WebViews.
+
