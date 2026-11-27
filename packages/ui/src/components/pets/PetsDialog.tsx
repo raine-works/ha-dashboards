@@ -128,7 +128,7 @@ const PetTile: React.FC<{ pet: PetView; color: string }> = ({ pet, color }) => (
 		</div>
 		<div className="flex shrink-0 flex-col items-end">
 			<span className="font-semibold text-3xl tabular-nums leading-none">
-				{pet.visitsToday == null ? '—' : <NumberFlow value={pet.visitsToday} />}
+				{pet.visitsToday == null ? '—' : pet.visitsToday}
 			</span>
 			<span className="text-muted-foreground text-xs">{pet.visitsToday === 1 ? 'visit today' : 'visits today'}</span>
 		</div>

@@ -133,21 +133,27 @@ A number that changes in place rolls to its new value like a mechanical counter:
 value, `Intl.NumberFormat` options, a prefix or suffix), `NumberFlowClock` (seconds as "3:05") and
 `Degrees` (a temperature, "—" for none), on NumberFlow's framework-free `<number-flow>` element. Its
 React wrapper isn't used: under preact/compat it hands the element a JSON string where it expects an
-object. The element is labelled with the whole value for screen readers and keeps still under
-reduced motion.
+object. The element is labelled with the whole value for screen readers, and keeps still under
+reduced motion: a device's own setting, or a card set to `motion: reduced` (`lessMotion()`).
+
+A roll restyles its digits every frame of its 0.9s, about 60ms of the main thread per change where
+it was measured, so it's kept for the numbers people adjust or watch, not the ones that change with
+whatever happens in the house ([Performance](../performance.md)).
 
 Where it rolls:
 
 | What | Where |
 | :--- | :--- |
 | Temperatures | The header's, the Weather dialog's and the Daily brief's; a thermostat's setpoint |
-| Counts | `CountBadge`, Music's "playing" count, All off (n), the To-do filters' open counts and "n selected", the keypad's system check (ready/total), a pet's visits today |
 | Levels | A pet's food and water, a person's phone battery, a curtain's position and a fan's speed (in their dialogs) |
 | Power | The Energy dialog's Using now and Always on |
 | Countdowns | The alarm's exit and entry delay, the Timer dialog's clock |
 
 Where it doesn't:
 
+- **Counts**: `CountBadge`, Music's "playing" count, All off (n), the To-do filters' open counts and
+  "n selected", the keypad's system check (ready/total), a pet's visits today. They change with what
+  happens in the house, a light or a door, often several at once: they just change.
 - **A readout that follows a finger**: a slider's percentage (volume, a theme's corners), and a
   curtain's or fan's while it's dragged (`animated={false}`); a curtain's while it moves, too, a new
   estimate every 100ms.

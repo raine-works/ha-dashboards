@@ -14,6 +14,7 @@ in YAML wins over these key by key.
 | Alarm panel | `alarm_panel` | The wall panels' status lights pulse red when it's triggered, amber during its delays, and show green while armed. Leave empty to use Alarmo's panel, else the first one. |
 | Bedtime | `bedtime_entity` | While it's on, the status lights show at 10% (a triggered alarm stays bright); else this integration's Home Bedtime, when it has bedtime rooms. Doors labeled Exterior Door show amber while open. |
 | Theme | `theme` | The house's theme: the dashboards' and Home Assistant's whole UI (and the Companion apps' bars) for anyone who hasn't picked their own. Each person picks theirs in the dashboards' Appearance menu. |
+| Animations | `motion` | Full: numbers roll to their new value, fans spin, and dialogs slide. Reduced: the dashboards draw as for a device set to reduce motion, for tablets or phones that struggle. A dashboard card's `motion` option wins for that dashboard, and a device set to reduce motion always gets less. |
 
 ## House
 

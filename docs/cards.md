@@ -40,6 +40,7 @@ For desktops, laptops and phones (the Companion app included).
 | :--- | :--- | :--- |
 | `color_scheme` | `auto` (default), `light`, `dark` | `auto` follows Home Assistant's theme mode; the card's Appearance dialog sets that |
 | `theme` | a theme id | This dashboard in that theme whatever's picked ([Themes](themes.md)) |
+| `motion` | `full`, `reduced` | `reduced` for a device that struggles: numbers change without rolling, nothing spins or pulses, dialogs don't slide. Else the integration's Animations option (General), `full` by default; a device set to reduce motion always gets less |
 | `house` | see below | House settings, over the integration's |
 
 ## `custom:wall-panel-dashboard`
@@ -55,6 +56,7 @@ For a tablet on the wall. See [Wall panels](wall-panels.md).
 | `timer` | `true` | A countdown timer in the header, announced on the house's speaker when it ends |
 | `color_scheme` | `dark` (default), `light`, `auto` | |
 | `theme` | a theme id | This panel in that theme ([Themes](themes.md)) |
+| `motion` | `full`, `reduced` | `reduced` for a tablet that struggles, as for the Home card |
 | `house` | see below | |
 
 ## Section cards: your own layout
@@ -72,7 +74,7 @@ parts, each part is also a card, for Home Assistant's **sections** view (or any 
 | `custom:raineworks-music` | Music Assistant: now playing, browse and search, the queue and speaker groups | |
 | `custom:raineworks-cameras` | Every camera's snapshot, each opening its live view and clips | |
 
-Every one also takes `color_scheme`, `theme` and `house`, as the whole dashboards do.
+Every one also takes `color_scheme`, `theme`, `motion` and `house`, as the whole dashboards do.
 
 ```yaml
 type: sections

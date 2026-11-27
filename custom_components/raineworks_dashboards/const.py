@@ -11,6 +11,11 @@ CONF_SERVE_BUNDLE = "serve_bundle"
 CONF_HOUSEHOLD_GROUP = "household_group"
 # The house settings (the dashboards' `house` option, as house.yaml writes it)
 CONF_HOUSE = "house"
+# How much the dashboards move (General: Animations): "full", or "reduced", as for a
+# device asking for less motion, for hardware that struggles; a card's `motion` wins
+CONF_MOTION = "motion"
+MOTION_FULL = "full"
+MOTION_REDUCED = "reduced"
 
 # Warden (raine-works/ha-warden), when installed: its groups pick the household.
 WARDEN_DOMAIN = "warden"

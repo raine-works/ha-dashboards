@@ -28,7 +28,6 @@ import {
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
-	NumberFlow,
 	Progress,
 } from '../ui';
 import { ArtBackdrop, Artwork, PlayingBars, playerArtIcon } from './Artwork';
@@ -152,7 +151,7 @@ export const MusicButton: React.FC<{ size?: ButtonProps['size']; onOpen?: () => 
 						<CoverWithBars player={active} playing={playing} className="size-full" />
 						{actives.length > 1 && (
 							<span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 font-semibold text-[10px] text-primary-foreground tabular-nums ring-2 ring-background">
-								<NumberFlow value={actives.length} />
+								{actives.length}
 							</span>
 						)}
 					</span>
@@ -186,7 +185,7 @@ export const MusicButton: React.FC<{ size?: ButtonProps['size']; onOpen?: () => 
 						    clips) so the button never grows */}
 						{actives.length > 1 && (
 							<span className="absolute top-0.5 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 font-semibold text-[10px] text-primary-foreground tabular-nums ring-2 ring-background">
-								<NumberFlow value={actives.length} />
+								{actives.length}
 							</span>
 						)}
 					</span>

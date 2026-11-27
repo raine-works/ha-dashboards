@@ -16,6 +16,18 @@
 @custom-variant short (@media (max-height: 480px));
 /* A wall panel (a touch tablet, `data-touch` on the mount point): controls a size up for fingers */
 @custom-variant touch (&:is([data-touch] *));
+/* Less motion: the device asks for it, or the card is set to `motion: reduced` (`data-motion` on the mount
+   point, lib/motion.ts), for hardware that struggles. Every reduced-motion rule below goes through it,
+   but a pseudo-element's: Tailwind wraps the selector in :is(), which can't hold one (the browser drops
+   the whole rule), so those are written out by hand, the media query and the attribute both. */
+@custom-variant motion-reduce {
+	@media (prefers-reduced-motion: reduce) {
+		@slot;
+	}
+	:where([data-motion="reduced"]) & {
+		@slot;
+	}
+}
 /* A section card (definePanelElement's `card`) sits in a column of Home Assistant's sections view, a
    phone's width on a desktop: inside its content (`[data-card]`, the `card` container) the breakpoints
    follow the card's own width, not the screen's. Everywhere else, and in dialogs (which portal outside
@@ -277,15 +289,17 @@
 				scale(0.4) rotate(120deg);
 		}
 	}
-	@media (prefers-reduced-motion: reduce) {
-		.holiday-bob,
-		.holiday-wiggle,
-		.holiday-beat,
-		.holiday-twinkle,
-		.holiday-hop {
+	.holiday-bob,
+	.holiday-wiggle,
+	.holiday-beat,
+	.holiday-twinkle,
+	.holiday-hop {
+		@variant motion-reduce {
 			animation: none;
 		}
-		.holiday-burst {
+	}
+	.holiday-burst {
+		@variant motion-reduce {
 			display: none;
 		}
 	}
@@ -621,9 +635,9 @@ ha-camera-stream {
 /* Continuous pulses and pings (detections, recording, a running washer) stand still for anyone whose
    device asks for less motion. Outside any layer: the utilities layer comes after base, so a rule
    there never won over the utilities' own animation. */
-@media (prefers-reduced-motion: reduce) {
-	.animate-pulse,
-	.animate-ping {
+.animate-pulse,
+.animate-ping {
+	@variant motion-reduce {
 		animation: none;
 	}
 }
@@ -1025,22 +1039,35 @@ ha-camera-stream {
 
 /* Less motion: nothing turns, pops, ripples or slides (the meter still shows the voice). Outside any
    layer and after the rules above, matching their specificity. */
-@media (prefers-reduced-motion: reduce) {
-	.assist-glow[data-phase],
-	.assist-glow[data-phase]::before,
-	.assist-card[data-phase],
-	.assist-card[data-phase]::before,
-	.assist-card[data-phase] .assist-orb::before,
-	.assist-card[data-phase] .assist-orb::after,
-	.assist-meter,
-	.assist-rise,
-	.assist-pop,
-	.assist-twinkle {
+.assist-glow[data-phase],
+.assist-card[data-phase],
+.assist-meter,
+.assist-rise,
+.assist-pop,
+.assist-twinkle {
+	@variant motion-reduce {
 		animation: none;
 	}
-	.assist-glow[data-phase],
-	.assist-card[data-phase] .assist-orb,
-	.assist-button:active {
+}
+/* The pseudo-elements by hand: nested, Tailwind wraps the selector in :is(), which can't hold one */
+@media (prefers-reduced-motion: reduce) {
+	.assist-glow[data-phase]::before,
+	.assist-card[data-phase]::before,
+	.assist-card[data-phase] .assist-orb::before,
+	.assist-card[data-phase] .assist-orb::after {
+		animation: none;
+	}
+}
+:where([data-motion="reduced"]) .assist-glow[data-phase]::before,
+:where([data-motion="reduced"]) .assist-card[data-phase]::before,
+:where([data-motion="reduced"]) .assist-card[data-phase] .assist-orb::before,
+:where([data-motion="reduced"]) .assist-card[data-phase] .assist-orb::after {
+	animation: none;
+}
+.assist-glow[data-phase],
+.assist-card[data-phase] .assist-orb,
+.assist-button:active {
+	@variant motion-reduce {
 		transform: none;
 	}
 }
@@ -1173,8 +1200,8 @@ ha-camera-stream {
 	[data-effects] ::selection {
 		background-color: color-mix(in oklab, var(--gradient-to) 28%, transparent);
 	}
-	@media (prefers-reduced-motion: reduce) {
-		[data-effects] * {
+	[data-effects] * {
+		@variant motion-reduce {
 			transition-duration: 0s !important;
 		}
 	}

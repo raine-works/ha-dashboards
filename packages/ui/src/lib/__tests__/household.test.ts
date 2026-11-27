@@ -8,6 +8,7 @@ import {
 	setHousehold,
 	todoAssigneeAction,
 } from '../household';
+import { resolveMotion, setIntegrationMotion } from '../motion';
 import { discoverPeople, householdPerson } from '../people';
 
 const person = (id: string, userId: string, trackers: string[]) =>
@@ -25,7 +26,10 @@ const states = {
 	'person.admin': person('admin', 'u-admin', []),
 };
 
-afterEach(() => setHousehold(null));
+afterEach(() => {
+	setHousehold(null);
+	setIntegrationMotion(null);
+});
 
 describe('the household', () => {
 	it('is everyone with a device tracker until the integration says otherwise', () => {
@@ -54,6 +58,13 @@ describe('the household', () => {
 		expect(discoverPeople(states).map((p) => p.entityId)).toEqual(['person.sam']);
 		// The same answer again changes nothing
 		expect(await loadHousehold({ callWS, config: { components: ['raineworks_dashboards'] } })).toBe(false);
+	});
+
+	it("takes the integration's Animations option with it", async () => {
+		const callWS = async <T>() => ({ household: [], motion: 'reduced' }) as T;
+		await loadHousehold({ callWS, config: { components: ['raineworks_dashboards'] } });
+		expect(resolveMotion(undefined)).toBe('reduced');
+		expect(resolveMotion('full')).toBe('full');
 	});
 
 	it('stays as it was when the integration can’t answer', async () => {
