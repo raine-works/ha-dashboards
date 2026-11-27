@@ -12,10 +12,10 @@ Medians of three runs each, Home Assistant 2026.10.4, Chromium 158 headless (Pla
 
 | Dashboard | Largest paint | JavaScript (transferred) | Heap after load | Idle | Unseen sensor updates | A light toggling | Both together |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Raineworks Home (1440×900) | 368 ms | 1549 KB | 16.1 MB | 2.1 ms/s | 6.8 ms/s | LIGHT_HOME | 77.2 ms/s |
-| Raineworks wall panel (1280×800) | 392 ms | 1549 KB | 16.2 MB | 2.2 ms/s | 6.6 ms/s | LIGHT_WALL | 81.7 ms/s |
-| Home Assistant's Home | 40 ms | 1647 KB | 15.6 MB | 0.1 ms/s | 10.9 ms/s | LIGHT_HAHOME | 11.5 ms/s |
-| Home Assistant auto-generated | 1036 ms | 2011 KB | 25.0 MB | 79.4 ms/s | 105.3 ms/s | LIGHT_HAAUTO | 111.9 ms/s |
+| Raineworks Home (1440×900) | 368 ms | 1549 KB | 16.1 MB | 2.1 ms/s | 6.8 ms/s | 73.0 ms/s | 77.2 ms/s |
+| Raineworks wall panel (1280×800) | 392 ms | 1549 KB | 16.2 MB | 2.2 ms/s | 6.6 ms/s | 80.7 ms/s | 81.7 ms/s |
+| Home Assistant's Home | 40 ms | 1647 KB | 15.6 MB | 0.1 ms/s | 10.9 ms/s | 4.9 ms/s | 11.5 ms/s |
+| Home Assistant auto-generated | 1036 ms | 2011 KB | 25.0 MB | 79.4 ms/s | 105.3 ms/s | 98.9 ms/s | 111.9 ms/s |
 
 - **Largest paint:** when the page's largest element was drawn, on a cold load (nothing cached).
 - **JavaScript:** every script the page loaded, Home Assistant's frontend included, as sent over the
@@ -57,7 +57,7 @@ shows. Each dashboard, in a new browser context with service workers off:
 3. A garbage collection and the heap, then 20 seconds with nothing changing.
 4. 30 seconds of changes at 6 a second through Home Assistant's REST API, in three runs of their own:
    - **unseen sensors**: the five power sensors take new readings,
-   - **a light toggling**: the kitchen light, which every dashboard shows, once a second,
+   - **a light toggling**: the kitchen light, which the dashboards show, once a second,
    - **both together**: five sensor readings and one toggle each second, the mix a busy house sends.
 
 Main-thread time comes from Chrome's own counters (`Performance.getMetrics` over the DevTools protocol:
