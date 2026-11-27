@@ -48,6 +48,17 @@ describe('the dashboards bundle', () => {
 		expect(text).toMatch(/\.max-lg\\\\:[\w-]+:not\(:where\(\[data-card\] \*\)\)/);
 	});
 
+	it('moves less in a card set to `motion: reduced`, as on a device that asks for less', async () => {
+		const text = await Bun.file(bundlePath).text();
+		// The motion-reduce: variant, and theme.css's own rules, under the media query and the attribute both
+		expect(text).toContain('@media (prefers-reduced-motion:reduce){.motion-reduce\\\\:animate-none');
+		expect(text).toContain(':where([data-motion=reduced]) .motion-reduce\\\\:animate-none');
+		expect(text).toContain(':where([data-motion=reduced]) :is(.animate-pulse,.animate-ping)');
+		expect(text).toContain(':where([data-motion=reduced]) .assist-card[data-phase] .assist-orb:after');
+		// :is() can't hold a pseudo-element: a browser drops the whole rule
+		expect(text).not.toMatch(/:is\([^)]*:(?:before|after)\b/);
+	});
+
 	// What every page loads: the bundle and the chunks it imports statically (code it shares with a
 	// chunk loaded on demand); `import()` chunks load only when used
 	const staticChunks = async () => {

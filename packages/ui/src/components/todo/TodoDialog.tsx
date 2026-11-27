@@ -53,7 +53,6 @@ import {
 	DialogTitle,
 	EmptyState,
 	Input,
-	NumberFlow,
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
@@ -1020,9 +1019,7 @@ const TodoListView: React.FC<{
 	);
 	const selecting = picked.length > 0 && (
 		<>
-			<span className="font-medium text-sm tabular-nums">
-				<NumberFlow value={picked.length} /> selected
-			</span>
+			<span className="font-medium text-sm tabular-nums">{picked.length} selected</span>
 			<Button variant="ghost" size="sm" onClick={() => setSelected([])} className="ml-auto">
 				<X />
 				Cancel
@@ -1103,9 +1100,7 @@ const TodoListView: React.FC<{
 						<div className="ml-auto flex items-center gap-2">
 							{picked.length > 0 ? (
 								<>
-									<span className="font-medium text-sm tabular-nums">
-										<NumberFlow value={picked.length} /> selected
-									</span>
+									<span className="font-medium text-sm tabular-nums">{picked.length} selected</span>
 									{bulk('lg')}
 								</>
 							) : (
@@ -1165,9 +1160,7 @@ const TodoListView: React.FC<{
 							>
 								{person && <PersonAvatar person={person} className="size-5" />}
 								{label}
-								<span className="tabular-nums opacity-70">
-									<NumberFlow value={openCount(key)} />
-								</span>
+								<span className="tabular-nums opacity-70">{openCount(key)}</span>
 							</Button>
 						))}
 					</ChipRow>

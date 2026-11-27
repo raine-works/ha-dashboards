@@ -9,6 +9,7 @@
  */
 import type { HassEntity, HomeAssistant } from '../types/homeassistant';
 import { setIntegrationHouse } from './house-config';
+import { setIntegrationMotion } from './motion';
 
 let members: ReadonlySet<string> | null = null;
 
@@ -36,11 +37,12 @@ interface IntegrationInfo {
 	version?: string;
 	household?: unknown;
 	house?: unknown;
+	motion?: unknown;
 }
 
 /**
  * Ask the integration who the household is (when it's loaded) and set it, with its house settings
- * (`setIntegrationHouse()`); resolves true when that changed the household. Without the
+ * (`setIntegrationHouse()`) and its Animations option (`setIntegrationMotion()`); resolves true when that changed the household. Without the
  * integration, or when it can't answer, nothing changes.
  */
 export async function loadHousehold(hass: Pick<HomeAssistant, 'callWS' | 'config'>): Promise<boolean> {
@@ -51,6 +53,7 @@ export async function loadHousehold(hass: Pick<HomeAssistant, 'callWS' | 'config
 			? info.household.filter((id): id is string => typeof id === 'string')
 			: null;
 		setIntegrationHouse(info?.house);
+		setIntegrationMotion(info?.motion);
 		const before = members;
 		setHousehold(ids);
 		return before?.size !== members?.size || [...(members ?? [])].some((id) => !before?.has(id));

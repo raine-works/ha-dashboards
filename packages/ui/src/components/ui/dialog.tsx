@@ -10,6 +10,7 @@
 
 import { XIcon } from 'lucide-react';
 import React, { createPortal, useEffect, useId, useLayoutEffect, useRef, useSyncExternalStore } from 'preact/compat';
+import { lessMotion } from '../../lib/motion';
 import {
 	SHEET_EASE,
 	SHEET_IDLE,
@@ -363,7 +364,6 @@ function useSheetDrag(
 		const sheet = ref.current;
 		if (!sheet || !enabled) return;
 		const phone = window.matchMedia(PHONE);
-		const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 		// The dialog's overlay, rendered just before it
 		const before = sheet.previousElementSibling;
 		const overlay = before instanceof HTMLElement && before.dataset.slot === 'dialog-overlay' ? before : null;
@@ -374,7 +374,7 @@ function useSheetDrag(
 
 		const paint = () => {
 			const { phase, dy, height } = state;
-			const ms = reducedMotion.matches ? 0 : SHEET_SETTLE_MS;
+			const ms = lessMotion(sheet) ? 0 : SHEET_SETTLE_MS;
 			const transition =
 				phase === 'dragging'
 					? 'none'
@@ -451,7 +451,7 @@ function useSheetDrag(
 		// Closed another way (a tap outside, the X, Escape, Back): slide away as a drag let go would.
 		// Off a phone the dialog isn't a sheet, and with reduced motion there's no slide: it closes at once
 		const slideAway = () => {
-			if (!phone.matches || reducedMotion.matches) return false;
+			if (!phone.matches || lessMotion(sheet)) return false;
 			if (state.phase !== 'closing') {
 				dispatch({ type: 'close' });
 				settle();

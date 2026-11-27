@@ -9,6 +9,7 @@
 | [Wall panels](wall-panels.md) | Tablets on the wall: their hardware, the status light, a shared user |
 | [Setting up with an assistant](assistant.md) | The integration's setup tools, through Home Assistant's MCP server: let Claude or another assistant check and set up your Home Assistant |
 | [Design system](design/README.md) | How the dashboards look and behave: principles, color, shape, space and type, components, and the overhaul plan |
+| [Performance](performance.md) | How the dashboards compare with Home Assistant's own: loading, memory, and the browser's time while the house changes |
 | [Development](development.md) | Running the demo, building, testing and releasing |
 
 | Reference (written from the code) | |

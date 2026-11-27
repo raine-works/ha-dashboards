@@ -32,7 +32,6 @@ import {
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
-	NumberFlow,
 } from '../ui';
 
 interface KeypadModalProps {
@@ -95,7 +94,7 @@ const SystemCheck: React.FC<{ parts: SystemPart[] }> = ({ parts }) => {
 							<Icon />
 							{label}
 							<span className="tabular-nums">
-								<NumberFlow value={ready} />/{total}
+								{ready}/{total}
 							</span>
 						</Badge>
 					);

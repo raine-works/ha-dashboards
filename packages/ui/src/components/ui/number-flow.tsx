@@ -15,6 +15,7 @@
 import NumberFlowElement, { type Digits, type Trend } from 'number-flow';
 import type React from 'preact/compat';
 import { useLayoutEffect, useRef } from 'preact/compat';
+import { lessMotion } from '../../lib/motion';
 import { type ClockParts, clockParts, formatClock } from '../../lib/time';
 import { cn } from '../../lib/utils';
 
@@ -48,7 +49,7 @@ export interface NumberFlowProps {
 	trend?: Trend;
 	/** The highest each place goes, by place (`{ 1: { max: 5 } }`: a clock's tens of seconds). */
 	digits?: Digits;
-	/** Roll (the default) or just change. Reduced motion is respected either way. */
+	/** Roll (the default) or just change. Less motion (the device's, or a card's `motion: reduced`) never rolls. */
 	animated?: boolean;
 	/** Layout and type; it's inline, in the surrounding font. */
 	className?: string;
@@ -83,7 +84,8 @@ export const NumberFlow: React.FC<NumberFlowProps> = ({
 		el.numberPrefix = prefix;
 		el.numberSuffix = suffix;
 		el.trend = trend ?? ELEMENT.defaultProps.trend;
-		el.animated = animated;
+		// A card set to less motion (lib/motion.ts) doesn't roll; the element itself follows the device's setting
+		el.animated = animated && !lessMotion(el);
 		el.update(value);
 	}, [value, formatKey, digitsKey, prefix, suffix, trend, animated]);
 

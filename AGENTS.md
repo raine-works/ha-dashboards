@@ -126,9 +126,13 @@ module, with its detection tested.
   its own width or height. On phones `sheet` and `detail` drag down to close (Vaul's gesture,
   hand-written: `lib/sheet-drag.ts`), and slide away the same way when closed otherwise (a tap
   outside, the X, Back); mark what takes a vertical drag itself `data-sheet-no-drag`.
-- A number that changes in place (a setpoint, a temperature, a count) is a `NumberFlow`, never one
-  that changes every second at a panel's edge or as a slider moves
+- A number people adjust or watch change in place (a setpoint, a temperature, a level, a countdown)
+  is a `NumberFlow`; never a count (All off (n), a badge: they change with the house, and each roll
+  restyles every frame), one that changes every second at a panel's edge, or one a slider moves
   ([components.md](docs/design/components.md#numberflow)).
+- Motion goes through the `motion-reduce:` variant (or `lessMotion()` in code), never
+  `prefers-reduced-motion` alone: it also follows a card set to `motion: reduced`
+  ([docs/performance.md](docs/performance.md)).
 - The design's building blocks (docs/design/components.md): `Section` and `SectionGroup`
   (`@app/ui/layout`), `Tile` / `TileGrid`, `StatusTile`, `DeviceRow` and `IconTile`
   (`@app/ui/components`), on the radius, type and density tokens (`rounded-tile`, `text-title`,

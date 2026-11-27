@@ -12,7 +12,7 @@ import { useStableCallbacks } from '../../hooks/useStableCallbacks';
 import { deepEqual } from '../../lib/hass-store';
 import { lightFill, showsLightControls } from '../../lib/lights';
 import { cn } from '../../lib/utils';
-import { Button, Card, NumberFlow, Slider, Switch } from '../ui';
+import { Button, Card, Slider, Switch } from '../ui';
 import { ColorRing } from './ColorRing';
 import type { FixtureState, LightControls, LightFixture } from './useLightControls';
 
@@ -329,15 +329,7 @@ export const AllOffButton: React.FC<{ controls: LightControls; className?: strin
 		>
 			{controls.allOffPending ? <Loader2 className="animate-spin" /> : <Power />}
 			{/* At the end of its header, with room to grow into: a new count moves nothing else */}
-			<span className="tabular-nums">
-				{count > 0 ? (
-					<>
-						All off (<NumberFlow value={count} />)
-					</>
-				) : (
-					'All off'
-				)}
-			</span>
+			<span className="tabular-nums">{count > 0 ? <>All off ({count})</> : 'All off'}</span>
 		</Button>
 	);
 };

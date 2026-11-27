@@ -92,7 +92,7 @@ How:
 - **Low vision:** text at 4.5:1, controls and focus rings at 3:1 (WCAG 1.4.3, 1.4.11); body at
   least 16px on a wall panel and 14px on a phone.
 - **Color blindness:** never color alone (WCAG 1.4.1); see [Color](color.md#color-blindness).
-- **Motion:** honor `prefers-reduced-motion`; ambient animation only for alerts and what's
+- **Motion:** honor `prefers-reduced-motion`, and a dashboard set to reduced motion; ambient animation only for alerts and what's
   playing. Constant motion in the corner of the eye is the busiest thing a wall panel can do.
 - **Night:** dark, dimmed during bedtime, no flashing, quiet. A panel that lights up a dark hallway
   is a bug ([Color: night](color.md#night)).

@@ -5,14 +5,15 @@
  */
 
 import type React from 'preact/compat';
-import { NumberFlow } from './number-flow';
 
 /**
  * Panel extension: a count on the corner of a header button (notifications, open to-dos, TVs that
- * are on). The button it sits in is `relative`. A number rolls to its new value (`NumberFlow`).
+ * are on). The button it sits in is `relative`. A count changes without rolling: counts change
+ * with what's on in the house, often, and a roll restyles its digits every frame (NumberFlow is for
+ * the numbers people adjust or watch: setpoints, readings, countdowns).
  */
 export const CountBadge: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 	<span className="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 font-semibold text-[11px] text-primary-foreground tabular-nums">
-		{typeof children === 'number' ? <NumberFlow value={children} /> : children}
+		{children}
 	</span>
 );

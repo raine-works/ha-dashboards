@@ -38,12 +38,15 @@ from .const import (
     CONF_DEVICE,
     CONF_HOUSE,
     CONF_HOUSEHOLD_GROUP,
+    CONF_MOTION,
     CONF_RELOAD,
     CONF_SERVE_BUNDLE,
     CONF_STATUS_LIGHT,
     CONF_WAKE,
     DEFAULT_BEDTIME_ENDS,
     DOMAIN,
+    MOTION_FULL,
+    MOTION_REDUCED,
     SUBENTRY_WALL_PANEL,
 )
 from .household import warden_groups
@@ -102,7 +105,7 @@ class DashboardsOptionsFlow(OptionsFlow):
     async def async_step_general(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Serving the bundle, the household, what the status lights follow."""
+        """The bundle, the theme, animations, the household, the status lights."""
         options = self.config_entry.options
         if user_input is not None:
             group = user_input.get(CONF_HOUSEHOLD_GROUP, TRACKERS)
@@ -110,6 +113,7 @@ class DashboardsOptionsFlow(OptionsFlow):
                 {
                     CONF_SERVE_BUNDLE: user_input[CONF_SERVE_BUNDLE],
                     CONF_THEME: user_input.get(CONF_THEME, DEFAULT_THEME),
+                    CONF_MOTION: user_input.get(CONF_MOTION, MOTION_FULL),
                     CONF_HOUSEHOLD_GROUP: None if group == TRACKERS else group,
                     CONF_ALARM_PANEL: user_input.get(CONF_ALARM_PANEL),
                     CONF_BEDTIME_ENTITY: user_input.get(CONF_BEDTIME_ENTITY),
@@ -141,6 +145,19 @@ class DashboardsOptionsFlow(OptionsFlow):
             ] = SelectSelector(
                 SelectSelectorConfig(options=choices, mode=SelectSelectorMode.DROPDOWN)
             )
+        # How much the dashboards move: less for hardware that struggles (a card's own
+        # `motion` option wins, and a device asking for less motion always gets it)
+        schema[
+            vol.Required(CONF_MOTION, default=options.get(CONF_MOTION, MOTION_FULL))
+        ] = SelectSelector(
+            SelectSelectorConfig(
+                options=[
+                    SelectOptionDict(value=MOTION_FULL, label="Full"),
+                    SelectOptionDict(value=MOTION_REDUCED, label="Reduced"),
+                ],
+                mode=SelectSelectorMode.LIST,
+            )
+        )
         groups = warden_groups(self.hass)
         if groups is not None:
             choices = [SelectOptionDict(value=TRACKERS, label="Everyone with a phone")]

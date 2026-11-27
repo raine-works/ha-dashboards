@@ -12,7 +12,7 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.loader import async_get_integration
 import voluptuous as vol
 
-from .const import CONF_HOUSE, CONF_HOUSEHOLD_GROUP, DOMAIN
+from .const import CONF_HOUSE, CONF_HOUSEHOLD_GROUP, CONF_MOTION, DOMAIN, MOTION_FULL
 from .household import household
 
 
@@ -51,6 +51,8 @@ async def ws_info(
             "house": _without_empty(options.get(CONF_HOUSE) or {}),
             # The house theme's id (Home Assistant's default; a person's own pick wins)
             "theme": options.get("theme", "raineworks"),
+            # How much the dashboards move (a card's own `motion` option wins)
+            "motion": options.get(CONF_MOTION, MOTION_FULL),
         },
     )
 

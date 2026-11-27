@@ -2,11 +2,13 @@
 
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResultType
+from homeassistant.data_entry_flow import FlowResultType, InvalidData
+import pytest
 
 from custom_components.raineworks_dashboards.const import (
     CONF_HOUSE,
     CONF_HOUSEHOLD_GROUP,
+    CONF_MOTION,
     CONF_SERVE_BUNDLE,
     DOMAIN,
 )
@@ -46,6 +48,35 @@ async def test_general_without_warden(hass: HomeAssistant, setup) -> None:
     await hass.async_block_till_done()
     assert entry.options[CONF_SERVE_BUNDLE] is False
     assert entry.options[CONF_HOUSEHOLD_GROUP] is None
+    # Full motion unless asked for less
+    assert entry.options[CONF_MOTION] == "full"
+
+
+async def test_general_reduces_motion_for_the_dashboards(
+    hass: HomeAssistant, hass_ws_client, setup
+) -> None:
+    entry = await setup()
+    client = await hass_ws_client(hass)
+    await client.send_json_auto_id({"type": "raineworks_dashboards/info"})
+    assert (await client.receive_json())["result"]["motion"] == "full"
+
+    result = await _open(hass, entry, "general")
+    await hass.config_entries.options.async_configure(
+        result["flow_id"], {CONF_SERVE_BUNDLE: True, CONF_MOTION: "reduced"}
+    )
+    await hass.async_block_till_done()
+    assert entry.options[CONF_MOTION] == "reduced"
+    await client.send_json_auto_id({"type": "raineworks_dashboards/info"})
+    assert (await client.receive_json())["result"]["motion"] == "reduced"
+
+
+async def test_general_refuses_an_unknown_motion(hass: HomeAssistant, setup) -> None:
+    entry = await setup()
+    result = await _open(hass, entry, "general")
+    with pytest.raises(InvalidData):
+        await hass.config_entries.options.async_configure(
+            result["flow_id"], {CONF_SERVE_BUNDLE: True, CONF_MOTION: "lots"}
+        )
 
 
 async def test_general_picks_a_warden_group(hass: HomeAssistant, warden, setup) -> None:

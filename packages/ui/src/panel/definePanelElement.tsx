@@ -26,6 +26,7 @@ import { homeBedtimeEntity } from '../lib/bedtime';
 import { createHassStore } from '../lib/hass-store';
 import { setHouseConfig } from '../lib/house-config';
 import { loadHousehold } from '../lib/household';
+import { resolveMotion } from '../lib/motion';
 import { installTapHaptics } from '../lib/tones';
 import { activeTheme, loadThemeCatalog, subscribeThemeCatalog } from '../themes/catalog';
 import { themeCss, themeEffects } from '../themes/css';
@@ -341,6 +342,9 @@ export function definePanelElement({
 			if (this._mountPoint.className !== scheme) this._mountPoint.className = scheme;
 			this._applyTheme(activeTheme(this._store.get(), this.config.theme));
 			this._applyNight();
+			// Less motion for hardware that struggles (lib/motion.ts): the card's `motion`, else the integration's
+			if (resolveMotion(this.config.motion) === 'reduced') this._mountPoint.dataset.motion = 'reduced';
+			else delete this._mountPoint.dataset.motion;
 			if (scheme === this._renderedScheme) return;
 			this._renderedScheme = scheme;
 			// What the page needs once (the banner, the update toast, the Assist glow, the TV-audio confirm;
@@ -421,6 +425,8 @@ export function definePanelElement({
 			loadHousehold(hass).then((changed) => {
 				const latest = this._store.get();
 				if (changed && latest) this._store.set({ ...latest, config: { ...latest.config } });
+				// The integration's Animations option may have come with it
+				this._render();
 			});
 		}
 
